@@ -16,6 +16,15 @@ const AssignedObject = () => {
         marginTop: "30px",
         borderRadius: "17px"
     }
+
+    // const navLinks = {
+    //     d
+    // }
+
+    const year = new Date
+    const thisYear = year.getFullYear()
+    console.log(thisYear);
+
     return (
         <div style={{ backgroundColor: "#f8f9fa" }}>
             <div className='container'>
@@ -194,7 +203,7 @@ const AssignedObject = () => {
             </div>
 
 
-            <div style={recentPerformance} className='container'>
+            <div style={recentPerformance} className='container my-5'>
 
                 <div className='d-flex justify-content-between align-items-center mb-4'>
                     <div>
@@ -206,7 +215,7 @@ const AssignedObject = () => {
                     </div>
                 </div>
 
-                <div className='row g-3'>
+                <div className='row g-3 my-3'>
                     <div className='col-lg-6 col-12'>
                         <div className='bg-white p-4 rounded-3'>
                             <h2 className='fw-bold fs-1' style={{ color: "#221888" }}>88%</h2>
@@ -228,6 +237,20 @@ const AssignedObject = () => {
                     </div>
                 </div>
             </div>
+
+            <footer className='container py-3'>
+                <div className='d-flex justify-content-between'>
+                    © {thisYear} Academic Curator CBT. Advanced Examination Systems.
+
+                    <div className=''>
+                        <ul className='d-flex gap-3'>
+                            <li style={{listStyle:"none"}}><a href="#" style={{textDecoration: "none", color:"black", fontWeight:"medium"}}>Honor Code</a></li>
+                            <li style={{listStyle:"none"}}><a href="#" style={{textDecoration: "none", color:"black", fontWeight:"medium"}}>Support</a></li>
+                            <li style={{listStyle:"none"}}><a href="#" style={{textDecoration: "none", color:"black", fontWeight:"medium"}}>Privacy</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </footer>
         </div>
     )
 }
