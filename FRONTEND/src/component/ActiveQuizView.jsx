@@ -42,17 +42,19 @@ const ActiveQuizView = () => {
             </div>
 
             <div style={{ backgroundColor: "#f8f9fa" }} className='pb-5' >
-                <div className='container col-lg-7 py-5 d-flex justify-content-between'>
+                <div className='container col-lg-7 py-4 py-lg-5 d-flex justify-content-between'>
                     <div style={{ backgroundColor: "#edeeef", color: "black" }} className='px-4 fw-medium py-2 rounded-3'>
                         Question 14 of 20
                     </div>
 
-                    <div style={{ color: "#392bd1" }}>
-                        Mark for Reviews
+                    <div>
+                        <button className='btn' style={{ color: "#392bd1" }}> Mark for Reviews</button>
                     </div>
                 </div>
 
-                <div className='container col-lg-7 bg-white p-4 rounded-4'>
+                <button className='container border border-0 bg-light px-3 my-2 text-secondary text-start fw-bold d-block d-lg-none d-md-none'>Review All <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#6b6868" d="M22 12.999V20a1 1 0 0 1-1 1h-8v-8.001zm-11 0V21H3a1 1 0 0 1-1-1v-7.001zM11 3v7.999H2V4a1 1 0 0 1 1-1zm10 0a1 1 0 0 1 1 1v6.999h-9V3z"/></svg></button> 
+
+                <div className='container col-11 col-lg-7 bg-white p-4 rounded-4'>
                     {/* Question */}
                     <h4 className='mb-4'>{questionText} </h4>
 
@@ -64,46 +66,40 @@ const ActiveQuizView = () => {
 
                                 return (
                                     <button key={option.id} onClick={() => setSelectedOption(option.id)} className={`btn text-start d-flex align-items-center p-3 rounded-3 
-                                        ${isSelected ? 'border-primary bg-white shadow-sm' : 'bg-light text-dark' }`}
+                                        ${isSelected ? 'border-primary bg-white shadow-sm' : 'bg-light text-dark'}`}
 
                                         style={{
                                             borderWidth: '2px',
                                             borderStyle: 'solid',
-                                            borderColor: isSelected ? '#0d6efd' : 'transparent',
+                                            borderColor: isSelected ? '#111314' : 'transparent',
                                             transition: 'all 0.2s ease-in-out'
                                         }}
                                     >
                                         <div className={`d-flex flex-shrink-0 align-items-center justify-content-center rounded-2 me-3 fw-bold 
-                                        ${isSelected ? 'bg-primary text-white' : 'bg-white text-secondary border' }`} style={{ width: '36px', height: '36px' }}> {option.id}
+                                        ${isSelected ? 'bg-primary text-white' : 'bg-white text-secondary border'}`} style={{ width: '36px', height: '36px' }}> {option.id}
                                         </div>
 
                                         <span className={`fs-6 ${isSelected ? 'fw-semibold text-dark' : 'text-secondary'}`}>
                                             {option.text}
                                         </span>
                                     </button>
-
                                 )
                             })
-
-                            // option.text
-                            // <button className='text-start'>
-                            // </button> 
-
-
                         }
                     </div>
 
-                    {/* <button className='w-100 my-3 border border-0 text-start px-4 py-3 fw-medium fs-5' style={{transition: 'all 0.2s ease-in-out'}}> */}
+                    <div className='py-5 d-flex flex-wrap justify-content-between align-items-center'>
+                        <div>
+                            <button className='py-2 px-2 px-lg-5 fw-bold border border-primary border-1 bg-white d-flex align-items-center gap-1' style={{ color: "#453adc" }}> <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="#453adc" d="M10.707 8.707a1 1 0 0 0-1.414-1.414l-4 4a1 1 0 0 0 0 1.414l4 4a1 1 0 0 0 1.414-1.414L8.414 13H18a1 1 0 1 0 0-2H8.414z" /></svg> Previous</button>
+                        </div>
 
+                        <div className='d-flex gap-4 align-items-center flex-wrap'>
+                            <button className='btn text-secondary fw-bold d-none d-lg-block d-md-block'>Review All <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#6b6868" d="M22 12.999V20a1 1 0 0 1-1 1h-8v-8.001zm-11 0V21H3a1 1 0 0 1-1-1v-7.001zM11 3v7.999H2V4a1 1 0 0 1 1-1zm10 0a1 1 0 0 1 1 1v6.999h-9V3z"/></svg></button> 
 
-                    {/* <button className='me-3 px-3 bg-primary border border-none text-white rounded-2 fw-bold  py-1'>A</button>  Variable-ratio reinforcement scheduling */}
-                    {/* </button> */}
-
-                    {/* <input type="radio" name="optionA" id="" /> A  */}
-
-
+                            <button className='py-2 px-4 fw-bold border border-1 d-flex align-items-center gap-2' style={{ backgroundColor: "#453adc", color: "white" }}> Next <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16"><path fill="#ffffff" fill-rule="evenodd" d="M2 8a.75.75 0 0 1 .75-.75h8.69L8.22 4.03a.75.75 0 0 1 1.06-1.06l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06l3.22-3.22H2.75A.75.75 0 0 1 2 8" clip-rule="evenodd" /></svg></button>
+                        </div>
+                    </div>
                 </div>
-
             </div>
         </>
     )
