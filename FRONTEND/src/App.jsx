@@ -1,7 +1,7 @@
 import React from 'react'
 import Navbar from './component/Navbar'
-import StudentDashboard from './component/StudentDashboard'
-import AssignedObject from './component/AssignedObject'
+import StudentDashboard from './component/student/StudentDashboard'
+import AssignedObject from './component/student/AssignedObject'
 
 const App = () => {
   return (

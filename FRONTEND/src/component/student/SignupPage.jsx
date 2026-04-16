@@ -65,7 +65,7 @@ const SignupPage = () => {
                                     <div className='input-group mt-3 border border-0 border-dark bg-white shadow-none rounded-2'>
                                         <input type={show ? "text": "password"} className="form form-control border-0 text-black rounded-0 py-3 shadow-none" style={{ backgroundColor: "#e1e3e4" }} name='password' value={form.values.password} onChange={form.handleChange} onBlur={form.handleBlur} id="userPassword" placeholder='Enter your password' />
                                         
-                                        <button className='border-0 fw-medium' style={{ backgroundColor: "#e1e3e4", fontSize: "13px" }} onClick={handleClick}>{show ? "Hide" : "Show"} </button>
+                                        <div className='border-0 fw-medium px-2' style={{ backgroundColor: "#e1e3e4", fontSize: "13px", cursor:"pointer" }} onClick={handleClick}>{show ? "Hide" : "Show"} </div>
                                     </div>
                                         {form.touched.password && form.errors.password ? <p className='text-danger'>{form.errors.password}</p> : ""}
                                 </div>
@@ -73,6 +73,7 @@ const SignupPage = () => {
                                 <div class="col-12">
                                     <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ background: "#30329f" }}>Initailize Identity</button>
                                 </div>
+                                
                                 <a href="" className='text-decoration-none text-center text-black fw-medium'><p>Already have an account ? </p></a>
                             </form>
                             <div class="col-12">

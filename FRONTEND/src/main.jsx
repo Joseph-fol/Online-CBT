@@ -5,18 +5,21 @@ import App from './App.jsx'
 
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import ActiveQuizView from './component/ActiveQuizView.jsx'
+import ActiveQuizView from './component/student/ActiveQuizView.jsx'
 import LandingPage from './component/LandingPage.jsx'
 import SignupPage from './component/student/SignupPage.jsx'
-import StudentDashboard from './component/StudentDashboard.jsx'
-import AssignedObject from './component/AssignedObject.jsx'
+import SigninPage from './component/student/SigninPage.jsx'
+import StudentDashboard from './component/student/StudentDashboard.jsx'
+import AssignedObject from './component/student/AssignedObject.jsx'
+import ResultAndHistory from './component/student/ResultAndHistory.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     {/* <SignupPage/> */}
-    {/* <LandingPage/> */}
+    {/* <SigninPage/> */}
+    <LandingPage/>
       {/* <ActiveQuizView/> */}
-      <App />
-      {/* <AssignedObject/> */}
+      {/* <App /> */}
+      {/* <ResultAndHistory/> */}
   </React.StrictMode>,
 )
