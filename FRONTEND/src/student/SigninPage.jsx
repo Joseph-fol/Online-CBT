@@ -40,18 +40,37 @@ const SigninPage = () => {
             <div className='py-2' style={{ backgroundColor: "#f7f8f8" }}>
                 <div className='container my-5'>
                     <div className='row g-5'>
-                        <div className='position-relative col-xl-6 col-lg-6 col-md-6 col-sm-12 d-none d-lg-block d-md-block vh-150 p-5 text-white' style={{ background: "#30329f"}} data-aos="fade-right">
-                            <h4 className='fw-bold mt-4'>CBT</h4>
-                            <div className=' mt-5 pt-5'>
-                                <h1 className='fw-bold' style={{ fontSize: "45px" }}>Continue Your Path to Excellence.</h1>
-                                <p className='fw-medium fs-6'>Access your secure testing environment, review your performance analytics, and prepare for your next assessment.</p>
-                            </div>
-                            <div className='position-absolute bottom-0'>
-                                <p className=' w-75 fw-bold fs-6'>TRUSTED BY 12,000+ STUDENTS</p>
+                        <div className='position-relative col-xl-6 col-lg-6 col-md-6 col-sm-12 d-none d-lg-block d-md-block vh-150 p-5 text-white' style={{
+                            background: "#101275",
+                            backgroundImage: "url('https://i.pinimg.com/736x/ac/43/ee/ac43ee0959ac1b13e3c4057e1cb0d54e.jpg')",
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            position: 'relative',
+                            overflow: 'hidden'
+                        }} data-aos="fade-right">
+                            <div style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                background: 'rgba(21, 23, 120, 0.75)',
+                                zIndex: 0
+                            }}></div>
+
+                            <div style={{ position: 'relative', zIndex: 1 }}>
+                                <h4 className='fw-bold mt-4'>CBT</h4>
+                                <div className=' mt-5 pt-5'>
+                                    <h1 className='fw-bold' style={{ fontSize: "45px" }}>Continue Your Path to Excellence.</h1>
+                                    <p className='fw-medium fs-6'>Access your secure testing environment, review your performance analytics, and prepare for your next assessment.</p>
+                                </div>
+                                {/* <div className='position-absolute bottom-0'>
+                                    <p className=' w-75 fw-bold fs-6'>TRUSTED BY 12,000+ STUDENTS</p>
+                                </div> */}
                             </div>
                         </div>
 
-                        <div className='col-lg-6 col-md-6 bg-white p-5'data-aos="fade-up">
+                        <div className='col-lg-6 col-md-6 bg-white p-5' data-aos="fade-up">
                             <form class="row g-3" onSubmit={form.handleSubmit}>
                                 <h4 className='fw-bold py-0'> Student Sign in</h4>
                                 <p className='fw-medium'>Please enter your institutional credentials to begin.</p>

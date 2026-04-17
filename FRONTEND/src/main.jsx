@@ -5,23 +5,25 @@ import App from './App.jsx'
 
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import ActiveQuizView from './component/student/ActiveQuizView.jsx'
+import ActiveQuizView from './student/ActiveQuizView.jsx'
 import LandingPage from './component/LandingPage.jsx'
-import SignupPage from './component/student/SignupPage.jsx'
-import SigninPage from './component/student/SigninPage.jsx'
-import StudentDashboard from './component/student/StudentDashboard.jsx'
-import AssignedObject from './component/student/AssignedObject.jsx'
-import ResultAndHistory from './component/student/ResultAndHistory.jsx'
-import ForgotPassword from './component/student/ForgotPassword.jsx'
+import SignupPage from './student/SignupPage.jsx'
+import SigninPage from './student/SigninPage.jsx'
+import StudentDashboard from './student/StudentDashboard.jsx'
+import AssignedObject from './student/AssignedObject.jsx'
+import ResultAndHistory from './student/ResultAndHistory.jsx'
+import ForgotPassword from './student/ForgotPassword.jsx'
+import AdminSignin from './admin/AdminSignin.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     {/* <SignupPage/> */}
-    <SigninPage/>
+    {/* <SigninPage/> */}
     {/* <LandingPage/> */}
       {/* <ActiveQuizView/> */}
       {/* <App /> */}
       {/* <ResultAndHistory/> */}
       {/* <ForgotPassword/> */}
+      <AdminSignin/>
   </React.StrictMode>,
 )

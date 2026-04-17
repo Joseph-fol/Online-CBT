@@ -30,14 +30,33 @@ const SignupPage = () => {
             <div className='py-2' style={{ backgroundColor: "#f7f8f8" }}>
                 <div className='container my-5'>
                     <div className='row g-5'>
-                        <div className='position-relative col-xl-6 col-lg-6 col-md-6 col-sm-12 d-none d-lg-block d-md-block vh-150 p-5 text-white' style={{ background: "#30329f" }}>
-                            <h4 className='fw-bold mt-5'>THE ACADEMIC CURATOR</h4>
-                            <div className=' mt-5 pt-5'>
-                                <h1 className='fw-bold' style={{fontSize:"45px"}}>Standard Excellence for Every Scholar.</h1>
-                                <p className='fw-medium fs-5'>Join our elite computer-based testing environment designed for high-density curriculum focus.</p>
-                            </div>
-                            <div className='position-absolute bottom-0'>
-                                <p className=' w-75 fw-bold'>TRUSTED BY 12,000+ STUDENTS</p>
+                        <div className='position-relative col-xl-6 col-lg-6 col-md-6 col-sm-12 d-none d-lg-block d-md-block vh-150 p-5 text-white' style={{
+                            background: "#101275",
+                            backgroundImage: "url('https://i.pinimg.com/736x/a5/23/1c/a5231cf966f71cd13cbd68bb6859bdfe.jpg')",
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            position: 'relative',
+                            overflow: 'hidden'
+                        }}>
+                            <div style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                background: 'rgba(21, 23, 120, 0.75)',
+                                zIndex: 0
+                            }}></div>
+
+                            <div style={{ position: 'relative', zIndex: 1 }}>
+                                <h4 className='fw-bold mt-5'>THE ACADEMIC CURATOR</h4>
+                                <div className=' mt-5 pt-5'>
+                                    <h1 className='fw-bold' style={{ fontSize: "45px" }}>Standard Excellence for Every Scholar.</h1>
+                                    <p className='fw-medium fs-5'>Join our elite computer-based testing environment designed for high-density curriculum focus.</p>
+                                </div>
+                                <div className='position-relative bottom-0 mt-5 pt-5'>
+                                    <p className='  fw-bold'>TRUSTED BY 12,000+ STUDENTS</p>
+                                </div>
                             </div>
                         </div>
 
@@ -62,17 +81,17 @@ const SignupPage = () => {
                                 <div class="col-md-12 mt-4">
                                     <label for="fullname" class="form-label fw-medium" style={{ fontSize: "13px" }}>PASSWORD</label>
                                     <div className='input-group border border-0 border-dark bg-white shadow-none rounded-2'>
-                                        <input type={show ? "text": "password"} className="form form-control border-0 text-black rounded-0 py-3 shadow-none" style={{ backgroundColor: "#e1e3e4" }} name='password' value={form.values.password} onChange={form.handleChange} onBlur={form.handleBlur} id="userPassword" placeholder='Enter your password' />
-                                        
-                                        <div className='border-0 fw-medium px-2 pt-3' style={{ backgroundColor: "#e1e3e4", fontSize: "13px", cursor:"pointer" }} onClick={handleClick}>{show ? "Hide" : "Show"} </div>
+                                        <input type={show ? "text" : "password"} className="form form-control border-0 text-black rounded-0 py-3 shadow-none" style={{ backgroundColor: "#e1e3e4" }} name='password' value={form.values.password} onChange={form.handleChange} onBlur={form.handleBlur} id="userPassword" placeholder='Enter your password' />
+
+                                        <div className='border-0 fw-medium px-2 pt-3' style={{ backgroundColor: "#e1e3e4", fontSize: "13px", cursor: "pointer" }} onClick={handleClick}>{show ? "Hide" : "Show"} </div>
                                     </div>
-                                        {form.touched.password && form.errors.password ? <p className='text-danger'>{form.errors.password}</p> : ""}
+                                    {form.touched.password && form.errors.password ? <p className='text-danger'>{form.errors.password}</p> : ""}
                                 </div>
 
                                 <div class="col-12">
                                     <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ background: "#30329f" }}>Signup</button>
                                 </div>
-                                
+
                                 <a href="" className='text-decoration-none text-center text-black fw-medium'><p>Already have an account ? </p></a>
                             </form>
                             <div class="col-12">

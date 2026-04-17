@@ -79,14 +79,15 @@ const LandingPage = () => {
                                 <a className="nav-link fw-medium text-black" href='#'>Curriculum</a>
                             </li>
 
+                            
                             <li className="nav-item">
                                 <a className="nav-link fw-medium text-black" href='#'>Pricing</a>
                             </li>
                         </ul>
-                        <a href="" className='mx-3 text-decoration-none text-dark fw-bold'>Student Login</a>
-                        <div className="d-flex justify-content-center align-items-center gap-3" >
+                        <a href="" className='mx-3 text-decoration-none text-dark fw-bold'> Admin Portal </a>
 
-                            <button className="btn w-100 text-white fw-medium" style={{ background: "#070235" }} type="submit">Admin Portal</button>
+                        <div className="d-flex justify-content-center align-items-center gap-3" >
+                            <button className="btn w-100 text-white fw-medium" style={{ background: "#070235" }} type="submit">Student Login</button>
                         </div>
                     </div>
                 </div>
