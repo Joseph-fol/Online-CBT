@@ -12,14 +12,16 @@ import SigninPage from './component/student/SigninPage.jsx'
 import StudentDashboard from './component/student/StudentDashboard.jsx'
 import AssignedObject from './component/student/AssignedObject.jsx'
 import ResultAndHistory from './component/student/ResultAndHistory.jsx'
+import ForgotPassword from './component/student/ForgotPassword.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     {/* <SignupPage/> */}
-    {/* <SigninPage/> */}
-    <LandingPage/>
+    <SigninPage/>
+    {/* <LandingPage/> */}
       {/* <ActiveQuizView/> */}
       {/* <App /> */}
       {/* <ResultAndHistory/> */}
+      {/* <ForgotPassword/> */}
   </React.StrictMode>,
 )

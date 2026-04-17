@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
+import './LandingPage.css'
 
 const LandingPage = () => {
     // const [hoveredCard, setHoveredCard] = useState(null)
@@ -102,7 +103,7 @@ const LandingPage = () => {
                 </svg>
 
                 <div className='w-md-50 mx-auto text-center' data-aos="fade-up" style={{ width: "60%", position: "relative", zIndex: 1 }}>
-                    <h1 className='text-center display-4' data-aos="zoom-in" data-aos-delay="200" style={{ fontWeight: "bolder", color: "#070235" }}>Secure, Seamless, and <span style={{ color: "#0f6e50" }}>Smart Online CBT </span></h1>
+                    <h1 className='text-center display-4' data-aos="zoom-in" data-aos-delay="200" style={{ fontWeight: "bolder", color: "#070235" }}>Secure, Seamless, and <span style={{ color: "#0f6e50" }}> Smart Online CBT </span></h1>
                     <p data-aos="fade-up" data-aos-delay="400">The definitive platform for high-stakes examinations. Empowering educators with tamper-proof security and students with a cognitive-calm testing environment.</p>
                     <div className='d-flex gap-3 align-items-center justify-content-center flex-wrap'>
                         <button className="btn text-white fw-medium py-2 px-4" data-aos="slide-left" data-aos-delay="600" style={{ background: "#070235" }} type="submit">Start a free assessment</button>
@@ -172,16 +173,22 @@ const LandingPage = () => {
                     <div className='row g-4'>
                         <div className='col-12 col-md-4 h-100' data-aos="slide-up" data-aos-delay="0">
                             <div className='p-4 rounded-4 h-100' style={{ backgroundColor: "#edf2fc" }}>
-                                <img src="https://i.pinimg.com/1200x/8e/1c/0f/8e1c0fd51f831e6cd499fdfb24585688.jpg" alt="" className='object-fit-cover w-100 h-75 rounded-4' />
+                                <div>
+                                    <img src="https://i.pinimg.com/1200x/8e/1c/0f/8e1c0fd51f831e6cd499fdfb24585688.jpg" alt="" className='object-fit-cover w-100 h-75 rounded-4' />
+                                </div>
                                 <div className='mt-3'>
                                     <h4>Admin Configuration</h4>
                                     <p>Upload curriculum data and set proctoring parameters in seconds.</p>
                                 </div>
                             </div>
                         </div>
-                        <div className='col-12 col-md-4 h-sm-100' data-aos="slide-up" data-aos-delay="200">
+
+
+                        <div className='col-12 col-md-4 h-100' data-aos="slide-up" data-aos-delay="200">
                             <div className='p-4 rounded-4 h-100' style={{ backgroundColor: "#edf2fc" }}>
-                                <img src="https://i.pinimg.com/736x/6d/97/72/6d9772063422d865fb1fc9e9e66beeb1.jpg" alt="" className='object-fit-cover w-100 h-75 rounded-4' />
+                                <div style={{ height: "300px", overflow: "hidden", borderRadius: "16px", marginBottom: "12px" }}>
+                                    <img src="https://i.pinimg.com/1200x/ff/4e/63/ff4e634f1fc5dfe0c573fc6e131957d3.jpg" alt="" className='object-fit-cover w-100 h-100' />
+                                </div>
                                 <div className='mt-3'>
                                     <h4>Student Deployment</h4>
                                     <p>Massive concurrent testing on any device with zero-lag synchronization.</p>
@@ -202,34 +209,32 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            <footer className='py-5 text-white'style={{ background: "#070235" }}>
+            <footer className='py-5 text-white' style={{ background: "#070235" }}>
                 <div className='container'>
                     <div className='row g-1'>
-                        <div className='col-lg-3'>
+                        <div className='col-lg-3 col-md-4'>
                             <h5>CBT</h5>
                             <p>Curating high-stakes digital examinations with unmatched precision and military-grade security.</p>
                         </div>
 
-                        <div className='col-lg-3 p-4'>
+                        <div className='col-lg-3 col-md-4 p-4'>
                             <span className='fw-bold' style={{ color: "#02b47c" }}>PLATFORM</span>
-                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>Documentation</li>
-                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>API Reference</li>
-                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>System Status</li>
+                            <li style={{ listStyle: "none", paddingTop: "15px", cursor: "pointer" }}>Documentation</li>
+                            <li style={{ listStyle: "none", paddingTop: "15px", cursor: "pointer" }}>API Reference</li>
+                            <li style={{ listStyle: "none", paddingTop: "15px", cursor: "pointer" }}>System Status</li>
                         </div>
-                        <div className='col-lg-3 p-4'>
+                        <div className='col-lg-3 col-md-4 p-4'>
                             <span className='fw-bold' style={{ color: "#02b47c" }}>COMPANY</span>
-                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>About Us</li>
-                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>Contact</li>
-                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>Support</li>
-                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>Partnerships</li>
+                            <li style={{ listStyle: "none", paddingTop: "15px", cursor: "pointer" }}>About Us</li>
+                            <li style={{ listStyle: "none", paddingTop: "15px", cursor: "pointer" }}>Contact</li>
+                            <li style={{ listStyle: "none", paddingTop: "15px", cursor: "pointer" }}>Support</li>
+                            <li style={{ listStyle: "none", paddingTop: "15px", cursor: "pointer" }}>Partnerships</li>
                         </div>
-                        <div className='col-lg-3 p-4'>
+                        <div className='col-lg-3 col-md-4 p-4'>
                             <span className='fw-bold' style={{ color: "#02b47c" }}>LEGAL</span>
-                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>Privacy Policy </li>
-                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>Terms of Services</li>
+                            <li style={{ listStyle: "none", paddingTop: "15px", cursor: "pointer" }}>Privacy Policy </li>
+                            <li style={{ listStyle: "none", paddingTop: "15px", cursor: "pointer" }}>Terms of Services</li>
                         </div>
-
-                        
                     </div>
                 </div>
             </footer>

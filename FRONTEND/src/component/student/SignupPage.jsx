@@ -60,18 +60,17 @@ const SignupPage = () => {
                                 </div>
 
                                 <div class="col-md-12 mt-4">
-                                    <label for="fullname" class="form-label fw-medium" style={{ fontSize: "13px" }}>SECURITY KEY</label>
-
-                                    <div className='input-group mt-3 border border-0 border-dark bg-white shadow-none rounded-2'>
+                                    <label for="fullname" class="form-label fw-medium" style={{ fontSize: "13px" }}>PASSWORD</label>
+                                    <div className='input-group border border-0 border-dark bg-white shadow-none rounded-2'>
                                         <input type={show ? "text": "password"} className="form form-control border-0 text-black rounded-0 py-3 shadow-none" style={{ backgroundColor: "#e1e3e4" }} name='password' value={form.values.password} onChange={form.handleChange} onBlur={form.handleBlur} id="userPassword" placeholder='Enter your password' />
                                         
-                                        <div className='border-0 fw-medium px-2' style={{ backgroundColor: "#e1e3e4", fontSize: "13px", cursor:"pointer" }} onClick={handleClick}>{show ? "Hide" : "Show"} </div>
+                                        <div className='border-0 fw-medium px-2 pt-3' style={{ backgroundColor: "#e1e3e4", fontSize: "13px", cursor:"pointer" }} onClick={handleClick}>{show ? "Hide" : "Show"} </div>
                                     </div>
                                         {form.touched.password && form.errors.password ? <p className='text-danger'>{form.errors.password}</p> : ""}
                                 </div>
 
                                 <div class="col-12">
-                                    <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ background: "#30329f" }}>Initailize Identity</button>
+                                    <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ background: "#30329f" }}>Signup</button>
                                 </div>
                                 
                                 <a href="" className='text-decoration-none text-center text-black fw-medium'><p>Already have an account ? </p></a>
