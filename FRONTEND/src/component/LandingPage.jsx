@@ -1,8 +1,20 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import AOS from 'aos'
+import 'aos/dist/aos.css'
 
 const LandingPage = () => {
     // const [hoveredCard, setHoveredCard] = useState(null)
     const [hoveredCard, setHoveredCard] = useState(null)
+
+    useEffect(() => {
+        AOS.init({
+            duration: 2000,
+            once: false,
+            offset: 100,
+            easing: 'ease-in-out',
+            delay: 0
+        })
+    }, [])
     const divContent = [
         {
             title: "Instant Grading",
@@ -25,6 +37,7 @@ const LandingPage = () => {
                     <button className="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>
+
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav me-auto gap-3 mb-2 mb-lg-0">
                             <li className="nav-item">
@@ -44,6 +57,7 @@ const LandingPage = () => {
                         </ul>
                         <a href="" className='mx-3 text-decoration-none text-dark fw-bold'>Student Login</a>
                         <div className="d-flex justify-content-center align-items-center gap-3" >
+                            
                             <button className="btn w-100 text-white fw-medium" style={{ background: "#070235" }} type="submit">Admin Portal</button>
                         </div>
                     </div>
@@ -51,28 +65,36 @@ const LandingPage = () => {
             </nav>
 
             {/* Header Section */}
-            <section className='bg-body-tertiary w-100 d-flex justify-content-center align-items-center' style={{ height: "100vh" }}>
-                <div className='w-md-50 mx-auto text-center' style={{ width: "60%" }}>
-                    <h1 className='text-center display-4' style={{ fontWeight: "bolder", color: "#070235" }}>Secure, Seamless, and <span style={{ color: "#0f6e50" }}>Smart Online Testing </span></h1>
-                    <p>The definitive platform for high-stakes examinations. Empowering educators with tamper-proof security and students with a cognitive-calm testing environment.</p>
+            <section className='bg-body-tertiary w-100 d-flex justify-content-center align-items-center position-relative' style={{ height: "100vh", overflow: "hidden", background: "linear-gradient(135deg, #f8faff 0%, #eff4ff 100%)" }}>
+
+                {/* Top curved shape */}
+                <svg className='position-absolute' style={{ width: "100%", height: "100%", top: 0, left: 0 }} viewBox="0 0 1200 800" preserveAspectRatio="none">
+                    <path d="M 0,0 Q 300,100 600,80 T 1200,0 L 1200,200 Q 900,150 600,180 T 0,200 Z" fill="#e0ebf7" opacity="0.5" />
+                    <path d="M 1200,600 Q 1000,650 800,700 Q 600,750 400,700 Q 200,650 0,600 L 0,800 L 1200,800 Z" fill="#d4e4f0" opacity="0.4" />
+                    <path d="M 900,150 Q 1000,200 1100,250 Q 1150,300 1200,400 L 1200,0 Q 1100,50 1000,100 Q 950,120 900,150 Z" fill="#070235" opacity="0.08" />
+                </svg>
+
+                <div className='w-md-50 mx-auto text-center' data-aos="fade-up" style={{ width: "60%", position: "relative", zIndex: 1 }}>
+                    <h1 className='text-center display-4' data-aos="zoom-in" data-aos-delay="200" style={{ fontWeight: "bolder", color: "#070235" }}>Secure, Seamless, and <span style={{ color: "#0f6e50" }}>Smart Online CBT </span></h1>
+                    <p data-aos="fade-up" data-aos-delay="400">The definitive platform for high-stakes examinations. Empowering educators with tamper-proof security and students with a cognitive-calm testing environment.</p>
                     <div className='d-flex gap-3 align-items-center justify-content-center flex-wrap'>
-                        <button className="btn text-white fw-medium py-2 px-4" style={{ background: "#070235" }} type="submit">Start a free assessment</button>
-                        <button className='btn fw-medium'>See how it works </button>
+                        <button className="btn text-white fw-medium py-2 px-4" data-aos="slide-left" data-aos-delay="600" style={{ background: "#070235" }} type="submit">Start a free assessment</button>
+                        <button className='btn fw-medium' data-aos="slide-right" data-aos-delay="600">See how it works </button>
                     </div>
                 </div>
             </section>
 
             <section className='container-fluid ' style={{ background: "#070235" }}>
                 <div className='px-5 py-4 d-flex flex-wrap justify-content-evenly gap-3 align-items-center'>
-                    <div style={{ borderLeft: "4px solid #0f6e50", paddingLeft: "10px" }}>
+                    <div data-aos="flip-left" style={{ borderLeft: "4px solid #0f6e50", paddingLeft: "10px" }}>
                         <h1 className='text-white fw-bold'>10,000+</h1>
                         <p className='fw-medium text-secondary'>QUESTION DELIVERED</p>
                     </div>
-                    <div style={{ borderLeft: "4px solid #0f6e50", paddingLeft: "10px" }}>
+                    <div data-aos="flip-left" data-aos-delay="200" style={{ borderLeft: "4px solid #0f6e50", paddingLeft: "10px" }}>
                         <h1 className='text-white fw-bold '>0ms</h1>
                         <p className='fw-medium text-secondary'>LATENCY DELAY</p>
                     </div>
-                    <div style={{ borderLeft: "4px solid #0f6e50", paddingLeft: "10px" }}>
+                    <div data-aos="flip-left" data-aos-delay="400" style={{ borderLeft: "4px solid #0f6e50", paddingLeft: "10px" }}>
                         <h1 className='text-white fw-bold'>100%</h1>
                         <p className='fw-medium text-secondary'>SECURITY GUARANTEE</p>
                     </div>
@@ -81,16 +103,16 @@ const LandingPage = () => {
 
             <section className="py-5" style={{ backgroundColor: "#eff4ff" }} >
                 <div className='container mx-auto text-center'>
-                    <h2 style={{ color: "#070235" }} className="text-center fw-bolder">Precision Engineering for Excellence</h2>
-                    <p className='fw-medium'>Rejecting standard dashboard noise for high-authority laboratory tools designed for cognitive focus.</p>
+                    <h2 style={{ color: "#070235" }} className="text-center fw-bolder" data-aos="fade-up">Precision Engineering for Excellence</h2>
+                    <p className='fw-medium' data-aos="fade-up" data-aos-delay="200">Rejecting standard dashboard noise for high-authority laboratory tools designed for cognitive focus.</p>
                 </div>
 
                 <div className='container pt-5'>
                     <div className='row g-4'>
                         {divContent.map((content, index) => (
-                            <div className='col-12 col-md-4' key={content.title}>
+                            <div className='col-12 col-md-4' key={content.title} data-aos="zoom-in" data-aos-delay={index * 200}>
                                 <div className='p-4 rounded-4 h-100'
-                                    onMouseEnter={()=> setHoveredCard(index)}
+                                    onMouseEnter={() => setHoveredCard(index)}
                                     onMouseLeave={() => setHoveredCard(null)}
                                     style={{
                                         background: hoveredCard === index ? "#d9f2e5" : "#ffffff",
@@ -109,6 +131,46 @@ const LandingPage = () => {
                                 </div>
                             </div>
                         ))}
+                    </div>
+                </div>
+            </section>
+
+            <section className="py-5" style={{ backgroundColor: "#f8faff" }} >
+                <div className='container mx-auto text-center'>
+                    <h2 style={{ color: "#070235" }} className="text-center fw-bolder" data-aos="fade-up">The Digital Lifecycle</h2>
+                    <p className='fw-medium' data-aos="fade-up" data-aos-delay="200">Streamlining the transition from content creation to knowledge validation.</p>
+                </div>
+
+                <div className='container pt-5'>
+                    <div className='row g-4'>
+                        <div className='col-12 col-md-4 h-100' data-aos="slide-up" data-aos-delay="0">
+                            <div className='p-4 rounded-4 h-100' style={{backgroundColor: "#edf2fc"}}>
+                                <img src="https://i.pinimg.com/1200x/8e/1c/0f/8e1c0fd51f831e6cd499fdfb24585688.jpg" alt="" className='object-fit-cover w-100 h-75 rounded-4' />
+                                <div className='mt-3'>
+                                    <h4>Admin Configuration</h4>
+                                    <p>Upload curriculum data and set proctoring parameters in seconds.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className='col-12 col-md-4 h-sm-100' data-aos="slide-up" data-aos-delay="200">
+                            <div className='p-4 rounded-4 h-100' style={{backgroundColor: "#edf2fc"}}>
+                                <img src="https://i.pinimg.com/736x/6d/97/72/6d9772063422d865fb1fc9e9e66beeb1.jpg" alt="" className='object-fit-cover w-100 h-75 rounded-4' />
+                                <div className='mt-3'>
+                                    <h4>Student Deployment</h4>
+                                    <p>Massive concurrent testing on any device with zero-lag synchronization.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className='col-12 col-md-4 h-100' data-aos="slide-up" data-aos-delay="400">
+                            <div className='p-4 rounded-4 h-100' style={{backgroundColor: "#edf2fc"}}>
+                                <img src="https://i.pinimg.com/736x/a2/2b/46/a22b46dde9b92371769bba261ee39c81.jpg" alt="" className='object-fit-cover w-100 h-75 rounded-4' />
+                                <div className='mt-3'>
+                                    <h4>Advanced Analytics</h4>
+                                    <p>Generate insights from individual scores to institutional performance trends.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
