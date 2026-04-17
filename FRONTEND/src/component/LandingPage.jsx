@@ -5,6 +5,7 @@ import 'aos/dist/aos.css'
 const LandingPage = () => {
     // const [hoveredCard, setHoveredCard] = useState(null)
     const [hoveredCard, setHoveredCard] = useState(null)
+    const [isScrolled, setIsScrolled] = useState(false)
 
     useEffect(() => {
         AOS.init({
@@ -14,6 +15,19 @@ const LandingPage = () => {
             easing: 'ease-in-out',
             delay: 0
         })
+    }, [])
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 50) {
+                setIsScrolled(true)
+            } else {
+                setIsScrolled(false)
+            }
+        }
+
+        window.addEventListener('scroll', handleScroll)
+        return () => window.removeEventListener('scroll', handleScroll)
     }, [])
     const divContent = [
         {
@@ -31,7 +45,20 @@ const LandingPage = () => {
     ]
     return (
         <>
-            <nav className="navbar navbar-expand-lg px-lg-5 px-md-4  ">
+            <nav
+                className="navbar navbar-expand-lg px-lg-5 px-md-4"
+                style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    zIndex: 1000,
+                    backdropFilter: isScrolled ? 'blur(10px)' : 'blur(0px)',
+                    backgroundColor: isScrolled ? 'rgba(255, 255, 255, 0.8)' : 'transparent',
+                    transition: 'all 0.3s ease',
+                    boxShadow: isScrolled ? '0 2px 10px rgba(0, 0, 0, 0.1)' : 'none'
+                }}
+            >
                 <div className="container-fluid">
                     <a className="navbar-brand fw-bold" href="#">CBT</a>
                     <button className="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +84,7 @@ const LandingPage = () => {
                         </ul>
                         <a href="" className='mx-3 text-decoration-none text-dark fw-bold'>Student Login</a>
                         <div className="d-flex justify-content-center align-items-center gap-3" >
-                            
+
                             <button className="btn w-100 text-white fw-medium" style={{ background: "#070235" }} type="submit">Admin Portal</button>
                         </div>
                     </div>
@@ -65,7 +92,7 @@ const LandingPage = () => {
             </nav>
 
             {/* Header Section */}
-            <section className='bg-body-tertiary w-100 d-flex justify-content-center align-items-center position-relative' style={{ height: "100vh", overflow: "hidden", background: "linear-gradient(135deg, #f8faff 0%, #eff4ff 100%)" }}>
+            <section className='bg-body-tertiary w-100 d-flex justify-content-center align-items-center position-relative' style={{ height: "100vh", overflow: "hidden", background: "linear-gradient(135deg, #f8faff 0%, #eff4ff 100%)", marginTop: "0" }}>
 
                 {/* Top curved shape */}
                 <svg className='position-absolute' style={{ width: "100%", height: "100%", top: 0, left: 0 }} viewBox="0 0 1200 800" preserveAspectRatio="none">
@@ -144,7 +171,7 @@ const LandingPage = () => {
                 <div className='container pt-5'>
                     <div className='row g-4'>
                         <div className='col-12 col-md-4 h-100' data-aos="slide-up" data-aos-delay="0">
-                            <div className='p-4 rounded-4 h-100' style={{backgroundColor: "#edf2fc"}}>
+                            <div className='p-4 rounded-4 h-100' style={{ backgroundColor: "#edf2fc" }}>
                                 <img src="https://i.pinimg.com/1200x/8e/1c/0f/8e1c0fd51f831e6cd499fdfb24585688.jpg" alt="" className='object-fit-cover w-100 h-75 rounded-4' />
                                 <div className='mt-3'>
                                     <h4>Admin Configuration</h4>
@@ -153,7 +180,7 @@ const LandingPage = () => {
                             </div>
                         </div>
                         <div className='col-12 col-md-4 h-sm-100' data-aos="slide-up" data-aos-delay="200">
-                            <div className='p-4 rounded-4 h-100' style={{backgroundColor: "#edf2fc"}}>
+                            <div className='p-4 rounded-4 h-100' style={{ backgroundColor: "#edf2fc" }}>
                                 <img src="https://i.pinimg.com/736x/6d/97/72/6d9772063422d865fb1fc9e9e66beeb1.jpg" alt="" className='object-fit-cover w-100 h-75 rounded-4' />
                                 <div className='mt-3'>
                                     <h4>Student Deployment</h4>
@@ -163,7 +190,7 @@ const LandingPage = () => {
                         </div>
 
                         <div className='col-12 col-md-4 h-100' data-aos="slide-up" data-aos-delay="400">
-                            <div className='p-4 rounded-4 h-100' style={{backgroundColor: "#edf2fc"}}>
+                            <div className='p-4 rounded-4 h-100' style={{ backgroundColor: "#edf2fc" }}>
                                 <img src="https://i.pinimg.com/736x/a2/2b/46/a22b46dde9b92371769bba261ee39c81.jpg" alt="" className='object-fit-cover w-100 h-75 rounded-4' />
                                 <div className='mt-3'>
                                     <h4>Advanced Analytics</h4>
@@ -174,6 +201,38 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
+
+            <footer className='py-5 text-white'style={{ background: "#070235" }}>
+                <div className='container'>
+                    <div className='row g-1'>
+                        <div className='col-lg-3'>
+                            <h5>CBT</h5>
+                            <p>Curating high-stakes digital examinations with unmatched precision and military-grade security.</p>
+                        </div>
+
+                        <div className='col-lg-3 p-4'>
+                            <span className='fw-bold' style={{ color: "#02b47c" }}>PLATFORM</span>
+                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>Documentation</li>
+                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>API Reference</li>
+                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>System Status</li>
+                        </div>
+                        <div className='col-lg-3 p-4'>
+                            <span className='fw-bold' style={{ color: "#02b47c" }}>COMPANY</span>
+                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>About Us</li>
+                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>Contact</li>
+                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>Support</li>
+                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>Partnerships</li>
+                        </div>
+                        <div className='col-lg-3 p-4'>
+                            <span className='fw-bold' style={{ color: "#02b47c" }}>LEGAL</span>
+                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>Privacy Policy </li>
+                            <li style={{listStyle: "none", paddingTop: "15px", cursor:"pointer" }}>Terms of Services</li>
+                        </div>
+
+                        
+                    </div>
+                </div>
+            </footer>
         </>
     )
 }
