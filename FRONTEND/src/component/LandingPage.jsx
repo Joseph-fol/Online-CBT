@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import './LandingPage.css'
+import { Link } from 'react-router-dom'
 
 const LandingPage = () => {
     // const [hoveredCard, setHoveredCard] = useState(null)
@@ -79,15 +80,19 @@ const LandingPage = () => {
                                 <a className="nav-link fw-medium text-black" href='#'>Curriculum</a>
                             </li>
 
-                            
+
                             <li className="nav-item">
                                 <a className="nav-link fw-medium text-black" href='#'>Pricing</a>
                             </li>
                         </ul>
-                        <a href="" className='mx-3 text-decoration-none text-dark fw-bold'> Admin Portal </a>
+                        <Link to="/AdminSignin">
+                            <button className=' btn mx-3 text-decoration-none text-dark fw-bold'> Admin Portal </button>
+                        </Link>
 
                         <div className="d-flex justify-content-center align-items-center gap-3" >
-                            <button className="btn w-100 text-white fw-medium" style={{ background: "#070235" }} type="submit">Student Login</button>
+                            <Link to="/studentsignin">
+                                <button className="btn w-100 text-white fw-medium" style={{ background: "#070235" }} type="submit">Student Login</button>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -107,7 +112,9 @@ const LandingPage = () => {
                     <h1 className='text-center display-4' data-aos="zoom-in" data-aos-delay="200" style={{ fontWeight: "bolder", color: "#070235" }}>Secure, Seamless, and <span style={{ color: "#0f6e50" }}> Smart Online CBT </span></h1>
                     <p data-aos="fade-up" data-aos-delay="400">The definitive platform for high-stakes examinations. Empowering educators with tamper-proof security and students with a cognitive-calm testing environment.</p>
                     <div className='d-flex gap-3 align-items-center justify-content-center flex-wrap'>
-                        <button className="btn text-white fw-medium py-2 px-4" data-aos="slide-left" data-aos-delay="600" style={{ background: "#070235" }} type="submit">Start a free assessment</button>
+                        <Link to="/createStudentAccount">
+                            <button className="btn text-white fw-medium py-2 px-4" data-aos="slide-left" data-aos-delay="600" style={{ background: "#070235" }} type="submit">Start a free assessment</button>
+                        </Link>
                         <button className='btn fw-medium' data-aos="slide-right" data-aos-delay="600">See how it works </button>
                     </div>
                 </div>

@@ -3,6 +3,7 @@ import { useFormik } from "formik"
 import * as yup from "yup"
 import AOS from 'aos'
 import 'aos/dist/aos.css'
+import { Link } from 'react-router-dom'
 
 const ForgotPassword = () => {
     const [show, setShow] = useState(false)
@@ -54,7 +55,9 @@ const ForgotPassword = () => {
                                 </div>
                             </form>
                             <div class="col-12">
-                                <button type="submit" class="btn w-100 py-2 text-black fs-6 fw-bold border border-dark border-1">BACK TO LOGIN </button>
+                                <Link to="/studentSignin">
+                                    <button type="submit" class="btn w-100 py-2 text-black fs-6 fw-bold border border-dark border-1">BACK TO LOGIN </button>
+                                </Link>
                             </div>
                         </div>
 

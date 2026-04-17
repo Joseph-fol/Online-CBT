@@ -3,6 +3,7 @@ import { useFormik } from "formik"
 import * as yup from "yup"
 import AOS from 'aos'
 import 'aos/dist/aos.css'
+import { Link } from 'react-router-dom'
 
 const SigninPage = () => {
     const [show, setShow] = useState(false)
@@ -72,7 +73,16 @@ const SigninPage = () => {
 
                         <div className='col-lg-6 col-md-6 bg-white p-5' data-aos="fade-up">
                             <form class="row g-3" onSubmit={form.handleSubmit}>
-                                <h4 className='fw-bold py-0'> Student Sign in</h4>
+                                <div className='d-flex justify-content-between'>
+                                    <h4 className='fw-bold py-0'> Student Sign in</h4>
+                                    <Link to="/">
+                                        <button className='btn'>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="#062164" d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42a.996.996 0 0 0-1.41 0l-6.59 6.59a.996.996 0 0 0 0 1.41l6.59 6.59a.996.996 0 1 0 1.41-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1" /></svg>
+                                        </button>
+                                    </Link>
+
+                                </div>
+
                                 <p className='fw-medium'>Please enter your institutional credentials to begin.</p>
 
                                 <div class="col-md-12 mt-4">
@@ -89,7 +99,9 @@ const SigninPage = () => {
                                         <p className='border-0 pt-3 outline-none fw-medium px-2' style={{ backgroundColor: "#e1e3e4", fontSize: "13px" }} onClick={handleClick}>{show ? "Hide" : "Show"} </p>
                                     </div>
                                     {form.touched.password && form.errors.password ? <p className='text-danger'>{form.errors.password}</p> : ""}
-                                    <a href="#" className='pt-2 fw-medium'>Forgot Password?</a>
+                                    <Link to="/forgotPassword">
+                                        <a href="#" className='pt-2 fw-medium'>Forgot Password?</a>
+                                    </Link>
                                 </div>
 
                                 <div class="col-12">
@@ -98,7 +110,9 @@ const SigninPage = () => {
                                 <a href="" className='text-decoration-none text-center text-black fw-medium'><p>Don't have an account ? </p></a>
                             </form>
                             <div class="col-12">
-                                <button type="submit" class="btn w-100 py-2 text-black fs-6 fw-bold border border-dark border-1" >CREATE ACCOUNT </button>
+                                <Link to="/createStudentAccount">
+                                    <button type="submit" class="btn w-100 py-2 text-black fs-6 fw-bold border border-dark border-1" >CREATE ACCOUNT </button>
+                                </Link>
                             </div>
                         </div>
                     </div>

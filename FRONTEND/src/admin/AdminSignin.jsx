@@ -3,7 +3,7 @@ import { useFormik } from "formik"
 import * as yup from "yup"
 import AOS from 'aos'
 import 'aos/dist/aos.css'
-// import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 const AdminSignin = () => {
     const [show, setShow] = useState(false)
@@ -75,15 +75,14 @@ const AdminSignin = () => {
                             <form class="row g-3" onSubmit={form.handleSubmit}>
                                 <div className='d-flex justify-content-between'>
                                     <h4 className='fw-bold py-0'> Admin Sign in</h4>
-                                    {/* <Link to="/LandingPage"> */}
-                                    <a href="#">
+                                    <Link to="/">
+                                    <button className='btn'>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="#0f6e50" d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42a.996.996 0 0 0-1.41 0l-6.59 6.59a.996.996 0 0 0 0 1.41l6.59 6.59a.996.996 0 1 0 1.41-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1" /></svg>
-                                    </a>
-                                    {/* </Link> */}
+                                    </button>
+                                    </Link>
                                 </div>
 
                                 <p className='fw-medium'>Please enter your admin credentials.</p>
-
                                 <div class="col-md-12 mt-4">
                                     <label for="fullname" class="form-label fw-medium" style={{ fontSize: "13px" }}>EMAIL</label>
                                     <input type="text" className="form form-control border-0 text-black rounded-0 py-3 shadow-none" style={{ backgroundColor: "#e1e3e4" }} value={form.values.email} name='email' onChange={form.handleChange} onBlur={form.handleBlur} id="userEmail" placeholder='a.dot@university.edu' />

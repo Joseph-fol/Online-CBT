@@ -1,10 +1,23 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useFormik } from "formik"
 import * as yup from "yup"
+import AOS from 'aos'
+import 'aos/dist/aos.css'
+import { Link } from 'react-router-dom'
 
 const SignupPage = () => {
     const [show, setShow] = useState(false)
     const handleClick = () => setShow(!show)
+
+    useEffect(() => {
+        AOS.init({
+            duration: 2000,
+            once: false,
+            offset: 100,
+            easing: 'ease-in-out',
+            delay: 0
+        })
+    }, [])
 
     const form = useFormik({
         initialValues: {
@@ -37,11 +50,11 @@ const SignupPage = () => {
                             backgroundPosition: 'center',
                             position: 'relative',
                             overflow: 'hidden'
-                        }}>
+                        }} data-aos="fade-right">
                             <div style={{
                                 position: 'absolute',
                                 top: 0,
-                                left: 0,
+                                left: 0, 
                                 right: 0,
                                 bottom: 0,
                                 background: 'rgba(21, 23, 120, 0.75)',
@@ -60,7 +73,7 @@ const SignupPage = () => {
                             </div>
                         </div>
 
-                        <div className='col-lg-6 col-md-6 bg-white p-5'>
+                        <div className='col-lg-6 col-md-6 bg-white p-5' data-aos="fade-up">
                             <form class="row g-3" onSubmit={form.handleSubmit}>
                                 <h4 className='fw-bold py-0'>Create Student Account</h4>
                                 <p className='fw-medium'>Please enter your institutional credentials to begin.</p>
@@ -95,7 +108,9 @@ const SignupPage = () => {
                                 <a href="" className='text-decoration-none text-center text-black fw-medium'><p>Already have an account ? </p></a>
                             </form>
                             <div class="col-12">
-                                <button type="submit" class="btn w-100 py-2 text-black fs-6 fw-bold border border-dark border-1" >SIGN IN TO PORTAL </button>
+                                <Link to="/studentSignin">
+                                    <button type="submit" class="btn w-100 py-2 text-black fs-6 fw-bold border border-dark border-1" >SIGN IN TO PORTAL </button>
+                                </Link>
                             </div>
                         </div>
                     </div>
