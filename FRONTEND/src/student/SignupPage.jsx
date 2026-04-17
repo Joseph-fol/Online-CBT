@@ -54,7 +54,7 @@ const SignupPage = () => {
                             <div style={{
                                 position: 'absolute',
                                 top: 0,
-                                left: 0, 
+                                left: 0,
                                 right: 0,
                                 bottom: 0,
                                 background: 'rgba(21, 23, 120, 0.75)',
@@ -75,7 +75,15 @@ const SignupPage = () => {
 
                         <div className='col-lg-6 col-md-6 bg-white p-5' data-aos="fade-up">
                             <form class="row g-3" onSubmit={form.handleSubmit}>
-                                <h4 className='fw-bold py-0'>Create Student Account</h4>
+                                <div className='d-flex-justify-content-between'>
+                                    <h4 className='fw-bold py-0'>Create Student Account</h4>
+                                    <Link to="/">
+                                        <button className='btn'>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="#062164" d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42a.996.996 0 0 0-1.41 0l-6.59 6.59a.996.996 0 0 0 0 1.41l6.59 6.59a.996.996 0 1 0 1.41-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1" /></svg>
+                                        </button>
+                                    </Link>
+                                </div>
+
                                 <p className='fw-medium'>Please enter your institutional credentials to begin.</p>
 
                                 <div class="col-md-12">
