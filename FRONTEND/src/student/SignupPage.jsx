@@ -75,7 +75,7 @@ const SignupPage = () => {
 
                         <div className='col-lg-6 col-md-6 bg-white p-5' data-aos="fade-up">
                             <form class="row g-3" onSubmit={form.handleSubmit}>
-                                <div className='d-flex-justify-content-between'>
+                                <div className='d-flex justify-content-between'>
                                     <h4 className='fw-bold py-0'>Create Student Account</h4>
                                     <Link to="/">
                                         <button className='btn'>
