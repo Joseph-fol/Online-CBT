@@ -3,11 +3,13 @@ import { useFormik } from "formik"
 import * as yup from "yup"
 import AOS from 'aos'
 import 'aos/dist/aos.css'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const SigninPage = () => {
     const [show, setShow] = useState(false)
     const handleClick = () => setShow(!show)
+
+    const navigate = useNavigate()
 
     useEffect(() => {
         AOS.init({
@@ -27,8 +29,9 @@ const SigninPage = () => {
 
         onSubmit: (values, { resetForm }) => {
             console.log(values);
-            alert("Form Successfully Submitted")
+            alert("Signin Successful!")
             resetForm()
+            navigate("/studentDashboard")
         },
 
         validationSchema: yup.object({

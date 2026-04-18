@@ -8,6 +8,7 @@ const LandingPage = () => {
     // const [hoveredCard, setHoveredCard] = useState(null)
     const [hoveredCard, setHoveredCard] = useState(null)
     const [isScrolled, setIsScrolled] = useState(false)
+    const [arrow, setArrow] = useState(null)
 
     useEffect(() => {
         AOS.init({
@@ -86,13 +87,17 @@ const LandingPage = () => {
                             </li>
                         </ul>
                         <Link to="/AdminSignin">
-                            <button className=' btn mx-3 text-decoration-none text-dark fw-bold'> Admin Portal </button>
+                            <button className=' btn mx-3 text-decoration-none text-dark fw-bold'> Admin Signin </button>
                         </Link>
 
                         <div className="d-flex justify-content-center align-items-center gap-3" >
-                            <Link to="/studentsignin">
+                            <Link to="/studentSignin">
                                 <button className="btn w-100 text-white fw-medium" style={{ background: "#070235" }} type="submit">Student Login</button>
                             </Link>
+
+                            {/* <Link to="/admin">
+                                <p>Admin portal</p>
+                            </Link> */}
                         </div>
                     </div>
                 </div>
@@ -113,7 +118,7 @@ const LandingPage = () => {
                     <p data-aos="fade-up" data-aos-delay="400">The definitive platform for high-stakes examinations. Empowering educators with tamper-proof security and students with a cognitive-calm testing environment.</p>
                     <div className='d-flex gap-3 align-items-center justify-content-center flex-wrap'>
                         <Link to="/createStudentAccount">
-                            <button className="btn text-white fw-medium py-2 px-4" data-aos="slide-left" data-aos-delay="600" style={{ background: "#070235" }} type="submit">Start a free assessment</button>
+                            <button className="btn text-white fw-medium py-2 px-4" data-aos="slide-left" data-aos-delay="600" style={{ background: "#070235" }}  type="submit">Start a free assessment</button>
                         </Link>
                         <button className='btn fw-medium' data-aos="slide-right" data-aos-delay="600">See how it works </button>
                     </div>
