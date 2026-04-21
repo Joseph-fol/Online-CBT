@@ -1,161 +1,158 @@
 import React, { useMemo, useState } from 'react'
 import './QuestionBank.css'
+import { useFormik } from 'formik'
+import * as yup from "yup"
 
 const QuestionBank = () => {
-  const [formValues, setFormValues] = useState({
-    subject: '',
-    questionType: 'multiple',
-    difficulty: 'intermediate',
-    marks: '2',
-    questionText: '',
-    optionA: '',
-    optionB: '',
-    optionC: '',
-    optionD: '',
-    correctAnswer: 'A',
-    topicTag: '',
-    solutionExplanation: '',
+
+  const formik = useFormik({
+    initialValues: {
+      subject: "",
+      marks: '2',
+      questionText: '',
+      optionA: '',
+      optionB: '',
+      optionC: '',
+      optionD: '',
+      correctAnswer: '',
+    },
+
+    onSubmit: (value, {resetForm}) => {
+      console.log(value);
+      resetForm()
+    },
+    validationSchema: yup.object({
+      subject: yup.string().required("Subject Domain is required"),
+      questionText: yup.string().required("Question Text is required"),
+      optionA: yup.string().required("Option A is required"),
+      optionB: yup.string().required("Option B is required"),
+      optionC: yup.string().required("Option C is required"),
+      optionD: yup.string().required("Option D is required"),
+      marks: yup.string().required("Mark for grading is required"),
+      correctAnswer: yup.string().required("Correct Answer is required"),
+    })
   })
 
-  const handleChange = (event) => {
-    const { name, value } = event.target
-    setFormValues((current) => ({ ...current, [name]: value }))
-  }
+  // const handleChange = (event) => {
+  //   const { name, value } = event.target
+  //   setFormValues((current) => ({ ...current, [name]: value }))
+  // }
 
-  const selectedAnswerText = useMemo(() => {
-    const optionMap = {
-      A: formValues.optionA,
-      B: formValues.optionB,
-      C: formValues.optionC,
-      D: formValues.optionD,
-    }
+  // const selectedAnswerText = useMemo(() => {
+  //   const optionMap = {
+  //     A: formValues.optionA,
+  //     B: formValues.optionB,
+  //     C: formValues.optionC,
+  //     D: formValues.optionD,
+  //   }
 
-    return optionMap[formValues.correctAnswer] || 'No answer selected yet'
-  }, [formValues.correctAnswer, formValues.optionA, formValues.optionB, formValues.optionC, formValues.optionD])
+  //   return optionMap[formValues.correctAnswer] || 'No answer selected yet'
+  // }, 
+  // [formValues.correctAnswer, formValues.optionA, formValues.optionB, formValues.optionC, formValues.optionD])
 
   return (
     <section className='question-bank'>
       <header className='question-bank__header'>
         <div>
           <h2 className='question-bank__title'>Question Bank</h2>
-          <p className='question-bank__subtitle'>Create and manage examination questions for different subjects and levels.</p>
+          <p className='question-bank__subtitle'>Construct high-fidelity test questions with our editorial-grade editor. Preview results in real-time as they will appear to students.</p>
         </div>
-        <button type='button' className='question-bank__header-action'>Save Template</button>
       </header>
 
       <div className='question-bank__grid'>
         <article className='question-bank__panel'>
-          <h3 className='question-bank__panel-title'>Create Question</h3>
+          <h4 className='py-3'>Create Question</h4>
 
-          <form className='question-bank__form' onSubmit={(event) => event.preventDefault()}>
+          <form className='question-bank__form' onSubmit={formik.handleSubmit}>
             <div className='question-bank__field-grid'>
               <label className='question-bank__field'>
-                <span>Subject</span>
+                <span>SUBJECT DOMAIN </span>
                 <input
                   type='text'
                   name='subject'
-                  value={formValues.subject}
-                  onChange={handleChange}
+                  value={formik.values.subject}
+                  onChange={formik.handleChange} onBlur={formik.handleBlur}
+                  onBlur={formik.handleBlur}
                   placeholder='Type subject name'
                 />
+                {formik.touched.subject ? <p className='text-danger'>{formik.errors.subject}</p> : ""}
               </label>
 
               <label className='question-bank__field'>
-                <span>Question Type</span>
-                <select name='questionType' value={formValues.questionType} onChange={handleChange}>
-                  <option value='multiple'>Multiple Choice</option>
-                  <option value='truefalse'>True / False</option>
-                  <option value='short'>Short Answer</option>
-                </select>
-              </label>
-
-              <label className='question-bank__field'>
-                <span>Difficulty</span>
-                <select name='difficulty' value={formValues.difficulty} onChange={handleChange}>
-                  <option value='beginner'>Beginner</option>
-                  <option value='intermediate'>Intermediate</option>
-                  <option value='advanced'>Advanced</option>
-                </select>
-              </label>
-
-              <label className='question-bank__field'>
-                <span>Marks</span>
-                <input type='number' min='1' name='marks' value={formValues.marks} onChange={handleChange} />
+                <span>QUESTION TEXTS</span>
+                <textarea
+                  rows='4'
+                  name='questionText'
+                  value={formik.values.questionText}
+                  onChange={formik.handleChange} onBlur={formik.handleBlur}
+                  placeholder='Type the full question statement here...'
+                />
+                {formik.touched.questionText ? <p className='text-danger'>{formik.errors.questionText}</p> : ""}
               </label>
             </div>
 
-            <label className='question-bank__field'>
-              <span>Question Text</span>
-              <textarea
-                rows='4'
-                name='questionText'
-                value={formValues.questionText}
-                onChange={handleChange}
-                placeholder='Type the full question statement here...'
-              />
-            </label>
 
             <div className='question-bank__options'>
               <label className='question-bank__field'>
-                <span>Option A</span>
-                <input type='text' name='optionA' value={formValues.optionA} onChange={handleChange} placeholder='First option' />
+                <span>OPTION A</span>
+                <input type='text' name='optionA' value={formik.values.optionA} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                  placeholder='Add option A..' />
+                {formik.touched.optionA ? <p className='text-danger'>{formik.errors.optionA}</p> : ""}
               </label>
+
               <label className='question-bank__field'>
-                <span>Option B</span>
-                <input type='text' name='optionB' value={formValues.optionB} onChange={handleChange} placeholder='Second option' />
+                <span>OPTION B</span>
+                <input type='text' name='optionB' value={formik.values.optionB} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                  placeholder='Add option B..' />
+                {formik.touched.optionB ? <p className='text-danger'>{formik.errors.optionB}</p> : ""}
               </label>
+
               <label className='question-bank__field'>
-                <span>Option C</span>
-                <input type='text' name='optionC' value={formValues.optionC} onChange={handleChange} placeholder='Third option' />
+                <span>OPTION C</span>
+                <input type='text' name='optionC' value={formik.values.optionC} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                  placeholder='Add option C..' />
+                {formik.touched.optionC ? <p className='text-danger'>{formik.errors.optionC}</p> : ""}
               </label>
+
               <label className='question-bank__field'>
-                <span>Option D</span>
-                <input type='text' name='optionD' value={formValues.optionD} onChange={handleChange} placeholder='Fourth option' />
+                <span>OPTION D</span>
+                <input type='text' name='optionD' value={formik.values.optionD} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                  placeholder='Add option D..' />
+                {formik.touched.optionD ? <p className='text-danger'>{formik.errors.optionD}</p> : ""}
               </label>
             </div>
 
             <div className='question-bank__field-grid'>
               <label className='question-bank__field'>
-                <span>Correct Answer</span>
-                <select name='correctAnswer' value={formValues.correctAnswer} onChange={handleChange}>
-                  <option value='A'>Option A</option>
+                <span>CORRECT ANSWER</span>
+                <select name='correctAnswer' value={formik.values.correctAnswer} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                >
+                  <option value='A' selected >Choose an option</option>
+                  <option value='A' >Option A</option>
                   <option value='B'>Option B</option>
                   <option value='C'>Option C</option>
                   <option value='D'>Option D</option>
                 </select>
-              </label>
-
-              <label className='question-bank__field'>
-                <span>Topic Tag</span>
-                <input
-                  type='text'
-                  name='topicTag'
-                  value={formValues.topicTag}
-                  onChange={handleChange}
-                  placeholder='e.g. Thermodynamics'
-                />
+                {formik.touched.correctAnswer ? <p className='text-danger'>{formik.errors.correctAnswer}</p> : ""}
               </label>
             </div>
 
             <label className='question-bank__field'>
-              <span>Solution Explanation</span>
-              <textarea
-                rows='3'
-                name='solutionExplanation'
-                value={formValues.solutionExplanation}
-                onChange={handleChange}
-                placeholder='Explain the expected answer for reviewers and tutors...'
+              <span>MARKS</span>
+              <input type='number' min='1' name='marks' value={formik.values.marks} onChange={formik.handleChange} onBlur={formik.handleBlur}
               />
+                {formik.touched.marks ? <p className='text-danger'>{formik.errors.marks}</p> : ""}
             </label>
 
             <div className='question-bank__actions'>
               <button type='button' className='question-bank__button question-bank__button--muted'>Save Draft</button>
-              <button type='submit' className='question-bank__button question-bank__button--primary'>Publish Question</button>
+              <button type='submit' className='question-bank__button question-bank__button--primary'>Save Questions</button>
             </div>
           </form>
+
         </article>
 
-        <aside className='question-bank__panel question-bank__panel--compact'>
+        {/* <aside className='question-bank__panel question-bank__panel--compact'>
           <h3 className='question-bank__panel-title'>Live Preview</h3>
           <div className='question-bank__preview'>
             <p className='question-bank__preview-badge'>
@@ -183,11 +180,9 @@ const QuestionBank = () => {
               <span>Correct Answer:</span> Option {formValues.correctAnswer} - {selectedAnswerText}
             </p>
 
-            <p className='question-bank__preview-solution'>
-              {formValues.solutionExplanation || 'Solution explanation will be shown here.'}
-            </p>
+
           </div>
-        </aside>
+        </aside> */}
       </div>
     </section>
   )

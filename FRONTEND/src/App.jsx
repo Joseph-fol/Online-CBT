@@ -38,7 +38,8 @@ const App = () => {
         <Route path="studentDashboard" element={<StudentDashboard/>}/>
         <Route path="/createStudentAccount" element={<SignupPage/>}/>
         <Route path="/forgotPassword" element={<ForgotPassword/>}/>
-        <Route path="/admin" element={<AdminDashboard /> }>
+        
+        <Route path="/admin" element={<AdminDashboard/> }>
           <Route index element={<AdminOverview />} />
           <Route path="subjects" element={<Subject />} />
           <Route path="question-bank" element={<QuestionBank />} />

@@ -23,15 +23,8 @@ const Sidebar = ({ isOpen = false, onNavigate }) => {
 
       <nav className='admin-sidebar__nav' aria-label='Admin sidebar navigation'>
         {navItems.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.end}
-            className={({ isActive }) =>
-              `admin-sidebar__link ${isActive ? 'is-active' : ''}`
-            }
-            onClick={onNavigate}
-          >
+          <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => `admin-sidebar__link ${isActive ? 'is-active' : ''}`
+            } onClick={onNavigate} >
             {item.label}
           </NavLink>
         ))}

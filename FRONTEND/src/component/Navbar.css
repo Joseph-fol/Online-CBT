@@ -43,7 +43,7 @@
     margin: 0;
     color: #3f51b5;
     text-decoration: none;
-    font-size: 1rem;
+    font-size: 18px;
     font-weight: 700;
     letter-spacing: -0.01em;
     white-space: nowrap;
@@ -58,7 +58,7 @@
 
 .admin-navbar__history {
     color: #667085;
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: 600;
     text-decoration: none;
 }
@@ -88,10 +88,6 @@
     text-decoration: none;
 }
 
-.admin-navbar__icon-button svg {
-    width: 0.88rem;
-    height: 0.88rem;
-}
 
 .admin-navbar__user-chip {
     display: inline-flex;
@@ -122,7 +118,7 @@
 .admin-navbar__logout {
     color: #98a2b3;
     text-decoration: none;
-    font-size: 0.76rem;
+    font-size: 0.9rem;
     font-weight: 600;
 }
 

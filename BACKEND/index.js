@@ -1,14 +1,23 @@
 const express = require("express")
 const app = express()
-const mongoose = require("mongoose")
 const dotenv = require("dotenv")
+const mongoose = require("mongoose")
+const ejs = require("ejs")
+const bcrypt = require("bcrypt")
+const studentRoutes = require("./routes/student.route")
 const cors = require("cors")
+
 dotenv.config()
 
-// const port = 2114
+app.set("view engine", "ejs")
+app.use(express.json())
+app.use(express.urlencoded({
+    extended: true
+}))
 
 const port = process.env.PORT 
 const URI = process.env.MONGO_URI
+// const students = []
 
 const dns = require("node:dns");
 dns.setDefaultResultOrder('ipv4first')
@@ -19,10 +28,11 @@ mongoose.connect(URI)
 .then(()=>{
     console.log("Connected to MongoDB");
 })
-
 .catch((err)=>{
     console.log("Error connecting to DB", err);
 })
+
+app.use("/student", studentRoutes)
 
 app.listen(port, (req, res) =>{
     console.log(`I am working on server ${port}`);
