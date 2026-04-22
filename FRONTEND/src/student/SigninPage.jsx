@@ -45,7 +45,7 @@ const SigninPage = () => {
                 <div className='container my-5'>
                     <div className='row g-5'>
                         <div className='position-relative col-xl-6 col-lg-6 col-md-6 col-sm-12 d-none d-lg-block d-md-block vh-150 p-5 text-white' style={{
-                            background: "#101275",
+                            background: "",
                             backgroundImage: "url('https://i.pinimg.com/736x/ac/43/ee/ac43ee0959ac1b13e3c4057e1cb0d54e.jpg')",
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
@@ -58,7 +58,7 @@ const SigninPage = () => {
                                 left: 0,
                                 right: 0,
                                 bottom: 0,
-                                background: 'rgba(21, 23, 120, 0.75)',
+                                background: '#0f172bc4',
                                 zIndex: 0
                             }}></div>
 
@@ -108,7 +108,7 @@ const SigninPage = () => {
                                 </div>
 
                                 <div class="col-12">
-                                    <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ background: "#30329f" }}>Signin</button>
+                                    <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ background: "#ab3500" }}>Signin</button>
                                 </div>
                                 <a href="" className='text-decoration-none text-center text-black fw-medium'><p>Don't have an account ? </p></a>
                             </form>

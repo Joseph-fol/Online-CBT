@@ -57,7 +57,7 @@ const SignupPage = () => {
                                 left: 0,
                                 right: 0,
                                 bottom: 0,
-                                background: 'rgba(21, 23, 120, 0.75)',
+                                background: '#0f172bda',
                                 zIndex: 0
                             }}></div>
 
@@ -110,7 +110,7 @@ const SignupPage = () => {
                                 </div>
 
                                 <div class="col-12">
-                                    <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ background: "#30329f" }}>Signup</button>
+                                    <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ background: "#ab3500" }}>Signup</button>
                                 </div>
 
                                 <a href="" className='text-decoration-none text-center text-black fw-medium'><p>Already have an account ? </p></a>
