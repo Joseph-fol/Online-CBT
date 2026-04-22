@@ -17,9 +17,10 @@ const QuestionBank = () => {
       correctAnswer: '',
     },
 
-    onSubmit: (value, {resetForm}) => {
+    onSubmit: (value, { resetForm }) => {
       console.log(value);
       resetForm()
+      alert("Details successfully submitted")
     },
     validationSchema: yup.object({
       subject: yup.string().required("Subject Domain is required"),
@@ -33,22 +34,22 @@ const QuestionBank = () => {
     })
   })
 
-  // const handleChange = (event) => {
-  //   const { name, value } = event.target
-  //   setFormValues((current) => ({ ...current, [name]: value }))
-  // }
+  const selectedAnswerText = useMemo(() => {
+    const optionMap = {
+      A: formik.values.optionA,
+      B: formik.values.optionB,
+      C: formik.values.optionC,
+      D: formik.values.optionD,
+    }
 
-  // const selectedAnswerText = useMemo(() => {
-  //   const optionMap = {
-  //     A: formValues.optionA,
-  //     B: formValues.optionB,
-  //     C: formValues.optionC,
-  //     D: formValues.optionD,
-  //   }
-
-  //   return optionMap[formValues.correctAnswer] || 'No answer selected yet'
-  // }, 
-  // [formValues.correctAnswer, formValues.optionA, formValues.optionB, formValues.optionC, formValues.optionD])
+    return optionMap[formik.values.correctAnswer] || 'No answer selected yet'
+  }, [
+    formik.values.correctAnswer,
+    formik.values.optionA,
+    formik.values.optionB,
+    formik.values.optionC,
+    formik.values.optionD,
+  ])
 
   return (
     <section className='question-bank'>
@@ -127,7 +128,7 @@ const QuestionBank = () => {
                 <span>CORRECT ANSWER</span>
                 <select name='correctAnswer' value={formik.values.correctAnswer} onChange={formik.handleChange} onBlur={formik.handleBlur}
                 >
-                  <option value='A' selected >Choose an option</option>
+                  <option value=''>Choose an option</option>
                   <option value='A' >Option A</option>
                   <option value='B'>Option B</option>
                   <option value='C'>Option C</option>
@@ -141,7 +142,7 @@ const QuestionBank = () => {
               <span>MARKS</span>
               <input type='number' min='1' name='marks' value={formik.values.marks} onChange={formik.handleChange} onBlur={formik.handleBlur}
               />
-                {formik.touched.marks ? <p className='text-danger'>{formik.errors.marks}</p> : ""}
+              {formik.touched.marks ? <p className='text-danger'>{formik.errors.marks}</p> : ""}
             </label>
 
             <div className='question-bank__actions'>
@@ -152,37 +153,32 @@ const QuestionBank = () => {
 
         </article>
 
-        {/* <aside className='question-bank__panel question-bank__panel--compact'>
-          <h3 className='question-bank__panel-title'>Live Preview</h3>
+        <aside className='question-bank__panel question-bank__panel--compact'>
+          <h3 className='question-bank__panel-title'>STUDENT PREVIEW</h3>
           <div className='question-bank__preview'>
-            <p className='question-bank__preview-badge'>
-              {(formValues.subject || 'General Subject')} - {formValues.difficulty}
-            </p>
+            {/* <p className='question-bank__preview-badge'>
+              {(formik.values.subject || 'General Subject')}
+            </p> */}
+
+            <p className='question-bank_question-number p-2 w-50 text-center text-white fw-bold'> QUESTION 04</p>
 
             <h4 className='question-bank__preview-question'>
-              {formValues.questionText || 'Your question preview will appear here as you type.'}
+              {formik.values.questionText || 'Your question preview will appear here as you type.'}
             </h4>
 
             <ul className='question-bank__preview-options'>
-              <li><strong>A.</strong> {formValues.optionA || 'Option A'}</li>
-              <li><strong>B.</strong> {formValues.optionB || 'Option B'}</li>
-              <li><strong>C.</strong> {formValues.optionC || 'Option C'}</li>
-              <li><strong>D.</strong> {formValues.optionD || 'Option D'}</li>
+              <li><strong>A.</strong> {formik.values.optionA || 'Option A'}</li>
+              <li><strong>B.</strong> {formik.values.optionB || 'Option B'}</li>
+              <li><strong>C.</strong> {formik.values.optionC || 'Option C'}</li>
+              <li><strong>D.</strong> {formik.values.optionD || 'Option D'}</li>
             </ul>
 
-            <div className='question-bank__preview-meta'>
-              <p><span>Type:</span> {formValues.questionType}</p>
-              <p><span>Marks:</span> {formValues.marks || '0'}</p>
-              <p><span>Topic:</span> {formValues.topicTag || 'Not tagged'}</p>
-            </div>
-
-            <p className='question-bank__preview-answer'>
-              <span>Correct Answer:</span> Option {formValues.correctAnswer} - {selectedAnswerText}
-            </p>
-
+            {/* <p className='question-bank__preview-answer'>
+              <span>Correct Answer:</span> {formik.values.correctAnswer ? `Option ${formik.values.correctAnswer} - ${selectedAnswerText}` : 'No answer selected yet'}
+            </p> */}
 
           </div>
-        </aside> */}
+        </aside>
       </div>
     </section>
   )
