@@ -54,7 +54,7 @@
     font-size: 13px;
     padding: 15px 0;
     font-weight: 700;
-    color: #473cdd;
+    color: #ab3500;
 }
 
 .question-bank__form {
@@ -133,9 +133,16 @@
 }
 
 .question-bank__button--primary {
-    background: #4f46e5;
+    background: #02011a;
     color: #ffffff;
-    border-color: #4f46e5;
+    border-color: #02011a;
+}
+
+.question-bank__button--primary:hover{
+    background-color: #ab3500;
+    border-color: #ab3500;
+    transition: 0.5s ease-in-out;
+
 }
 
 .question-bank__preview {
@@ -147,7 +154,7 @@
 }
 
 .question-bank_question-number{
-    background: #4f46e5;
+    background: #ab3500;
     font-size: 14px;
 }
 
@@ -201,6 +208,13 @@
 .question-bank__preview-answer span {
     color: #344054;
     font-weight: 600;
+}
+
+.instruction_display {
+    border: 1px solid #e4e7ec;
+    border-radius: 0.7rem;
+    background: #ffffff;
+    padding: 20px;
 }
 
 @media (max-width: 992px) {

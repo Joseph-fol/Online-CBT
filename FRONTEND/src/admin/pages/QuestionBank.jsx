@@ -15,6 +15,9 @@ const QuestionBank = () => {
       optionC: '',
       optionD: '',
       correctAnswer: '',
+      duration: "",
+      totalQuestion: "",
+      score: ""
     },
 
     onSubmit: (value, { resetForm }) => {
@@ -30,9 +33,16 @@ const QuestionBank = () => {
       optionC: yup.string().required("Option C is required"),
       optionD: yup.string().required("Option D is required"),
       marks: yup.string().required("Mark for grading is required"),
+      duration: yup.string().required("Duration for grading is required"),
+      totalQuestion: yup.string().required("Total Question is required"),
+      score: yup.string().required("Score for grading is required"),
       correctAnswer: yup.string().required("Correct Answer is required"),
     })
   })
+
+  const displayDraft = () => {
+    alert("Successfully saved as draft")
+  }
 
   const selectedAnswerText = useMemo(() => {
     const optionMap = {
@@ -67,7 +77,7 @@ const QuestionBank = () => {
           <form className='question-bank__form' onSubmit={formik.handleSubmit}>
             <div className='question-bank__field-grid'>
               <label className='question-bank__field'>
-                <span>SUBJECT DOMAIN </span>
+                <span>SUBJECT</span>
                 <input
                   type='text'
                   name='subject'
@@ -138,19 +148,39 @@ const QuestionBank = () => {
               </label>
             </div>
 
-            <label className='question-bank__field'>
-              <span>MARKS</span>
-              <input type='number' min='1' name='marks' value={formik.values.marks} onChange={formik.handleChange} onBlur={formik.handleBlur}
-              />
-              {formik.touched.marks ? <p className='text-danger'>{formik.errors.marks}</p> : ""}
-            </label>
+            <div className='question-bank__options'>
+              <label className='question-bank__field'>
+                <span>MARKS</span>
+                <input type='number' min='1' name='marks' value={formik.values.marks} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                />
+                {formik.touched.marks ? <p className='text-danger'>{formik.errors.marks}</p> : ""}
+              </label>
+
+              <label className='question-bank__field'>
+                <span>DURATIONS (Minutes)</span>
+                <input type='number' min='1' name='duration' value={formik.values.duration} placeholder='e.g., 50' onChange={formik.handleChange} onBlur={formik.handleBlur}
+                />
+                {formik.touched.duration ? <p className='text-danger'>{formik.errors.duration}</p> : ""}
+              </label>
+
+              <label className='question-bank__field'>
+                <span>TOTAL QUESTIONS</span>
+                <input type='number' min='1' name='totalQuestion' placeholder='e.g., 20' value={formik.values.totalQuestion} onChange={formik.handleChange} onBlur={formik.handleBlur} />
+                {formik.touched.totalQuestion ? <p className='text-danger'>{formik.errors.totalQuestion}</p> : ""}
+              </label>
+
+              <label className='question-bank__field'>
+                <span>SCORE</span>
+                <input type='number' min='1' name='score' placeholder='e.g., 20' value={formik.values.score} onChange={formik.handleChange} onBlur={formik.handleBlur} />
+                {formik.touched.score ? <p className='text-danger'>{formik.errors.score}</p> : ""}
+              </label>
+            </div>
 
             <div className='question-bank__actions'>
-              <button type='button' className='question-bank__button question-bank__button--muted'>Save Draft</button>
+              <button type='button' className='question-bank__button question-bank__button--muted' onClick={displayDraft}>Save Draft</button>
               <button type='submit' className='question-bank__button question-bank__button--primary'>Save Questions</button>
             </div>
           </form>
-
         </article>
 
         <aside className='question-bank__panel question-bank__panel--compact'>
@@ -179,6 +209,14 @@ const QuestionBank = () => {
 
           </div>
         </aside>
+      </div>
+
+      <div className='instruction_display my-4'>
+        <p className='fw-medium'>Instruction for creating the Exam</p>
+        <ul>
+          <li>Set a clear and descriptive exam title</li>
+          <li>Ensure duration is appropriate for the number of questions</li>
+        </ul>
       </div>
     </section>
   )

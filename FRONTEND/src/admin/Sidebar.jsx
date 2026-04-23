@@ -16,15 +16,15 @@ const Sidebar = ({ isOpen = false, onNavigate }) => {
     <aside className={`admin-sidebar ${isOpen ? 'is-open' : ''}`}>
       <div className='admin-sidebar__brand'>
         <div>
-          <p className='admin-sidebar__eyebrow'>Curator Admin</p>
-          <h1 className='admin-sidebar__title'></h1>
+          <h1 className='admin-sidebar__title'>Online CBT</h1>
+          <p className='admin-sidebar__eyebrow'>Admin User</p>
         </div>
       </div>
 
       <nav className='admin-sidebar__nav' aria-label='Admin sidebar navigation'>
         {navItems.map((item) => (
           <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => `admin-sidebar__link ${isActive ? 'is-active' : ''}`
-            } onClick={onNavigate} >
+          } onClick={onNavigate} >
             {item.label}
           </NavLink>
         ))}
