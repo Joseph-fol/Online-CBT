@@ -44,7 +44,7 @@ const AdminSignin = () => {
                 <div className='container my-5'>
                     <div className='row g-5'>
                         <div className='position-relative col-xl-6 col-lg-6 col-md-6 col-sm-12 d-none d-lg-block d-md-block vh-150 p-5 text-white' style={{
-                            background: "#101275",
+                            background: "#0f172bc4",
                             backgroundImage: "url('https://i.pinimg.com/236x/b3/1b/79/b31b795a1109c73f147236ea2e73e1a8.jpg')",
                             backgroundSize: 'cover',
                             backgroundPosition: 'center',
@@ -57,7 +57,7 @@ const AdminSignin = () => {
                                 left: 0,
                                 right: 0,
                                 bottom: 0,
-                                background: '#0f6e50e1',
+                                background: '#0f172bc4',
                                 zIndex: 0
                             }}></div>
 
@@ -79,7 +79,7 @@ const AdminSignin = () => {
                                     <h4 className='fw-bold py-0'> Admin Sign in</h4>
                                     <Link to="/">
                                     <button className='btn'>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="#0f6e50" d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42a.996.996 0 0 0-1.41 0l-6.59 6.59a.996.996 0 0 0 0 1.41l6.59 6.59a.996.996 0 1 0 1.41-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1" /></svg>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="#0f172b" d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42a.996.996 0 0 0-1.41 0l-6.59 6.59a.996.996 0 0 0 0 1.41l6.59 6.59a.996.996 0 1 0 1.41-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1" /></svg>
                                     </button>
                                     </Link>
                                 </div>
@@ -102,7 +102,7 @@ const AdminSignin = () => {
                                 </div>
 
                                 <div class="col-12">
-                                    <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ backgroundColor: "#0f6e50" }}>Signin</button>
+                                    <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ backgroundColor: "#ab3500" }}>Signin</button>
                                 </div>
                             </form>
                         </div>

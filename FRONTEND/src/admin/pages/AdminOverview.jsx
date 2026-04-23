@@ -20,7 +20,7 @@ const AdminOverview = () => {
 
         <div className='admin-overview-top_button'>
           <Link to="/admin/question-bank">
-            <button> <svg xmlns="http://www.w3.org/2000/svg" width="2.5em" height="1.3em" viewBox="0 0 24 24"><path fill="#fff" d="M11 13H5v-2h6V5h2v6h6v2h-6v6h-2z" /></svg>Create New Subject</button>
+            <button> <svg xmlns="http://www.w3.org/2000/svg" width="1.3em" height="1.3em" viewBox="0 0 24 24"><path fill="#fff" d="M11 13H5v-2h6V5h2v6h6v2h-6v6h-2z" /></svg>Create New Subject</button>
           </Link>
 
           <Link to="/admin/student-result">
@@ -36,6 +36,60 @@ const AdminOverview = () => {
             <span className='admin-overview__card-value'>{item.value}</span>
           </article>
         ))}
+      </div>
+
+      <div className='col-lg-12 col-md-10 py-4 '>
+        <div className='d-flex justify-content-between'>
+          <h5 className='fs-5'>Recent Activity History </h5>
+        </div>
+
+        <div className='admin-overview__table-wrap'>
+          <table className='table table-hover table-light'>
+            <thead>
+              <tr>
+                <th scope="col">STUDENT NAME</th>
+                <th scope="col">SUBJECT</th>
+                <th scope="col">SCORE</th>
+                <th scope="col">TIME SUBMITTED</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <th scope="row" className='fw-medium'>Adesola Micheal</th>
+                <td>
+                  <span className=''>Advanced Macroeconomics</span>
+                </td>
+                <td className='fw-medium'>85%</td>
+                <td className=''>2 min ago</td>
+              </tr>
+              <tr>
+                <th scope="row" className='fw-medium'>Adesola Micheal</th>
+                <td>
+                  <span className=''>Advanced Macroeconomics</span>
+                </td>
+                <td className='fw-medium'>85%</td>
+                <td className=''>2 min ago</td>
+              </tr>
+              <tr>
+                <th scope="row" className='fw-medium'>Adesola Micheal</th>
+                <td>
+                  <span className=''>Advanced Macroeconomics</span>
+                </td>
+                <td className='fw-medium'>85%</td>
+                <td className=''>2 min ago</td>
+              </tr>
+              <tr>
+                <th scope="row" className='fw-medium'>Adesola Micheal</th>
+                <td>
+                  <span className=''>Advanced Macroeconomics</span>
+                </td>
+                <td className='fw-medium'>85%</td>
+                <td className=''>2 min ago</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   )
