@@ -1,9 +1,10 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import './QuestionBank.css'
 import { useFormik } from 'formik'
 import * as yup from "yup"
 
 const QuestionBank = () => {
+  const [draftQuestions, setDraftQuestions] = useState([])
 
   const formik = useFormik({
     initialValues: {
@@ -41,25 +42,42 @@ const QuestionBank = () => {
   })
 
   const displayDraft = () => {
-    alert("Successfully saved as draft")
-  }
+    const { questionText, optionA, optionB, optionC, optionD, correctAnswer } = formik.values
 
-  const selectedAnswerText = useMemo(() => {
-    const optionMap = {
-      A: formik.values.optionA,
-      B: formik.values.optionB,
-      C: formik.values.optionC,
-      D: formik.values.optionD,
+    if (!questionText.trim() || !optionA.trim() || !optionB.trim() || !optionC.trim() || !optionD.trim()) {
+      alert("Add question text and all options before saving draft")
+      return
     }
 
-    return optionMap[formik.values.correctAnswer] || 'No answer selected yet'
-  }, [
-    formik.values.correctAnswer,
-    formik.values.optionA,
-    formik.values.optionB,
-    formik.values.optionC,
-    formik.values.optionD,
-  ])
+    const newDraft = {
+      id: Date.now(),
+      questionText: questionText.trim(),
+      options: [
+        { 
+          key: 'A', 
+          text: optionA.trim() 
+        },
+
+        { 
+          key: 'B', 
+          text: optionB.trim() 
+        },
+
+        { 
+          key: 'C', 
+          text: optionC.trim() 
+        },
+
+        { key: 'D', 
+          text: optionD.trim() 
+        },
+      ],
+      correctAnswer,
+    }
+
+    setDraftQuestions((prev) => [...prev, newDraft])
+    alert("Successfully saved as draft")
+  }
 
   return (
     <section className='question-bank'>
@@ -82,7 +100,7 @@ const QuestionBank = () => {
                   type='text'
                   name='subject'
                   value={formik.values.subject}
-                  onChange={formik.handleChange} onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   placeholder='Type subject name'
                 />
@@ -105,7 +123,7 @@ const QuestionBank = () => {
 
             <div className='question-bank__options'>
               <label className='question-bank__field'>
-                <span>OPTION A</span>
+                <span>OPTION A </span>
                 <input type='text' name='optionA' value={formik.values.optionA} onChange={formik.handleChange} onBlur={formik.handleBlur}
                   placeholder='Add option A..' />
                 {formik.touched.optionA ? <p className='text-danger'>{formik.errors.optionA}</p> : ""}
@@ -217,6 +235,41 @@ const QuestionBank = () => {
           <li>Set a clear and descriptive exam title</li>
           <li>Ensure duration is appropriate for the number of questions</li>
         </ul>
+      </div>
+
+      <div className='displayDraft'>
+        <h4 className='displayDraft__title'>Draft Questions</h4>
+
+        {draftQuestions.length === 0 ? (
+          <p className='displayDraft__empty'>No draft question yet. Fill the form and click Save Draft.</p>
+        ) : (
+          <div className='displayDraft__list'>
+            {draftQuestions.map((item, index) => (
+
+              <article className='displayDraft__card' key={item.id}>
+                <div className='displayDraft__card-header'>
+                  <span className='displayDraft__number'>{index + 1}</span>
+                  <h5 className='displayDraft__question'>{item.questionText}</h5>
+                </div>
+
+                <ul className='displayDraft__options'>
+                  {item.options.map((option) => {
+                    const isCorrect = item.correctAnswer === option.key
+
+                    return (
+                      <li key={`${item.id}-${option.key}`} className={isCorrect ? 'displayDraft__option displayDraft__option--correct' : 'displayDraft__option'}>
+                        <span className={isCorrect ? 'displayDraft__option-icon displayDraft__option-icon--correct' : 'displayDraft__option-icon'} aria-hidden='true'>
+                          {isCorrect ? '✓' : '○'}
+                        </span>
+                        <span>{option.text}</span>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </article>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )

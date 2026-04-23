@@ -25,12 +25,34 @@
     gap: 1.25rem;
 }
 
+.admin-overview-top-section {
+    display: flex;
+    background: rgba(255, 255, 255, 0.88);
+    border-radius: 1.35rem;
+
+}
+
+.admin-overview-top_button {
+    padding: 20px;
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    width: 40%;
+}
+
+.admin-overview-top_button button {
+    padding: 10px 50px;
+    border: none;
+    background-color: #ab3500;
+    font-weight: 600;
+    color: white;
+    border-radius: 10px;
+}
+
 .admin-overview__hero,
 .admin-page-card {
     padding: 1.5rem;
-    background: rgba(255, 255, 255, 0.88);
-    border: 1px solid rgba(148, 163, 184, 0.18);
-    border-radius: 1.35rem;
+    /* border: 1px solid rgba(148, 163, 184, 0.18); */
 }
 
 .admin-overview__eyebrow {
@@ -78,6 +100,7 @@
 .admin-overview__card-label {
     color: #475569;
     font-weight: 600;
+    font-size: 0.8rem;
 }
 
 @media (max-width: 992px) {
@@ -91,6 +114,22 @@
 
     .admin-overview__stats {
         grid-template-columns: 1fr;
+    }
+
+    .admin-overview-top-section {
+        display: block;
+    }
+
+    .admin-overview-top_button {
+        padding: 20px;
+        display: flex;
+        gap: 10px;
+        flex-direction: row;
+        width: 100%;
+    }
+
+    .admin-overview-top_button button {
+        padding: 10px 15px;
     }
 }
 

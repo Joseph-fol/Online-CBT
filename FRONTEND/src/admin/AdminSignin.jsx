@@ -28,7 +28,7 @@ const AdminSignin = () => {
 
         onSubmit: (values, { resetForm }) => {
             console.log(values);
-            alert("Form Successfully Submitted")
+            alert("Successful")
             resetForm()
             navigate("/admin")
         },
