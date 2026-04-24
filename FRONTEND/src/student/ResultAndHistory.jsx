@@ -1,10 +1,10 @@
 import React from 'react'
-import Navbar from '../component/Navbar'
+import StudentNavbar from './StudentNavbar'
 
 const ResultAndHistory = () => {
     return (
         <>
-            <Navbar />
+            <StudentNavbar />
             <div className='mx-auto' style={{ backgroundColor: "#f8f9fa" }}>
                 <div className='col-lg-8 col-md-10 mx-auto pt-5 container' >
                     <div className='bg-white' style={{ borderTop: "4px solid #463bdc", borderRadius:"5px" }}>

@@ -1,0 +1,23 @@
+.student-result-top-section{
+    display: flex;
+    justify-content: space-between;
+}
+
+.the-btn {
+    border: none;
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    background-color: #ab3500;
+}
+
+.the-btn:hover{
+    background-color: #c73e03;
+    transition: 0.5s ease-in-out;
+}
+
+@media (max-width:950px) {
+    .student-result-top-section{
+        display: block;
+    }
+}

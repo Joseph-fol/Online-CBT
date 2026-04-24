@@ -26,7 +26,7 @@ const Navbar = ({ isSidebarOpen, onToggleSidebar }) => {
 
         <div className='admin-navbar__actions'>
           <button type='button' className='admin-navbar__icon-button' aria-label='Notifications'>
-            <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' aria-hidden='true'>
+            <svg xmlns='http://www.w3.org/2000/svg' width= "1.3em" height=" 1.3em" viewBox='0 0 24 24' aria-hidden='true'>
               <path fill='currentColor' d='M12 2a6 6 0 0 0-6 6v3.54l-.79 2.37A1 1 0 0 0 6.16 15h11.68a1 1 0 0 0 .95-1.32L18 11.54V8a6 6 0 0 0-6-6m0 20a3 3 0 0 1-2.82-2h5.64A3 3 0 0 1 12 22' />
             </svg>
           </button>

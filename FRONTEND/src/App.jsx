@@ -6,7 +6,7 @@ import React from 'react'
 // import Subject from './admin/pages/Subject'
 // import StudentResult from './admin/pages/StudentResult'
 // import Sidebar from './admin/Sidebar'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import LandingPage from './component/LandingPage'
 import AdminSignin from './admin/AdminSignin'
 import SigninPage from './student/SigninPage'
@@ -20,6 +20,9 @@ import AdminOverview from './admin/pages/AdminOverview'
 import Settings from './admin/pages/Settings'
 import Support from './admin/pages/Support'
 import StudentDashboard from './student/StudentDashboard'
+import StudentLayout from './student/StudentLayout'
+import AvailableAssessmentsPage from './student/AvailableAssessmentsPage'
+import PerformanceHistoryPage from './student/PerformanceHistoryPage'
 
 const App = () => {
   return (
@@ -35,9 +38,17 @@ const App = () => {
         <Route path="/" element={<LandingPage/>}/>
         <Route path="/AdminSignin" element={<AdminSignin/>}/>
         <Route path="/studentSignin" element={<SigninPage/>}/>
-        <Route path="studentDashboard" element={<StudentDashboard/>}/>
+        <Route path="/studentDashboard" element={<Navigate to='/student/dashboard' replace />} />
         <Route path="/createStudentAccount" element={<SignupPage/>}/>
         <Route path="/forgotPassword" element={<ForgotPassword/>}/>
+        <Route path="/student-history" element={<Navigate to='/student/performance-history' replace />} />
+
+        <Route path='/student' element={<StudentLayout />}>
+          <Route index element={<Navigate to='dashboard' replace />} />
+          <Route path='dashboard' element={<StudentDashboard />} />
+          <Route path='available-assessments' element={<AvailableAssessmentsPage />} />
+          <Route path='performance-history' element={<PerformanceHistoryPage />} />
+        </Route>
         
         <Route path="/admin" element={<AdminDashboard/> }>
           <Route index element={<AdminOverview />} />

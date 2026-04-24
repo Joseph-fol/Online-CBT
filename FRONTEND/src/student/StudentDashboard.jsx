@@ -1,12 +1,9 @@
 import React from 'react'
 import './StudentDashboard.css'
-import Navbar from '../component/Navbar'
-import AssignedObject from './AssignedObject'
 
 const StudentDashboard = () => {
     return (
         <>
-        <Navbar/>
             <section className='student-dashboard-shell'>
                 <div className='student-dashboard-banner'>
                     <div className='student-dashboard-content'>
@@ -21,7 +18,6 @@ const StudentDashboard = () => {
                     </div>
                 </div>
             </section>
-            <AssignedObject/>
         </>
     )
 }

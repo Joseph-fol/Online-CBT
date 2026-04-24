@@ -38,12 +38,12 @@ const AdminOverview = () => {
         ))}
       </div>
 
-      <div className='col-lg-12 col-md-10 py-4 '>
+      <div className='col-lg-12 col-md-10 py-4'>
         <div className='d-flex justify-content-between'>
           <h5 className='fs-5'>Recent Activity History </h5>
         </div>
 
-        <div className='admin-overview__table-wrap'>
+        <div className='admin-overview__table-wrap bg-secondary' >
           <table className='table table-hover table-light'>
             <thead>
               <tr>

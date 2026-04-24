@@ -1,0 +1,19 @@
+.student-layout {
+    min-height: 100vh;
+    background: #f8f9fa;
+}
+
+.student-layout__content-wrap {
+    min-height: 100vh;
+    margin-left: 15rem;
+}
+
+.student-layout__content {
+    min-width: 0;
+}
+
+@media (max-width: 992px) {
+    .student-layout__content-wrap {
+        margin-left: 0;
+    }
+}
