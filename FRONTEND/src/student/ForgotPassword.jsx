@@ -51,7 +51,7 @@ const ForgotPassword = () => {
                                 </div>
 
                                 <div class="col-12">
-                                    <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3 shadow-sm" style={{ background: "#30329f" }}>Send Recovery Link</button>
+                                    <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3 shadow-sm" style={{ background: "#ab3500" }}>Send Recovery Link</button>
                                 </div>
                             </form>
                             <div class="col-12">
@@ -62,9 +62,9 @@ const ForgotPassword = () => {
                         </div>
 
                         <div className='position-relative col-xl-6 col-lg-6 col-md-6 col-sm-12 d-none d-lg-block d-md-block vh-150 p-5' style={{ backgroundColor: "#f3f4f5" }} data-aos="slide-left" data-aos-delay="0">
-                            <h4 className='fw-bold 'style={{ color: "#30329f" }}>CBT</h4>
+                            <h4 className='fw-bold 'style={{ color: "#ab3500" }}>CBT</h4>
                             <div className=' mt-5 pt-5 pb-5'>
-                                <h1 className='fw-bold text-black' style={{ fontSize: "45px" }}>Restore your <span style={{ color: "#30329f" }}>access</span> to excellence.</h1>
+                                <h1 className='fw-bold text-black' style={{ fontSize: "45px" }}>Restore your <span style={{ color: "#ab3500" }}>access</span> to excellence.</h1>
                                 <p className='fw-medium fs-6'>Secure, institutional recovery for The Academic Curator's global research and examination network.</p>
                             </div>
                             <div className='position-absolute bottom-0'>
