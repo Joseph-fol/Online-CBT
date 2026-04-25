@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import './LandingPage.css'
+import logo from '../assets/Online-cbt.jpg'
 import { Link } from 'react-router-dom'
 
 const LandingPage = () => {
@@ -63,7 +64,7 @@ const LandingPage = () => {
                 }}
             >
                 <div className="container-fluid">
-                    <a className="navbar-brand fw-bold" href="#"><img src="src/assets/Online-cbt.jpg" alt="" width={30}/> Online CBT</a>
+                    <a className="navbar-brand fw-bold" href="#"><img src={logo} alt="" width={30}/> Online CBT</a>
                     <button className="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>
