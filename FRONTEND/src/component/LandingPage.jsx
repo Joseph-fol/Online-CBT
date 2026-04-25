@@ -63,7 +63,7 @@ const LandingPage = () => {
                 }}
             >
                 <div className="container-fluid">
-                    <a className="navbar-brand fw-bold" href="#"><img src="src\assets\Online-cbt.jpg" alt=""  width={30}/> Online CBT</a>
+                    <a className="navbar-brand fw-bold" href="#"><img src="src\assets\Online-cbt.jpg" alt="" width={30} /> Online CBT</a>
                     <button className="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>
@@ -100,15 +100,15 @@ const LandingPage = () => {
             </nav>
 
             {/* Watermark Logo */}
-<div className='watermark-logo'>
-    <img src="src/assets/Online-cbt.jpg"  alt="watermark" 
-        style={{
-            width: '300px',
-            height: 'auto',
-            // filter: 'grayscale(100%)'
-        }}
-    />
-</div>
+            <div className='watermark-logo'>
+                <img src="src/assets/Online-cbt.jpg" alt="watermark"
+                    style={{
+                        width: '300px',
+                        height: 'auto',
+                        // filter: 'grayscale(100%)'
+                    }}
+                />
+            </div>
 
             {/* Header Section */}
             <section className='bg-body-tertiary w-100 d-flex justify-content-center align-items-center position-relative' style={{ height: "100vh", overflow: "hidden", background: "linear-gradient(135deg, #fff7ed 0%, #f8fafc 100%)", marginTop: "0" }}>
@@ -125,7 +125,7 @@ const LandingPage = () => {
                     <p data-aos="fade-up" data-aos-delay="400">The definitive platform for high-stakes examinations. Empowering educators with tamper-proof security and students with a cognitive-calm testing environment.</p>
                     <div className='d-flex gap-3 align-items-center justify-content-center flex-wrap'>
                         <Link to="/createStudentAccount">
-                            <button className="btn text-white fw-medium py-2 px-4" data-aos="slide-left" data-aos-delay="600" style={{ background: "#0f172b" }}  type="submit">Start a free assessment</button>
+                            <button className="btn text-white fw-medium py-2 px-4" data-aos="slide-left" data-aos-delay="600" style={{ background: "#0f172b" }} type="submit">Start a free assessment</button>
                         </Link>
                         <button className='btn fw-medium' data-aos="slide-right" data-aos-delay="600">See how it works </button>
                     </div>
@@ -135,7 +135,7 @@ const LandingPage = () => {
             <section className='container-fluid ' style={{ background: "#ab3500" }}>
                 <div className='px-5 py-4 d-flex flex-wrap justify-content-evenly gap-3 align-items-center'>
                     <div data-aos="flip-left" style={{ borderLeft: "4px solid #fff7ed", paddingLeft: "10px" }}>
-                        <h1 className='text-white fw-bold' style={{color:"#0f172b"}}>10,000+</h1>
+                        <h1 className='text-white fw-bold' style={{ color: "#0f172b" }}>10,000+</h1>
                         <p className='fw-medium text-white'>QUESTION DELIVERED</p>
                     </div>
                     <div data-aos="flip-left" data-aos-delay="200" style={{ borderLeft: "4px solid #fff7ed", paddingLeft: "10px" }}>
