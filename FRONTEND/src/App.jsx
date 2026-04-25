@@ -23,6 +23,7 @@ import StudentDashboard from './student/StudentDashboard'
 import StudentLayout from './student/StudentLayout'
 import AvailableAssessmentsPage from './student/AvailableAssessmentsPage'
 import PerformanceHistoryPage from './student/PerformanceHistoryPage'
+import PageNotFound from './component/PageNotFound'
 
 const App = () => {
   return (
@@ -42,6 +43,7 @@ const App = () => {
         <Route path="/createStudentAccount" element={<SignupPage/>}/>
         <Route path="/forgotPassword" element={<ForgotPassword/>}/>
         <Route path="/student-history" element={<Navigate to='/student/performance-history' replace />} />
+        <Route path='*' element={<PageNotFound/>}/>
 
         <Route path='/student' element={<StudentLayout />}>
           <Route index element={<Navigate to='dashboard' replace />} />
