@@ -63,7 +63,7 @@ const LandingPage = () => {
                 }}
             >
                 <div className="container-fluid">
-                    <a className="navbar-brand fw-bold" href="#">Online CBT</a>
+                    <a className="navbar-brand fw-bold" href="#"><img src="src\assets\Online-cbt.jpg" alt=""  width={30}/> Online CBT</a>
                     <button className="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>
@@ -94,14 +94,21 @@ const LandingPage = () => {
                             <Link to="/studentSignin">
                                 <button className="btn w-100 text-white fw-medium" style={{ background: "#ab3500" }} type="submit">Student Login</button>
                             </Link>
-
-                            {/* <Link to="/admin">
-                                <p>Admin portal</p>
-                            </Link> */}
                         </div>
                     </div>
                 </div>
             </nav>
+
+            {/* Watermark Logo */}
+<div className='watermark-logo'>
+    <img src="src/assets/Online-cbt.jpg"  alt="watermark" 
+        style={{
+            width: '300px',
+            height: 'auto',
+            // filter: 'grayscale(100%)'
+        }}
+    />
+</div>
 
             {/* Header Section */}
             <section className='bg-body-tertiary w-100 d-flex justify-content-center align-items-center position-relative' style={{ height: "100vh", overflow: "hidden", background: "linear-gradient(135deg, #fff7ed 0%, #f8fafc 100%)", marginTop: "0" }}>
