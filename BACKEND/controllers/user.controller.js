@@ -13,14 +13,13 @@ const getDashboard = (req, res) => {
     res.send("You are welcome to dashboard")
 }
 
-const adminSignin = (req, res) =>{
+const adminSignin = (req, res) => {
     res.render("adminSignin")
 }
 
 
 const postStudentSignUp = (req, res) => {
-    const { email, password } = req.body
-
+    const { fullName, email, password } = req.body
     let salt = bcrypt.genSaltSync(10)
     let hashedPassword = bcrypt.hashSync(req.body.password, salt)
     req.body.password = hashedPassword
@@ -31,14 +30,19 @@ const postStudentSignUp = (req, res) => {
 
         .then((studentData) => {
             console.log("Customer Saved", studentData);
-            setTimeout(() => {
-                // Send only one response for this request.
-                return res.redirect("studentSignin")
-            }, 2000);
+            // Send only one response for this request.
+            return res.status(201).json({
+                message: "Signup Successful",
+                student: {
+                    id: studentData._id,
+                    email: studentData.email
+                }
+            })
+            return res.redirect("studentSignin")
 
-            const userExists = student.findOne({email})
-            if(userExists){
-                return res.status(400).json({message: "User already exists"})
+            const userExists = student.findOne({ email })
+            if (userExists) {
+                return res.status(400).json({ message: "User already exists" })
             }
         })
         .catch((err) => {
@@ -80,37 +84,37 @@ const postSignin = (req, res) => {
 }
 
 const postAdminSignin = (req, res) => {
-    const {email, password} = req.body
-    student.findOne({email, role: "admin"})
-    .then((foundAdmin) =>{
-        console.log("Found admin:", foundAdmin)
+    const { email, password } = req.body
+    student.findOne({ email, role: "admin" })
+        .then((foundAdmin) => {
+            console.log("Found admin:", foundAdmin)
 
-        if(!foundAdmin){
-            console.log("Admin not found");
-            return res.status(401).json({message: "Admin not found"})
-        }
-
-        const isMatch = bcrypt.compareSync(password, foundAdmin.password)
-        if(!isMatch){
-            console.log("Invalid password");
-            return res.status(401).json({message: "Invalid password"})
-        }
-        // admin123
-        console.log("Admin successfully signin ", foundAdmin.email);       
-        return res.json({
-            message: "Admin successfully signed in",
-            admin:{
-                id: foundAdmin._id,
-                email: foundAdmin.email,
-                role: foundAdmin.role
+            if (!foundAdmin) {
+                console.log("Admin not found");
+                return res.status(401).json({ message: "Admin not found" })
             }
-        })
-    }) 
 
-    .catch((err) =>{
-        console.log("Error during admin signin", err)
-        return res.status(500).send("Internal server error")
-    })
+            const isMatch = bcrypt.compareSync(password, foundAdmin.password)
+            if (!isMatch) {
+                console.log("Invalid password");
+                return res.status(401).json({ message: "Invalid password" })
+            }
+            // admin123
+            console.log("Admin successfully signin ", foundAdmin.email);
+            return res.json({
+                message: "Admin successfully signed in",
+                admin: {
+                    id: foundAdmin._id,
+                    email: foundAdmin.email,
+                    role: foundAdmin.role
+                }
+            })
+        })
+
+        .catch((err) => {
+            console.log("Error during admin signin", err)
+            return res.status(500).send("Internal server error")
+        })
 }
 
 module.exports = { getStudentSignUp, postStudentSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin }

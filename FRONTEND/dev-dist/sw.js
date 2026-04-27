@@ -67,19 +67,19 @@ if (!self.define) {
     });
   };
 }
-define(['./workbox-5a5d9309'], (function (workbox) { 'use strict';
+define(['../../../../Desktop/EXTERNAL MEMORY DATA/WEB DEVELOPMENT/LEVEL THREE/MY PROJECTS/CBT EXAM/FRONTEND/node_modules/workbox-core/clientsClaim.mjs', '../../../../Desktop/EXTERNAL MEMORY DATA/WEB DEVELOPMENT/LEVEL THREE/MY PROJECTS/CBT EXAM/FRONTEND/node_modules/workbox-precaching/precacheAndRoute.mjs', './workbox-79b74f88'], (function (clientsClaim_mjs, precacheAndRoute_mjs, workbox) { 'use strict';
 
   self.skipWaiting();
-  workbox.clientsClaim();
+  clientsClaim_mjs.clientsClaim();
 
   /**
    * The precacheAndRoute() method efficiently caches and responds to
    * requests for URLs in the manifest.
    * See https://goo.gl/S9QRab
    */
-  workbox.precacheAndRoute([{
+  precacheAndRoute_mjs.precacheAndRoute([{
     "url": "index.html",
-    "revision": "0.3enfl4c1cj4"
+    "revision": "0.nnk99k1nrf4"
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {

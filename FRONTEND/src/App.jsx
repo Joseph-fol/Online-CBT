@@ -1,11 +1,4 @@
 import React from 'react'
-// import Navbar from './component/Navbar'
-// import StudentDashboard from './student/StudentDashboard'
-// import AssignedObject from './student/AssignedObject'
-// import QuestionBank from './admin/pages/QuestionBank'
-// import Subject from './admin/pages/Subject'
-// import StudentResult from './admin/pages/StudentResult'
-// import Sidebar from './admin/Sidebar'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import LandingPage from './component/LandingPage'
 import AdminSignin from './admin/AdminSignin'
@@ -28,13 +21,6 @@ import PageNotFound from './component/PageNotFound'
 const App = () => {
   return (
     <>
-        {/* <Navbar/> */}
-        {/* <StudentDashboard/> */}
-        {/* <AssignedObject/> */}
-
-        {/* <QuestionBank/> */}
-        {/* <Subject/> */}
-        {/* <StudentResult/> */}
       <Routes>
         <Route path="/" element={<LandingPage/>}/>
         <Route path="/AdminSignin" element={<AdminSignin/>}/>
@@ -60,13 +46,7 @@ const App = () => {
           <Route path="settings" element={<Settings />} />
           <Route path="support" element={<Support />} />
         </Route>
-      </Routes>
-
-    {/* <Router>
-      <div className='App'>
-        <Sidebar/>
-      </div>
-    </Router> */}
+      </Routes>  
     </>
   )
 }

@@ -4,10 +4,12 @@ import * as yup from "yup"
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import { Link, useNavigate } from 'react-router-dom'
+import axios from "axios"
 
 const SignupPage = () => {
     const [show, setShow] = useState(false)
     const handleClick = () => setShow(!show)
+    const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -28,9 +30,19 @@ const SignupPage = () => {
         },
 
         onSubmit: (values, { resetForm }) => {
+            setLoading(true)
             console.log(values);
-            alert("Form Successfully Submitted")
-            resetForm()
+            axios.post("https://online-cbt.onrender.com/user/signUp", values)
+            .then((response)=>{
+                setLoading(false)
+                alert("Form Successfully Submitted")
+                resetForm()
+                navigate("/studentSignin")
+            })
+            .catch((err) =>{
+                setLoading(false)
+                alert("Signup failed, please try again")
+            })
         },
 
         validationSchema: yup.object({
@@ -75,6 +87,7 @@ const SignupPage = () => {
                         </div>
 
                         <div className='col-lg-6 col-md-6 bg-white p-5' data-aos="fade-up">
+                            
                             <form class="row g-3" onSubmit={form.handleSubmit}>
                                 <div className='d-flex justify-content-between'>
                                     <h4 className='fw-bold py-0'>Create Student Account</h4>
@@ -111,14 +124,14 @@ const SignupPage = () => {
                                 </div>
 
                                 <div class="col-12">
-                                    <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ background: "#ab3500" }}>Signup</button>
+                                    <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ background: "#ab3500" }}>{loading ? "Signing up...." : "Signup"}</button>
                                 </div>
 
                                 <a href="" className='text-decoration-none text-center text-black fw-medium'><p>Already have an account ? </p></a>
                             </form>
                             <div class="col-12">
                                 <Link to="/studentSignin">
-                                    <button type="submit" class="btn w-100 py-2 text-black fs-6 fw-bold border border-dark border-1" >SIGN IN TO PORTAL </button>
+                                    <button class="btn w-100 py-2 text-black fs-6 fw-bold border border-dark border-1" >SIGN IN TO PORTAL </button>
                                 </Link>
                             </div>
                         </div>
