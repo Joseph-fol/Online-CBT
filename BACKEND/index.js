@@ -31,8 +31,7 @@ mongoose.connect(URI)
 .catch((err)=>{
     console.log("Error connecting to DB", err);
 })
-
-app.use("/student", studentRoutes)
+app.use("/user", studentRoutes)
 
 app.listen(port, (req, res) =>{
     console.log(`I am working on server ${port}`);
