@@ -15,7 +15,7 @@ export default defineConfig({
         description: 'Online CBT is a fast, secure, and mobile-friendly computer-based testing platform that lets students take assessments anytime, while giving admins tools to manage questions, subjects, and results efficiently.',
         start_url: '/',
         scope: '/',
-        theme_color: '#ab3500',
+        theme_color: '#0f172b',
         background_color: '#fbf3ed',
         display: 'standalone',
         icons: [
