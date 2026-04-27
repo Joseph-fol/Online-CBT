@@ -36,7 +36,7 @@
     padding: 0.9rem 1.2rem;
     border: 0;
     border-radius: 0.6rem;
-    background: #4f46e5;
+    background: #c73e03;
     color: #ffffff;
     font-size: 0.96rem;
     font-weight: 700;
@@ -151,7 +151,7 @@
     border: 0;
     border-radius: 0.45rem;
     background: #eef2ff;
-    color: #4f46e5;
+    color: #c73e03;
     cursor: pointer;
 }
 
@@ -204,7 +204,7 @@
 }
 
 .admin-subjects__page.is-active {
-    background: #4338ca;
+    background: #c73e03;
     color: #ffffff;
 }
 
