@@ -64,7 +64,7 @@ const LandingPage = () => {
                 }}
             >
                 <div className="container-fluid">
-                    <a className="navbar-brand fw-bold" href="#"><img src={logo} alt="" width={30}/> Online CBT</a>
+                    <a className="navbar-brand fw-bold" onClick={()=> navigate("/")} style={{cursor:"pointer"}} ><img src={logo} alt="" width={30}/> Online CBT</a>
                     <button className="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>

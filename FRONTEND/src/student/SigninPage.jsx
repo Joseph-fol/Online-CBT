@@ -8,7 +8,6 @@ import { Link, useNavigate } from 'react-router-dom'
 const SigninPage = () => {
     const [show, setShow] = useState(false)
     const handleClick = () => setShow(!show)
-
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -63,7 +62,7 @@ const SigninPage = () => {
                             }}></div>
 
                             <div style={{ position: 'relative', zIndex: 1 }}>
-                                <h4 className='fw-bold mt-4'>CBT</h4>
+                                <h4 className='fw-bold mt-4' onClick={()=> navigate("/")} style={{cursor:"pointer"}} >Online CBT</h4>
                                 <div className=' mt-5 pt-5'>
                                     <h1 className='fw-bold' style={{ fontSize: "45px" }}>Continue Your Path to Excellence.</h1>
                                     <p className='fw-medium fs-6'>Access your secure testing environment, review your performance analytics, and prepare for your next assessment.</p>

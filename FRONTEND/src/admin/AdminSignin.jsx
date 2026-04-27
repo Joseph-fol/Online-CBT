@@ -62,7 +62,7 @@ const AdminSignin = () => {
                             }}></div>
 
                             <div style={{ position: 'relative', zIndex: 1 }}>
-                                <h4 className='fw-bold mt-4'>CBT</h4>
+                                <h4 className='fw-bold mt-4' onClick={()=> navigate("/")} style={{cursor:"pointer"}}>Online CBT</h4>
                                 <div className=' mt-5 pt-5'>
                                     <h1 className='fw-bold' style={{ fontSize: "45px" }}>Orchestrate Academic Excellence.</h1>
                                     <p className='fw-medium fs-6'>Manage dynamic question banks, deploy tamper-proof assessments, and generate real-time performance analytics from your centralized command center.</p>

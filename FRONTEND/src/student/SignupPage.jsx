@@ -63,7 +63,7 @@ const SignupPage = () => {
                             }}></div>
 
                             <div style={{ position: 'relative', zIndex: 1 }}>
-                                <h4 className='fw-bold mt-5'>THE ACADEMIC CURATOR</h4>
+                                <h4 className='fw-bold mt-5'>Online CBT</h4>
                                 <div className=' mt-5 pt-5'>
                                     <h1 className='fw-bold' style={{ fontSize: "45px" }}>Standard Excellence for Every Scholar.</h1>
                                     <p className='fw-medium fs-5'>Join our elite computer-based testing environment designed for high-density curriculum focus.</p>
