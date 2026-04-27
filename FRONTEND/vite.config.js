@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     react(), 
     VitePWA({
-      registerType: 'autoUpdate',
+      // registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.jpg'],
       manifest: {
         name: 'Online CBT',
