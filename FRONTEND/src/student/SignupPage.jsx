@@ -10,6 +10,7 @@ const SignupPage = () => {
     const [show, setShow] = useState(false)
     const handleClick = () => setShow(!show)
     const [loading, setLoading] = useState(false)
+    const [emailError, setEmailError] = useState("")
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -31,7 +32,7 @@ const SignupPage = () => {
 
         onSubmit: (values, { resetForm }) => {
             setLoading(true)
-            // console.log(values);
+            setEmailError("")
             axios.post("https://online-cbt.onrender.com/user/signUp", values)
             .then((response)=>{
                 setLoading(false)
@@ -41,7 +42,13 @@ const SignupPage = () => {
             })
             .catch((err) =>{
                 setLoading(false)
-                alert("Signup failed, please try again")
+                const errorMessage = err.response?.data?.message || err.message
+                if(errorMessage && errorMessage.toLowerCase().includes("email")) {
+                    setEmailError("This email already exists. Please use a different email.")
+                    alert("This email already exists. Please use a different email.")
+                } else {
+                    alert("Signup failed, please try again")
+                }
             })
         },
 
@@ -111,6 +118,7 @@ const SignupPage = () => {
                                     <label for="fullname" class="form-label fw-medium" style={{ fontSize: "13px" }}>INSTITUTIONAL EMAIL</label>
                                     <input type="text" className="form form-control border-0 text-black rounded-0 py-3 shadow-none" style={{ backgroundColor: "#e1e3e4" }} value={form.values.email} name='email' onChange={form.handleChange} onBlur={form.handleBlur} id="userEmail" placeholder='a.dot@university.edu' />
                                     {form.touched.email && form.errors.email ? <p className='text-danger'>{form.errors.email}</p> : ""}
+                                    {emailError ? <p className='text-danger'>{emailError}</p> : ""}
                                 </div>
 
                                 <div class="col-md-12 mt-4">
