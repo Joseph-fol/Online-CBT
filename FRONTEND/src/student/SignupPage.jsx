@@ -42,8 +42,23 @@ const SignupPage = () => {
             })
             .catch((err) =>{
                 setLoading(false)
-                const errorMessage = err.response?.data?.message || err.message
-                if(errorMessage && errorMessage.toLowerCase().includes("email")) {
+                console.log("Error response:", err.response)
+                console.log("Full error:", err)
+                
+                const errorData = err.response?.data
+                const errorMessage = errorData?.message || err.message || ""
+                const statusCode = err.response?.status
+                
+                // Check for duplicate email error in various formats
+                const isDuplicateEmail = 
+                    errorMessage.toLowerCase().includes("email") || 
+                    errorMessage.toLowerCase().includes("already exists") ||
+                    errorMessage.toLowerCase().includes("already registered") ||
+                    statusCode === 409 || // Conflict status code
+                    errorData?.error?.toLowerCase().includes("email") ||
+                    (errorData?.errors && errorData.errors.email)
+                
+                if(isDuplicateEmail) {
                     setEmailError("This email already exists. Please use a different email.")
                     alert("This email already exists. Please use a different email.")
                 } else {
