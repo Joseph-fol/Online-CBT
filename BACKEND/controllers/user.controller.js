@@ -42,7 +42,10 @@ const postStudentSignUp = (req, res) => {
             return res.redirect("studentSignin")
             const userExists = student.findOne({ email })
             if (userExists) {
-                return res.status(400).json({ message: "User already exists" })
+                return res.status(400).json({ 
+                    message: "User already exists",
+                    email: studentData.email
+                })
             }
         })
         .catch((err) => {
@@ -55,6 +58,7 @@ const postSignin = (req, res) => {
     const { email, password } = req.body
     student.findOne({ email })
         .then((foundStudent) => {
+
             if (!foundStudent) {
                 console.log("Invalid email");
                 return res.status(401).json({

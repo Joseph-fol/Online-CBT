@@ -30,10 +30,11 @@ const SigninPage = () => {
 
         onSubmit: (values, { resetForm }) => {
             setLoading(true)
+
             axios.post("https://online-cbt.onrender.com/user/signin")
+
             .then((response) =>{
                 setLoading(false)
-                console.log(values);
                 alert("Signin Successful!")
                 resetForm()
                 navigate("/studentDashboard")
