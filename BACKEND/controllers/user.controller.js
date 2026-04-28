@@ -1,4 +1,5 @@
 const student = require("../models/user.model")
+const Question  = require('../models/questions.model')
 const bcrypt = require("bcrypt")
 
 const getStudentSignUp = (req, res) => {
@@ -100,7 +101,6 @@ const postAdminSignin = (req, res) => {
                 console.log("Admin not found");
                 return res.status(401).json({ message: "Admin not found" })
             }
-
             const isMatch = bcrypt.compareSync(password, foundAdmin.password)
             if (!isMatch) {
                 console.log("Invalid password");
@@ -124,4 +124,38 @@ const postAdminSignin = (req, res) => {
         })
 }
 
-module.exports = { getStudentSignUp, postStudentSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin }
+const addQuestion = (req, res) => {
+    const {subject, duration, marks, correctAnswer, totalQuestion, questionText, optionA, optionB, optionC, optionD, score } = req.body
+    Question.create({
+        subject,
+        duration,
+        marks,
+        correctAnswer,
+        totalQuestion,
+        questionText,
+        options: {
+            A: optionA,
+            B: optionB,
+            C: optionC,
+            D: optionD
+        },
+        correctAnswer
+    })
+
+    .then((newQuestion) =>{
+        res.status(201).json({
+            message: "Question successfully added",
+            question: newQuestion
+        })
+    })
+    .catch((err)=>{
+        console.error(err);
+        res.status(500).json({
+            message: "Failed to add question",
+            error: err.message
+        })
+    })
+}
+
+
+module.exports = { getStudentSignUp, postStudentSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion }

@@ -33,6 +33,8 @@ mongoose.connect(URI)
 })
 app.use("/user", studentRoutes)
 
+// http://localhost:2114/admin/questions/addQuestions
+
 app.listen(port, (req, res) =>{
     console.log(`I am working on server ${port}`);
 })
