@@ -37,7 +37,7 @@ const postStudentSignUp = (req, res) => {
             const newStudentDetails = new student(studentInfo)
             return newStudentDetails.save()
         })
-        
+
         .then((studentData) => {
             if (!studentData) {
                 return
@@ -76,14 +76,14 @@ const postSignin = (req, res) => {
                     message: "Invalid email or password"
                 })
             }
-            return res.json({
+            console.log("Login successful for, ", foundStudent.email)
+            return res.status(200).json({
                 message: "Signin Successful",
                 student: {
                     id: foundStudent._id,
                     email: foundStudent.email,
                 }
             })
-            console.log("Login successful for, ", foundStudent.email)
         })
         .catch((err) => {
             console.error("Error during signin", err);
