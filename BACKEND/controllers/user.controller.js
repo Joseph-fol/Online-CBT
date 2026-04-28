@@ -20,17 +20,30 @@ const adminSignin = (req, res) => {
 
 const postStudentSignUp = (req, res) => {
     const { fullName, email, password } = req.body
-    let salt = bcrypt.genSaltSync(10)
-    let hashedPassword = bcrypt.hashSync(req.body.password, salt)
-    req.body.password = hashedPassword
+    student.findOne({ email: req.body.email })
+        .then((userExists) => {
+            if (userExists) {
+                return res.status(409).json({
+                    message: "User already exists",
+                    email: userExists.email
+                })
+            }
 
-    const studentInfo = req.body
-    const newStudentDetails = new student(studentInfo)
-    newStudentDetails.save()
+            let salt = bcrypt.genSaltSync(10)
+            let hashedPassword = bcrypt.hashSync(req.body.password, salt)
+            req.body.password = hashedPassword
 
+            const studentInfo = req.body
+            const newStudentDetails = new student(studentInfo)
+            return newStudentDetails.save()
+        })
+        
         .then((studentData) => {
+            if (!studentData) {
+                return
+            }
+
             console.log("Customer Saved", studentData);
-            // Send only one response for this request.
             return res.status(201).json({
                 message: "Signup Successful",
                 student: {
@@ -38,15 +51,6 @@ const postStudentSignUp = (req, res) => {
                     email: studentData.email
                 }
             })
-
-            return res.redirect("studentSignin")
-            const userExists = student.findOne({ email })
-            if (userExists) {
-                return res.status(400).json({ 
-                    message: "User already exists",
-                    email: studentData.email
-                })
-            }
         })
         .catch((err) => {
             console.log("Error saving to database", err);
