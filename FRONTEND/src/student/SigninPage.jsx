@@ -4,10 +4,12 @@ import * as yup from "yup"
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 const SigninPage = () => {
     const [show, setShow] = useState(false)
     const handleClick = () => setShow(!show)
+    const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -27,10 +29,21 @@ const SigninPage = () => {
         },
 
         onSubmit: (values, { resetForm }) => {
-            console.log(values);
-            alert("Signin Successful!")
-            resetForm()
-            navigate("/studentDashboard")
+            setLoading(true)
+            axios.post("https://online-cbt.onrender.com/user/signin")
+            .then((response) =>{
+                setLoading(false)
+                console.log(values);
+                alert("Signin Successful!")
+                resetForm()
+                navigate("/studentDashboard")
+            })
+            .catch((err)=>{
+                setLoading(false)
+                console.error("Error", err);
+                alert("Login fail, please check your email and password" )
+            })
+
         },
 
         validationSchema: yup.object({
@@ -104,7 +117,7 @@ const SigninPage = () => {
                                 </div>
 
                                 <div class="col-12">
-                                    <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ background: "#ab3500" }}>Signin</button>
+                                    <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ background: "#ab3500" }}>{loading ? "Signing in..." : "Signin"}</button>
                                 </div>
                                 <a href="" className='text-decoration-none text-center text-black fw-medium'><p>Don't have an account ? </p></a>
                             </form>

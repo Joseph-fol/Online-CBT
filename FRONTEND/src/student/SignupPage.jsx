@@ -31,7 +31,7 @@ const SignupPage = () => {
 
         onSubmit: (values, { resetForm }) => {
             setLoading(true)
-            console.log(values);
+            // console.log(values);
             axios.post("https://online-cbt.onrender.com/user/signUp", values)
             .then((response)=>{
                 setLoading(false)

@@ -38,8 +38,8 @@ const postStudentSignUp = (req, res) => {
                     email: studentData.email
                 }
             })
-            return res.redirect("studentSignin")
 
+            return res.redirect("studentSignin")
             const userExists = student.findOne({ email })
             if (userExists) {
                 return res.status(400).json({ message: "User already exists" })
@@ -68,7 +68,7 @@ const postSignin = (req, res) => {
                     message: "Invalid email or password"
                 })
             }
-            res.json({
+            return res.json({
                 message: "Signin Successful",
                 student: {
                     id: foundStudent._id,
@@ -88,7 +88,6 @@ const postAdminSignin = (req, res) => {
     student.findOne({ email, role: "admin" })
         .then((foundAdmin) => {
             console.log("Found admin:", foundAdmin)
-
             if (!foundAdmin) {
                 console.log("Admin not found");
                 return res.status(401).json({ message: "Admin not found" })
