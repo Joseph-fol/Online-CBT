@@ -45,7 +45,6 @@ const postStudentSignUp = (req, res) => {
             }
 
             console.log("Customer Saved", studentData);
-
             let transporter = nodemailer.createTransport({
                 service: "gmail",
                 auth: {
@@ -56,13 +55,13 @@ const postStudentSignUp = (req, res) => {
 
             let mailOptions = {
                 from: "Online CBT",
-                to: [studentData.email, "olawoyinjosephfola@gmail.com"],
+                to: [studentData.email],
                 subject: "Welcome to Online CBT",
                 html: `
                     <div style="background-color: #f8fafc; padding: 0 0 10px; border-radius: 30px 30px 0 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
     
-    <div style="padding-top: 30px; height: 80px; border-radius: 30px 30px 0 0; background-color: #0f172b; display: flex; align-items: center; justify-content: center;">
-        <h1 style="color: #f8fafc; text-align: center; margin: 0; font-size: 26px; letter-spacing: 1px;">Welcome to Online CBT</h1>
+    <div style="padding-top: 30px; height: 80px; border-radius: 30px 30px 0 0; background-color: #0f172b; display: flex; align-items: center; justify-content: center; text-align: center;">
+        <h1 style="color: #f8fafc; text-align: center; font-size: 26px; letter-spacing: 1px;">Welcome to Online CBT</h1>
     </div>
 
 
@@ -73,7 +72,7 @@ const postStudentSignUp = (req, res) => {
         </p>
 
         <p style="line-height: 1.8; padding: 15px 10px; font-size: 16px;">
-            Welcome to <strong style="color: #0f172b;">Online CBT</strong>, a premium and secure testing platform. By joining us, you have taken the first step toward unlocking a seamless and distraction-free online examination experience. 
+            Welcome to <strong style="color: #0f172b;">Online CBT</strong>, a secure, seamless, and smart online cbt platform . By joining us, you have taken the first step toward unlocking a seamless and distraction-free online examination experience. 
             <br><br>
             We would love to hear from you! If you have any questions or require assistance navigating your new account, please do not hesitate to reach out to our support team.
         </p>
