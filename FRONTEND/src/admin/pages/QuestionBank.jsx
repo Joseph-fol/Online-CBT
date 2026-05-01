@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import './QuestionBank.css'
 import { useFormik } from 'formik'
 import * as yup from "yup"
+import axios from 'axios'
 
 const QuestionBank = () => {
   const [draftQuestions, setDraftQuestions] = useState([])
@@ -18,11 +19,13 @@ const QuestionBank = () => {
       correctAnswer: '',
       duration: "",
       totalQuestion: "",
-      score: ""
+      score: "",
+      description: ""
     },
 
-    onSubmit: (value, { resetForm }) => {
-      console.log(value);
+    onSubmit: (values, { resetForm }) => {
+      console.log(values);
+      axios.post("https://online-cbt.onrender.com/user/addQuestions", values)
       resetForm()
       alert("Details successfully submitted")
     },
@@ -38,6 +41,7 @@ const QuestionBank = () => {
       totalQuestion: yup.string().required("Total Question is required"),
       score: yup.string().required("Score for grading is required"),
       correctAnswer: yup.string().required("Correct Answer is required"),
+      description: yup.string().required("Description is required"),
     })
   })
 
@@ -48,7 +52,6 @@ const QuestionBank = () => {
       alert("Add question text and all options before saving draft")
       return
     }
-
     const newDraft = {
       id: Date.now(),
       questionText: questionText.trim(),
@@ -74,7 +77,6 @@ const QuestionBank = () => {
       ],
       correctAnswer,
     }
-
     setDraftQuestions((prev) => [...prev, newDraft])
     alert("Successfully saved as draft")
   }
@@ -94,6 +96,7 @@ const QuestionBank = () => {
 
           <form className='question-bank__form' onSubmit={formik.handleSubmit}>
             <div className='question-bank__field-grid'>
+
               <label className='question-bank__field'>
                 <span>SUBJECT</span>
                 <input
@@ -105,6 +108,19 @@ const QuestionBank = () => {
                   placeholder='Type subject name'
                 />
                 {formik.touched.subject ? <p className='text-danger'>{formik.errors.subject}</p> : ""}
+              </label>
+
+              <label className='question-bank__field'>
+                <span>DESCRIPTION</span>
+                <input
+                  type='text'
+                  name='description'
+                  value={formik.values.description}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  placeholder='Description of the subject'
+                />
+                {formik.touched.subject ? <p className='text-danger'>{formik.errors.description}</p> : ""}
               </label>
 
               <label className='question-bank__field'>
@@ -166,6 +182,10 @@ const QuestionBank = () => {
               </label>
             </div>
 
+            <div className='text-secondary fw-bold'>
+            OTHER DETAILS
+            </div>
+
             <div className='question-bank__options'>
               <label className='question-bank__field'>
                 <span>MARKS</span>
@@ -208,7 +228,7 @@ const QuestionBank = () => {
               {(formik.values.subject || 'General Subject')}
             </p> */}
 
-            <p className='question-bank_question-number p-2 w-50 text-center text-white fw-bold'> QUESTION 04</p>
+            <p className='question-bank_question-number p-2 w-50 text-center text-white fw-bold'> QUESTION 01 </p>
 
             <h4 className='question-bank__preview-question'>
               {formik.values.questionText || 'Your question preview will appear here as you type.'}

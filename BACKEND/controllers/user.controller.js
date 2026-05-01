@@ -1,5 +1,5 @@
 const student = require("../models/user.model")
-const Question  = require('../models/questions.model')
+const Question = require('../models/questions.model')
 const bcrypt = require("bcrypt")
 
 const getStudentSignUp = (req, res) => {
@@ -17,7 +17,6 @@ const getDashboard = (req, res) => {
 const adminSignin = (req, res) => {
     res.render("adminSignin")
 }
-
 
 const postStudentSignUp = (req, res) => {
     const { fullName, email, password } = req.body
@@ -125,12 +124,14 @@ const postAdminSignin = (req, res) => {
 }
 
 const addQuestion = (req, res) => {
-    const {subject, duration, marks, correctAnswer, totalQuestion, questionText, optionA, optionB, optionC, optionD, score } = req.body
+    console.log("Incoming payload", req.body)
+
+    const { subject, duration, marks, correctAnswer, totalQuestion, questionText, optionA, optionB, optionC, optionD, score, description } = req.body
     Question.create({
         subject,
         duration,
         marks,
-        correctAnswer,
+        description: description?.trim(),
         totalQuestion,
         questionText,
         options: {
@@ -142,20 +143,36 @@ const addQuestion = (req, res) => {
         correctAnswer
     })
 
-    .then((newQuestion) =>{
-        res.status(201).json({
-            message: "Question successfully added",
-            question: newQuestion
+        .then((newQuestion) => {
+            console.log("Saved question:", newQuestion)
+            res.status(201).json({
+                message: "Question successfully added",
+                question: newQuestion
+            })
         })
-    })
-    .catch((err)=>{
-        console.error(err);
-        res.status(500).json({
-            message: "Failed to add question",
-            error: err.message
+        .catch((err) => {
+            console.error(err);
+            res.status(500).json({
+                message: "Failed to add question",
+                error: err.message
+            })
         })
-    })
+}
+
+const getAllQuestions = (req, res) => {
+    Question.find()
+        .then((questionsArray) => {
+            res.status(200).json({
+                questionsArray
+            })
+        })
+        .catch((error) => {
+            res.status(500).json({
+                message: "Failed to fetch question",
+                details: error.message
+            })
+        })
 }
 
 
-module.exports = { getStudentSignUp, postStudentSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion }
+module.exports = { getStudentSignUp, postStudentSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions }
