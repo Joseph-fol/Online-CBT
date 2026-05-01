@@ -9,13 +9,13 @@ const AssignedObject = () => {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        axios.get("http://localhost:2114/user/getAllQuestions")
+        // axios.get("http://localhost:2114/user/getAllQuestions")
+        axios.get("https://online-cbt.onrender.com/user/getAllQuestions")
             .then((response) => {
                 setLoading(false)
                 console.log(response.data.questionsArray)
                 setQuestions(response.data.questionsArray)
             })
-
     }, [])
 
     const subjectsAssigned = {

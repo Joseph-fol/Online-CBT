@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import './QuestionBank.css'
 import { useFormik } from 'formik'
 import * as yup from "yup"
@@ -6,6 +6,84 @@ import axios from 'axios'
 
 const QuestionBank = () => {
   const [draftQuestions, setDraftQuestions] = useState([])
+  const [editingDraftId, setEditingDraftId] = useState(null)
+  const formSectionRef = useRef(null)
+
+  const buildDraftFromValues = (values, existingId = null) => {
+    return {
+      id: existingId ?? Date.now(),
+      subject: values.subject?.trim() || '',
+      description: values.description?.trim() || '',
+      questionText: values.questionText?.trim() || '',
+      marks: values.marks,
+      duration: values.duration,
+      totalQuestion: values.totalQuestion,
+      score: values.score,
+      correctAnswer: values.correctAnswer,
+      options: [
+        {
+          key: 'A',
+          text: values.optionA?.trim() || ''
+        },
+        {
+          key: 'B',
+          text: values.optionB?.trim() || ''
+        },
+        {
+          key: 'C',
+          text: values.optionC?.trim() || ''
+        },
+        {
+          key: 'D',
+          text: values.optionD?.trim() || ''
+        },
+      ],
+    }
+  }
+
+  const upsertDraft = (draftPayload) => {
+    setDraftQuestions((prev) => {
+      const existingIndex = prev.findIndex((item) => item.id === draftPayload.id)
+
+      if (existingIndex === -1) {
+        return [draftPayload, ...prev]
+      }
+
+      const updated = [...prev]
+      updated[existingIndex] = draftPayload
+      return updated
+    })
+  }
+
+  const handleEditDraft = (draftItem) => {
+    formik.setValues({
+      subject: draftItem.subject || '',
+      marks: draftItem.marks || '',
+      questionText: draftItem.questionText || '',
+      optionA: draftItem.options?.find((opt) => opt.key === 'A')?.text || '',
+      optionB: draftItem.options?.find((opt) => opt.key === 'B')?.text || '',
+      optionC: draftItem.options?.find((opt) => opt.key === 'C')?.text || '',
+      optionD: draftItem.options?.find((opt) => opt.key === 'D')?.text || '',
+      correctAnswer: draftItem.correctAnswer || '',
+      duration: draftItem.duration || '',
+      totalQuestion: draftItem.totalQuestion || '',
+      score: draftItem.score || '',
+      description: draftItem.description || ''
+    })
+    setEditingDraftId(draftItem.id)
+
+    requestAnimationFrame(() => {
+      formSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
+
+  const handleDeleteDraft = (draftId) => {
+    setDraftQuestions((prev) => prev.filter((item) => item.id !== draftId))
+
+    if (editingDraftId === draftId) {
+      setEditingDraftId(null)
+    }
+  }
 
   const formik = useFormik({
     initialValues: {
@@ -24,10 +102,21 @@ const QuestionBank = () => {
     },
 
     onSubmit: (values, { resetForm }) => {
-      console.log(values);
+      console.log(values)
+
       axios.post("https://online-cbt.onrender.com/user/addQuestions", values)
-      resetForm()
-      alert("Details successfully submitted")
+        .then(() => {
+          const draftPayload = buildDraftFromValues(values, editingDraftId)
+          upsertDraft(draftPayload)
+
+          setEditingDraftId(null)
+          resetForm()
+          alert("Details successfully submitted")
+        })
+        .catch((error) => {
+          console.error(error)
+          alert("Failed to save question")
+        })
     },
     validationSchema: yup.object({
       subject: yup.string().required("Subject Domain is required"),
@@ -45,39 +134,35 @@ const QuestionBank = () => {
     })
   })
 
+  useEffect(() => {
+    const marks = Number(formik.values.marks)
+    const totalQuestion = Number(formik.values.totalQuestion)
+
+    if (Number.isFinite(marks) && Number.isFinite(totalQuestion) && totalQuestion !== 0) {
+      formik.setFieldValue('score', String(marks * totalQuestion), false)
+      return
+    }
+
+    formik.setFieldValue('score', '', false)
+  }, [formik.values.marks, formik.values.totalQuestion])
+
   const displayDraft = () => {
-    const { questionText, optionA, optionB, optionC, optionD, correctAnswer } = formik.values
+    const { questionText, optionA, optionB, optionC, optionD } = formik.values
 
     if (!questionText.trim() || !optionA.trim() || !optionB.trim() || !optionC.trim() || !optionD.trim()) {
       alert("Add question text and all options before saving draft")
       return
     }
-    const newDraft = {
-      id: Date.now(),
-      questionText: questionText.trim(),
-      options: [
-        { 
-          key: 'A', 
-          text: optionA.trim() 
-        },
 
-        { 
-          key: 'B', 
-          text: optionB.trim() 
-        },
+    const draftPayload = buildDraftFromValues(formik.values, editingDraftId)
+    upsertDraft(draftPayload)
 
-        { 
-          key: 'C', 
-          text: optionC.trim() 
-        },
-
-        { key: 'D', 
-          text: optionD.trim() 
-        },
-      ],
-      correctAnswer,
+    if (editingDraftId) {
+      setEditingDraftId(null)
+      alert("Draft updated successfully")
+      return
     }
-    setDraftQuestions((prev) => [...prev, newDraft])
+
     alert("Successfully saved as draft")
   }
 
@@ -91,7 +176,7 @@ const QuestionBank = () => {
       </header>
 
       <div className='question-bank__grid'>
-        <article className='question-bank__panel'>
+        <article className='question-bank__panel' ref={formSectionRef}>
           <h4 className='py-3'>Create Question</h4>
 
           <form className='question-bank__form' onSubmit={formik.handleSubmit}>
@@ -188,7 +273,7 @@ const QuestionBank = () => {
 
             <div className='question-bank__options'>
               <label className='question-bank__field'>
-                <span>MARKS</span>
+                <span>MARK (PER QUESTION)</span>
                 <input type='number' min='1' name='marks' value={formik.values.marks} onChange={formik.handleChange} onBlur={formik.handleBlur}
                 />
                 {formik.touched.marks ? <p className='text-danger'>{formik.errors.marks}</p> : ""}
@@ -208,14 +293,14 @@ const QuestionBank = () => {
               </label>
 
               <label className='question-bank__field'>
-                <span>SCORE</span>
-                <input type='number' min='1' name='score' placeholder='e.g., 20' value={formik.values.score} onChange={formik.handleChange} onBlur={formik.handleBlur} />
+                <span> TOTAL SCORE</span>
+                <input type='number' min='1' name='score' placeholder='e.g., 20' value={formik.values.score} readOnly />
                 {formik.touched.score ? <p className='text-danger'>{formik.errors.score}</p> : ""}
               </label>
             </div>
 
             <div className='question-bank__actions'>
-              <button type='button' className='question-bank__button question-bank__button--muted' onClick={displayDraft}>Save Draft</button>
+              <button type='button' className='question-bank__button question-bank__button--muted' onClick={displayDraft}>{editingDraftId ? 'Update Draft' : 'Save Draft'}</button>
               <button type='submit' className='question-bank__button question-bank__button--primary'>Save Questions</button>
             </div>
           </form>
@@ -272,6 +357,14 @@ const QuestionBank = () => {
                   <h5 className='displayDraft__question'>{item.questionText}</h5>
                 </div>
 
+                <p className='displayDraft__meta'>
+                  <strong>Subject:</strong> {item.subject || 'N/A'} | <strong>Description:</strong> {item.description || 'N/A'}
+                </p>
+
+                <p className='displayDraft__meta'>
+                  <strong>Total Questions:</strong> {item.totalQuestion || 'N/A'} | <strong>Duration:</strong> {item.duration || 'N/A'} mins | <strong>Marks:</strong> {item.marks || 'N/A'}
+                </p>
+
                 <ul className='displayDraft__options'>
                   {item.options.map((option) => {
                     const isCorrect = item.correctAnswer === option.key
@@ -286,6 +379,23 @@ const QuestionBank = () => {
                     )
                   })}
                 </ul>
+
+                <div className='displayDraft__actions'>
+                  <button
+                    type='button'
+                    className='displayDraft__action-btn displayDraft__action-btn--edit'
+                    onClick={() => handleEditDraft(item)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type='button'
+                    className='displayDraft__action-btn displayDraft__action-btn--delete'
+                    onClick={() => handleDeleteDraft(item.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </article>
             ))}
           </div>
