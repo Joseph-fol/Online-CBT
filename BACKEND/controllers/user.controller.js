@@ -93,17 +93,25 @@ const postStudentSignUp = (req, res) => {
             transporter.sendMail(mailOptions, function (error, info) {
                 if (error) {
                     console.error("Email sending failed", error.message);
+                    return res.status(201).json({
+                        message: "Signup Successful",
+                        student: {
+                            id: studentData._id,
+                            email: studentData.email
+                        },
+                        emailStatus: "Failed to send welcome email"
+                    })
                 }
                 else {
                     console.log("Email sent: " + info.response);
-                }
-            })
-
-            return res.status(201).json({
-                message: "Signup Successful",
-                student: {
-                    id: studentData._id,
-                    email: studentData.email
+                    return res.status(201).json({
+                        message: "Signup Successful",
+                        student: {
+                            id: studentData._id,
+                            email: studentData.email
+                        },
+                        emailStatus: "Welcome email sent successfully"
+                    })
                 }
             })
         })
@@ -117,7 +125,6 @@ const postSignin = (req, res) => {
     const { email, password } = req.body
     student.findOne({ email })
         .then((foundStudent) => {
-
             if (!foundStudent) {
                 console.log("Invalid email");
                 return res.status(401).json({
