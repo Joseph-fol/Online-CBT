@@ -45,13 +45,6 @@ const postStudentSignUp = (req, res) => {
             }
 
             console.log("Customer Saved", studentData);
-            return res.status(201).json({
-                message: "Signup Successful",
-                student: {
-                    id: studentData._id,
-                    email: studentData.email
-                }
-            })
 
             let transporter = nodemailer.createTransport({
                 service: "gmail",
@@ -97,15 +90,21 @@ const postStudentSignUp = (req, res) => {
                 `
             }
 
-
             // This is what will send the gmail to the user
             transporter.sendMail(mailOptions, function (error, info) {
                 if (error) {
                     console.error("Email sending failed", error.message);
                 }
-
                 else {
                     console.log("Email sent: " + info.response);
+                }
+            })
+
+            return res.status(201).json({
+                message: "Signup Successful",
+                student: {
+                    id: studentData._id,
+                    email: studentData.email
                 }
             })
         })
