@@ -17,6 +17,7 @@ import StudentLayout from './student/StudentLayout'
 import AvailableAssessmentsPage from './student/AvailableAssessmentsPage'
 import PerformanceHistoryPage from './student/PerformanceHistoryPage'
 import PageNotFound from './component/PageNotFound'
+import ExactQuestion from './student/ExactQuestion'
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
         <Route path="/studentSignin" element={<SigninPage/>}/>
         <Route path="/studentDashboard" element={<Navigate to='/student/dashboard' replace />} />
         <Route path="/createStudentAccount" element={<SignupPage/>}/>
+        <Route path="/question" element={<ExactQuestion/>}/>
         <Route path="/forgotPassword" element={<ForgotPassword/>}/>
         <Route path="/student-history" element={<Navigate to='/student/performance-history' replace />} />
         <Route path='*' element={<PageNotFound/>}/>

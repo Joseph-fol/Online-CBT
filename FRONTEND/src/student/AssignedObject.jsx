@@ -3,6 +3,7 @@ import AssignedObjectCard from './AssignedObjectCard'
 import { useEffect } from 'react'
 import axios from 'axios'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const AssignedObject = () => {
     const [questions, setQuestions] = useState([])
@@ -13,7 +14,7 @@ const AssignedObject = () => {
         axios.get("https://online-cbt.onrender.com/user/getAllQuestions")
             .then((response) => {
                 setLoading(false)
-                console.log(response.data.questionsArray)
+                // console.log(response.data.questionsArray)
                 setQuestions(response.data.questionsArray)
             })
     }, [])
@@ -61,7 +62,7 @@ const AssignedObject = () => {
 
                         {loading ? (<p className='text-center py-5 mx-auto px-5'><svg xmlns="http://www.w3.org/2000/svg" width="3.5em" height="3.5em" viewBox="0 0 24 24"><rect width="10" height="10" x="1" y="1" fill="#ab3500" rx="1"><animate id="SVG7JagGz2Y" fill="freeze" attributeName="x" begin="0;SVGgDT19bUV.end" dur="0.17s" values="1;13" /><animate id="SVGpS1BddYk" fill="freeze" attributeName="y" begin="SVGc7yq8dne.end" dur="0.17s" values="1;13" /><animate id="SVGboa7EdFl" fill="freeze" attributeName="x" begin="SVG0ZX9C6Fa.end" dur="0.17s" values="13;1" /><animate id="SVG6rrusL2C" fill="freeze" attributeName="y" begin="SVGTOnnO5Dr.end" dur="0.17s" values="13;1" /></rect><rect width="10" height="10" x="1" y="13" fill="#ab3500" rx="1"><animate id="SVGc7yq8dne" fill="freeze" attributeName="y" begin="SVG7JagGz2Y.end" dur="0.17s" values="13;1" /><animate id="SVG0ZX9C6Fa" fill="freeze" attributeName="x" begin="SVGpS1BddYk.end" dur="0.17s" values="1;13" /><animate id="SVGTOnnO5Dr" fill="freeze" attributeName="y" begin="SVGboa7EdFl.end" dur="0.17s" values="1;13" /><animate id="SVGgDT19bUV" fill="freeze" attributeName="x" begin="SVG6rrusL2C.end" dur="0.17s" values="13;1" /></rect></svg></p>) : (
                             questions.map((question) => (
-                                <div className='col-12 col-md-4'>
+                                <div className='col-12 col-md-4' key={question._id}>
                                     <div>
                                         <AssignedObjectCard
                                             cardSvg={<svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 16 16"><path fill="#ab3500" fill-rule="evenodd" d="M8 0a1 1 0 0 1 1 1v1.17c1.1.389 1.91 1.4 1.99 2.61l2.95 5.48a.5.5 0 0 1 .06.237v5a.5.5 0 0 1-.943.232l-4.13-7.88a3 3 0 0 1-1.86 0l-4.13 7.88a.5.5 0 0 1-.942-.232v-5a.5.5 0 0 1 .06-.237l2.95-5.48v.01a3.01 3.01 0 0 1 1.82-2.56l.167-.063V.997a1 1 0 0 1 1-1zM3 10.6v2.84l3.18-6.08a3 3 0 0 1-.871-1.06l-2.31 4.3zm7.69-4.3a3.06 3.06 0 0 1-.871 1.06l3.19 6.08V10.6l-2.31-4.3zM8 2.97a2 2 0 1 0-.001 4.001A2 2 0 0 0 8 2.97" clip-rule="evenodd" /></svg>}
@@ -73,11 +74,11 @@ const AssignedObject = () => {
 
                                             minutes={`${question.duration} MINS`}
                                             minutesSvg={<svg xmlns="http://www.w3.org/2000/svg" width="1.0em" height="1.0em" viewBox="0 0 20 20"><path fill="#ab3500" d="M10 0c5.523 0 10 4.477 10 10s-4.477 10-10 10S0 15.523 0 10S4.477 0 10 0m0 1.395a8.605 8.605 0 1 0 0 17.21a8.605 8.605 0 0 0 0-17.21m-.93 4.186c.385 0 .697.313.697.698v4.884h5.884a.698.698 0 0 1 0 1.395H9.07a.7.7 0 0 1-.698-.698V6.28c0-.386.312-.699.698-.699" /></svg>}
-
                                             cardBtn="Start Quiz"
                                         />
                                     </div>
                                 </div>
+
                             )))
                         }
                         {!loading && questions.length === 0 && (
@@ -135,7 +136,7 @@ const AssignedObject = () => {
                         </div>
                     </div>
                 </footer>
-            </div>
+            </div >
         </>
     )
 }

@@ -102,7 +102,7 @@ const QuestionBank = () => {
     },
 
     onSubmit: (values, { resetForm }) => {
-      console.log(values)
+      // console.log(values)
 
       axios.post("https://online-cbt.onrender.com/user/addQuestions", values)
         .then(() => {
@@ -301,7 +301,7 @@ const QuestionBank = () => {
 
             <div className='question-bank__actions'>
               <button type='button' className='question-bank__button question-bank__button--muted' onClick={displayDraft}>{editingDraftId ? 'Update Draft' : 'Save Draft'}</button>
-              <button type='submit' className='question-bank__button question-bank__button--primary'>Save Questions</button>
+              <button type='submit' className='question-bank__button question-bank__button--primary' disabled={!formik.isValid}>Save Questions</button>
             </div>
           </form>
         </article>
@@ -313,7 +313,7 @@ const QuestionBank = () => {
               {(formik.values.subject || 'General Subject')}
             </p> */}
 
-            <p className='question-bank_question-number p-2 w-50 text-center text-white fw-bold'> QUESTION 01 </p>
+            <p className='question-bank_question-number p-2 w-50 text-center text-white fw-bold'> QUESTION {String(draftQuestions.length + 1).padStart(2, '0')} </p>
 
             <h4 className='question-bank__preview-question'>
               {formik.values.questionText || 'Your question preview will appear here as you type.'}

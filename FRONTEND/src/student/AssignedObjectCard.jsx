@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const AssignedObjectCard = ({title, description, question, cardSvg, questionSvg, minutes, minutesSvg, cardBtn }) => {
     return (
@@ -21,7 +22,9 @@ const AssignedObjectCard = ({title, description, question, cardSvg, questionSvg,
                         <span style={{ fontSize: " 14px" }}> {minutes}</span>
                     </div>
                 </div>
-                <button className='w-100 text-white my-3 py-2 fw-medium border border-none' style={{ backgroundColor: "#ab3500" }}>{cardBtn}</button>
+                <Link to={`/question/${question._id}`}>
+                    <button className='w-100 text-white my-3 py-2 fw-medium border border-none' style={{ backgroundColor: "#ab3500" }}>{cardBtn}</button>
+                </Link>
             </div>
         </>
     )

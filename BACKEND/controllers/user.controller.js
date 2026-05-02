@@ -19,105 +19,94 @@ const adminSignin = (req, res) => {
     res.render("adminSignin")
 }
 
-const postStudentSignUp = async (req, res) => {
-    try {
-        const { fullName, email, password } = req.body
-        
-        // Check if user already exists
-        const userExists = await student.findOne({ email })
-        if (userExists) {
-            if (!res.headersSent) {
+const postStudentSignUp = (req, res) => {
+    const { fullName, email, password } = req.body
+    
+    student.findOne({ email: req.body.email })
+        .then((userExists) => {
+            if (userExists) {
                 return res.status(409).json({
                     message: "User already exists",
                     email: userExists.email
                 })
             }
-            return
-        }
 
-        // Hash password and create new student
-        const salt = bcrypt.genSaltSync(10)
-        const hashedPassword = bcrypt.hashSync(password, salt)
+            let salt = bcrypt.genSaltSync(10)
+            let hashedPassword = bcrypt.hashSync(req.body.password, salt)
+            req.body.password = hashedPassword
+
+            const studentInfo = req.body
+            const newStudentDetails = new student(studentInfo)
+            
+            return newStudentDetails.save()
+                .then((studentData) => {
+                    console.log("Customer Saved", studentData);
+                    
+                    let transporter = nodemailer.createTransport({
+                        service: "gmail",
+                        auth: {
+                            user: "olawoyinjoseph05@gmail.com",
+                            pass: "oysa nbex vzjb bily"
+                        }
+                    })
+
+                    let mailOptions = {
+                        from: "Online CBT",
+                        to: [studentData.email],
+                        subject: "Welcome to Online CBT",
+                        html: `
+                            <div style="background-color: #f8fafc; padding: 0 0 10px; border-radius: 30px 30px 0 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
         
-        const studentData = await student.create({
-            ...req.body,
-            password: hashedPassword
+        <div style="padding-top: 30px; height: 80px; border-radius: 30px 30px 0 0; background-color: #0f172b; display: flex; align-items: center; justify-content: center; text-align: center;">
+            <h1 style="color: #f8fafc; text-align: center; font-size: 26px; letter-spacing: 1px;">Welcome to Online CBT</h1>
+        </div>
+
+        <div style="padding: 40px 30px 20px; text-align: center; color: #0f172b; background-color: #ffffff;">
+            <p style="font-size: 20px; margin-top: 0;">
+                <span style="font-weight: 700; color: #ab3500;">Congratulations!</span> Your sign-up was successful.
+            </p>
+
+            <p style="line-height: 1.8; padding: 15px 10px; font-size: 16px;">
+                Welcome to <strong style="color: #0f172b;">Online CBT</strong>, a secure, seamless, and smart online cbt platform . By joining us, you have taken the first step toward unlocking a seamless and distraction-free online examination experience. 
+                <br><br>
+                We would love to hear from you! If you have any questions or require assistance navigating your new account, please do not hesitate to reach out to our support team.
+            </p>
+
+            <!-- Footer Area -->
+            <div style="padding: 20px 0 10px;">
+                <hr style="width: 50%; border: none; border-top: 1px solid #e2e8f0; margin-bottom: 20px;">
+                <p style="margin-bottom: 5px; font-size: 16px; font-weight: 600;">Best Regards,</p>
+                <p style="color: #ab3500; margin-top: 0; font-size: 18px; font-weight: bold;">Dev Joseph</p>
+            </div>
+        </div>
+    </div>
+                        `
+                    }
+
+                    // Send email asynchronously but don't wait for it
+                    transporter.sendMail(mailOptions, function (error, info) {
+                        if (error) {
+                            console.error("Email sending failed", error.message);
+                        }
+                        else {
+                            console.log("Email sent: " + info.response);
+                        }
+                    })
+
+                    // Send response immediately
+                    return res.status(201).json({
+                        message: "Signup Successful",
+                        student: {
+                            id: studentData._id,
+                            email: studentData.email
+                        }
+                    })
+                })
         })
-        console.log("Customer Saved", studentData);
-        
-        // Send response immediately (only once)
-        if (!res.headersSent) {
-            res.status(201).json({
-                message: "Signup Successful",
-                student: {
-                    id: studentData._id,
-                    email: studentData.email
-                }
-            })
-        }
-
-        // Send welcome email in background (non-blocking)
-        setImmediate(() => {
-            sendWelcomeEmail(studentData.email)
+        .catch((err) => {
+            console.log("Error saving to database", err);
+            return res.status(500).send(`Error: ${err.message}`)
         })
-
-    } catch (err) {
-        console.error("Error during signup:", err);
-        if (!res.headersSent) {
-            res.status(500).json({
-                message: "Signup failed",
-                error: err.message
-            })
-        }
-    }
-}
-
-// Helper function for sending welcome email
-const sendWelcomeEmail = async (email) => {
-    try {
-        const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || "smtp.gmail.com",
-            port: process.env.SMTP_PORT || 587,
-            secure: false,
-            auth: {
-                user: process.env.EMAIL_USER || "olawoyinjoseph05@gmail.com",
-                pass: process.env.EMAIL_PASS || "oysa nbex vzjb bily"
-            }
-        })
-
-        const mailOptions = {
-            from: "Online CBT",
-            to: email,
-            subject: "Welcome to Online CBT",
-            html: `
-                <div style="background-color: #f8fafc; padding: 0 0 10px; border-radius: 30px 30px 0 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                    <div style="padding-top: 30px; height: 80px; border-radius: 30px 30px 0 0; background-color: #0f172b; display: flex; align-items: center; justify-content: center; text-align: center;">
-                        <h1 style="color: #f8fafc; text-align: center; font-size: 26px; letter-spacing: 1px;">Welcome to Online CBT</h1>
-                    </div>
-                    <div style="padding: 40px 30px 20px; text-align: center; color: #0f172b; background-color: #ffffff;">
-                        <p style="font-size: 20px; margin-top: 0;">
-                            <span style="font-weight: 700; color: #ab3500;">Congratulations!</span> Your sign-up was successful.
-                        </p>
-                        <p style="line-height: 1.8; padding: 15px 10px; font-size: 16px;">
-                            Welcome to <strong style="color: #0f172b;">Online CBT</strong>, a secure, seamless, and smart online cbt platform. By joining us, you have taken the first step toward unlocking a seamless and distraction-free online examination experience. 
-                            <br><br>
-                            We would love to hear from you! If you have any questions or require assistance navigating your new account, please do not hesitate to reach out to our support team.
-                        </p>
-                        <div style="padding: 20px 0 10px;">
-                            <hr style="width: 50%; border: none; border-top: 1px solid #e2e8f0; margin-bottom: 20px;">
-                            <p style="margin-bottom: 5px; font-size: 16px; font-weight: 600;">Best Regards,</p>
-                            <p style="color: #ab3500; margin-top: 0; font-size: 18px; font-weight: bold;">Dev Joseph</p>
-                        </div>
-                    </div>
-                </div>
-            `
-        }
-
-        await transporter.sendMail(mailOptions)
-        console.log(`Email sent successfully to ${email}`)
-    } catch (error) {
-        console.error(`Email sending failed for ${email}:`, error.message)
-    }
 }
 
 const postSignin = (req, res) => {
