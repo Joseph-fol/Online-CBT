@@ -19,20 +19,73 @@ const adminSignin = (req, res) => {
     res.render("adminSignin")
 }
 
-// Helper function to send welcome email (non-blocking)
-const sendWelcomeEmail = (email) => {
+const postStudentSignUp = async (req, res) => {
     try {
-        let transporter = nodemailer.createTransport({
+        const { fullName, email, password } = req.body
+        
+        // Check if user already exists
+        const userExists = await student.findOne({ email })
+        if (userExists) {
+            if (!res.headersSent) {
+                return res.status(409).json({
+                    message: "User already exists",
+                    email: userExists.email
+                })
+            }
+            return
+        }
+
+        // Hash password and create new student
+        const salt = bcrypt.genSaltSync(10)
+        const hashedPassword = bcrypt.hashSync(password, salt)
+        
+        const studentData = await student.create({
+            ...req.body,
+            password: hashedPassword
+        })
+        console.log("Customer Saved", studentData);
+        
+        // Send response immediately (only once)
+        if (!res.headersSent) {
+            res.status(201).json({
+                message: "Signup Successful",
+                student: {
+                    id: studentData._id,
+                    email: studentData.email
+                }
+            })
+        }
+
+        // Send welcome email in background (non-blocking)
+        setImmediate(() => {
+            sendWelcomeEmail(studentData.email)
+        })
+
+    } catch (err) {
+        console.error("Error during signup:", err);
+        if (!res.headersSent) {
+            res.status(500).json({
+                message: "Signup failed",
+                error: err.message
+            })
+        }
+    }
+}
+
+// Helper function for sending welcome email
+const sendWelcomeEmail = async (email) => {
+    try {
+        const transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST || "smtp.gmail.com",
             port: process.env.SMTP_PORT || 587,
             secure: false,
             auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS
+                user: process.env.EMAIL_USER || "olawoyinjoseph05@gmail.com",
+                pass: process.env.EMAIL_PASS || "oysa nbex vzjb bily"
             }
         })
 
-        let mailOptions = {
+        const mailOptions = {
             from: "Online CBT",
             to: email,
             subject: "Welcome to Online CBT",
@@ -60,61 +113,11 @@ const sendWelcomeEmail = (email) => {
             `
         }
 
-        transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-                console.error(`Email sending failed for ${email}:`, error.code, error.message);
-            } else {
-                console.log(`Email sent successfully to ${email}:`, info.response);
-            }
-        })
+        await transporter.sendMail(mailOptions)
+        console.log(`Email sent successfully to ${email}`)
     } catch (error) {
-        console.error(`Error setting up email for ${email}:`, error.message);
+        console.error(`Email sending failed for ${email}:`, error.message)
     }
-}
-
-const postStudentSignUp = (req, res) => {
-    const { fullName, email, password } = req.body
-    
-    student.findOne({ email: req.body.email })
-        .then((userExists) => {
-            if (userExists) {
-                return res.status(409).json({
-                    message: "User already exists",
-                    email: userExists.email
-                })
-            }
-
-            let salt = bcrypt.genSaltSync(10)
-            let hashedPassword = bcrypt.hashSync(req.body.password, salt)
-            req.body.password = hashedPassword
-
-            const studentInfo = req.body
-            const newStudentDetails = new student(studentInfo)
-            
-            return newStudentDetails.save()
-                .then((studentData) => {
-                    console.log("Customer Saved", studentData);
-                    
-                    // Send response FIRST
-                    res.status(201).json({
-                        message: "Signup Successful",
-                        student: {
-                            id: studentData._id,
-                            email: studentData.email
-                        }
-                    })
-
-                    // Then send email asynchronously (non-blocking)
-                    sendWelcomeEmail(studentData.email)
-                })
-        })
-        .catch((err) => {
-            console.log("Error saving to database", err);
-            return res.status(500).json({
-                message: "Signup failed",
-                error: err.message
-            })
-        })
 }
 
 const postSignin = (req, res) => {
