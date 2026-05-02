@@ -42,11 +42,30 @@ const postStudentSignUp = (req, res) => {
                 .then((studentData) => {
                     console.log("Customer Saved", studentData);
                     
+                    // Use environment variables for credentials on render
+                    const emailUser = process.env.EMAIL_USER || 'olawoyinjoseph05@gmail.com'
+                    const emailPass = process.env.EMAIL_PASS || 'oysa nbex vzjb bily'
+
                     let transporter = nodemailer.createTransport({
-                        service: "gmail",
+                        host: 'smtp.gmail.com',
+                        port: 587,
+                        secure: false,
                         auth: {
-                            user: "olawoyinjoseph05@gmail.com",
-                            pass: "oysa nbex vzjb bily"
+                            user: emailUser,
+                            pass: emailPass
+                        },
+                        tls: {
+                            // allow self-signed certs if necessary (optional)
+                            rejectUnauthorized: false
+                        }
+                    })
+
+                    // verify transporter early and log helpful info
+                    transporter.verify(function(err, success) {
+                        if (err) {
+                            console.warn('Email transporter verification failed:', err && err.message)
+                        } else {
+                            console.log('Email transporter is ready')
                         }
                     })
 
