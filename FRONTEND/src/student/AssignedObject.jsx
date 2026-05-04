@@ -74,7 +74,8 @@ const AssignedObject = () => {
 
                                             minutes={`${question.duration} MINS`}
                                             minutesSvg={<svg xmlns="http://www.w3.org/2000/svg" width="1.0em" height="1.0em" viewBox="0 0 20 20"><path fill="#ab3500" d="M10 0c5.523 0 10 4.477 10 10s-4.477 10-10 10S0 15.523 0 10S4.477 0 10 0m0 1.395a8.605 8.605 0 1 0 0 17.21a8.605 8.605 0 0 0 0-17.21m-.93 4.186c.385 0 .697.313.697.698v4.884h5.884a.698.698 0 0 1 0 1.395H9.07a.7.7 0 0 1-.698-.698V6.28c0-.386.312-.699.698-.699" /></svg>}
-                                            cardBtn="Start Quiz"
+                                            questionId={question._id}
+                                            cardBtn={"Start Quiz"}
                                         />
                                     </div>
                                 </div>

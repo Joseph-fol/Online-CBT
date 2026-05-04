@@ -28,7 +28,7 @@ const App = () => {
         <Route path="/studentSignin" element={<SigninPage/>}/>
         <Route path="/studentDashboard" element={<Navigate to='/student/dashboard' replace />} />
         <Route path="/createStudentAccount" element={<SignupPage/>}/>
-        <Route path="/question" element={<ExactQuestion/>}/>
+        <Route path="/question/:id" element={<ExactQuestion/>}/>
         <Route path="/forgotPassword" element={<ForgotPassword/>}/>
         <Route path="/student-history" element={<Navigate to='/student/performance-history' replace />} />
         <Route path='*' element={<PageNotFound/>}/>

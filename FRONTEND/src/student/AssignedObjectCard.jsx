@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 
-const AssignedObjectCard = ({title, description, question, cardSvg, questionSvg, minutes, minutesSvg, cardBtn }) => {
+const AssignedObjectCard = ({title, description, question, cardSvg, questionSvg, minutes, minutesSvg, cardBtn, questionId }) => {
     return (
         <>
             <div className='bg-white p-4 rounded-3 h-100'>
@@ -22,7 +22,7 @@ const AssignedObjectCard = ({title, description, question, cardSvg, questionSvg,
                         <span style={{ fontSize: " 14px" }}> {minutes}</span>
                     </div>
                 </div>
-                <Link to={`/question/${question._id}`}>
+                <Link to={`/question/${questionId}`}>
                     <button className='w-100 text-white my-3 py-2 fw-medium border border-none' style={{ backgroundColor: "#ab3500" }}>{cardBtn}</button>
                 </Link>
             </div>

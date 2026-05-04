@@ -21,7 +21,7 @@ const adminSignin = (req, res) => {
 
 const postStudentSignUp = (req, res) => {
     const { fullName, email, password } = req.body
-    
+
     student.findOne({ email: req.body.email })
         .then((userExists) => {
             if (userExists) {
@@ -37,11 +37,11 @@ const postStudentSignUp = (req, res) => {
 
             const studentInfo = req.body
             const newStudentDetails = new student(studentInfo)
-            
+
             return newStudentDetails.save()
                 .then((studentData) => {
                     console.log("Customer Saved", studentData);
-                    
+
                     let transporter = nodemailer.createTransport({
                         service: "gmail",
                         auth: {
@@ -224,5 +224,24 @@ const getAllQuestions = (req, res) => {
         })
 }
 
+const getQuestionById = (req, res) => {
+    const {id} = req.params
+    Question.findById(id)
+    .then((question) => {
+        if(!question){
+            return res.status(400).json({
+                message: "Question not found"
+            })
+        }
+        res.status(200).json(question)
+    })
+    .catch((error) => {
+        res.status(500).json({
+            error: "Invalid id or server error",
+            details: error.message
+        })
+    })
+}
 
-module.exports = { getStudentSignUp, postStudentSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions }
+
+module.exports = { getStudentSignUp, postStudentSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById }
