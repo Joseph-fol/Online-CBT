@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 const ActiveQuizView = () => {
-    const [selectedOption, setSelectedOption] = useState("B")
+    const [selectedOption, setSelectedOption] = useState("")
 
     const questionText = "In the context of behavioral reinforcement, which mechanism most effectively sustains a habituated response when extrinsic rewards are gradually withdrawn?"
 
@@ -29,7 +29,7 @@ const ActiveQuizView = () => {
         <>
             <div className='container-sm col-lg-9 bg-white font-sans '>
                 <div className='d-flex justify-content-between pt-4' >
-                    <div>
+                    <div className='me-2'>
                         <span className='fw-medium text-black'>ADVANCED PSYCHOMETRICS</span>
                         <span><h4 className='fw-bold' style={{ color: "#ab3500" }}>Cognitive Behavioral Analysis</h4></span>
                     </div>
@@ -44,11 +44,11 @@ const ActiveQuizView = () => {
             <div style={{ backgroundColor: "#f8f9fa" }} className='pb-5' >
                 <div className='container col-lg-7 py-4 py-lg-5 d-flex justify-content-between'>
                     <div style={{ backgroundColor: "#edeeef", color: "black" }} className='px-4 fw-medium py-2 rounded-3'>
-                        Question 14 of 20
+                        Question 1 of 20
                     </div>
 
                     <div>
-                        <button className='btn fw-medium' style={{ color: "#392bd1" }}> Mark for Reviews</button>
+                        <button className='btn fw-medium' style={{ color: "#0f172b" }}> Mark for Reviews</button>
                     </div>
                 </div>
 

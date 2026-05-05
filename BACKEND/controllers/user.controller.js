@@ -2,6 +2,10 @@ const student = require("../models/user.model")
 const Question = require('../models/questions.model')
 const bcrypt = require("bcrypt")
 const nodemailer = require("nodemailer")
+const jsonwebtoken = require("jsonwebtoken")
+
+const JWT_SECRET = process.env.jwtSecretKey
+// console.log(JWT_SECRET);
 
 const getStudentSignUp = (req, res) => {
     res.render("studentSignup")
@@ -92,7 +96,9 @@ const postStudentSignUp = (req, res) => {
                             console.log("Email sent: " + info.response);
                         }
                     })
-
+                    const token = jwt.sign({email: studentData.email}, JWT_SECRET, {expiresIn: "30d"})
+                    console.log("Generated token", studentData.email);
+                    
                     // Send response immediately
                     return res.status(201).json({
                         message: "Signup Successful",
@@ -243,5 +249,25 @@ const getQuestionById = (req, res) => {
     })
 }
 
+const getQuestionBySubject = (req, res) => {
+    const {subject} = req.params
 
-module.exports = { getStudentSignUp, postStudentSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById }
+    Question.find({subject: subject})
+    .then((question)=>{
+        if(!question || question.length ==0){
+            return res.status(404).json({
+                message: `No question found for ${subject}`
+            })
+        }
+        res.status(200).json(question)
+    })
+    .catch((error) => {
+        res.status(500).json({
+            message: "Failed to fetch exam questions",
+            details: error.message
+        })
+    })
+}
+
+
+module.exports = { getStudentSignUp, postStudentSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject }
