@@ -21,7 +21,7 @@ const ExactQuestion = () => {
         // axios.get("http://localhost:2114/user/getAllQuestions")
         // http://localhost:2114/user/
         // axios.get(`https://online-cbt.onrender.com/user/${id}`)
-        axios.get(`http://localhost:2114/user/question/${id}`)
+        axios.get(`https://online-cbt.onrender.com/user/question/${id}`)
             .then((response) => {
                 // console.log(response.data)
                 setQuestionDetail(response.data)
