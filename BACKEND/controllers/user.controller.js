@@ -225,7 +225,7 @@ const getAllQuestions = (req, res) => {
 }
 
 const getQuestionById = (req, res) => {
-    const {id} = req.params
+    const { id } = req.params
     Question.findById(id)
     .then((question) => {
         if(!question){

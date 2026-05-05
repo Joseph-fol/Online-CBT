@@ -59,7 +59,6 @@ const AssignedObject = () => {
                 {/* First Div */}
                 <div className='container'>
                     <div className='row g-4'>
-
                         {loading ? (<p className='text-center py-5 mx-auto px-5'><svg xmlns="http://www.w3.org/2000/svg" width="3.5em" height="3.5em" viewBox="0 0 24 24"><rect width="10" height="10" x="1" y="1" fill="#ab3500" rx="1"><animate id="SVG7JagGz2Y" fill="freeze" attributeName="x" begin="0;SVGgDT19bUV.end" dur="0.17s" values="1;13" /><animate id="SVGpS1BddYk" fill="freeze" attributeName="y" begin="SVGc7yq8dne.end" dur="0.17s" values="1;13" /><animate id="SVGboa7EdFl" fill="freeze" attributeName="x" begin="SVG0ZX9C6Fa.end" dur="0.17s" values="13;1" /><animate id="SVG6rrusL2C" fill="freeze" attributeName="y" begin="SVGTOnnO5Dr.end" dur="0.17s" values="13;1" /></rect><rect width="10" height="10" x="1" y="13" fill="#ab3500" rx="1"><animate id="SVGc7yq8dne" fill="freeze" attributeName="y" begin="SVG7JagGz2Y.end" dur="0.17s" values="13;1" /><animate id="SVG0ZX9C6Fa" fill="freeze" attributeName="x" begin="SVGpS1BddYk.end" dur="0.17s" values="1;13" /><animate id="SVGTOnnO5Dr" fill="freeze" attributeName="y" begin="SVGboa7EdFl.end" dur="0.17s" values="1;13" /><animate id="SVGgDT19bUV" fill="freeze" attributeName="x" begin="SVG6rrusL2C.end" dur="0.17s" values="13;1" /></rect></svg></p>) : (
                             questions.map((question) => (
                                 <div className='col-12 col-md-4' key={question._id}>

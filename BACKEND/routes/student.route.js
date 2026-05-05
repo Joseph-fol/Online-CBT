@@ -11,6 +11,6 @@ router.post("/admin/signin", postAdminSignin)
 router.get("/adminSignin", adminSignin)
 router.post("/addQuestions", addQuestion)
 router.get("/getAllQuestions", getAllQuestions)
-router.post("/:id", getQuestionById)
+router.get("/question/:id", getQuestionById)
 
 module.exports = router

@@ -18,6 +18,7 @@ import AvailableAssessmentsPage from './student/AvailableAssessmentsPage'
 import PerformanceHistoryPage from './student/PerformanceHistoryPage'
 import PageNotFound from './component/PageNotFound'
 import ExactQuestion from './student/ExactQuestion'
+import ActiveQuizView from './student/ActiveQuizView'
 
 const App = () => {
   return (
@@ -38,6 +39,7 @@ const App = () => {
           <Route path='dashboard' element={<StudentDashboard />} />
           <Route path='available-assessments' element={<AvailableAssessmentsPage />} />
           <Route path='performance-history' element={<PerformanceHistoryPage />} />
+          <Route path='ActiveQuizView' element={<ActiveQuizView />} />
         </Route>
         
         <Route path="/admin" element={<AdminDashboard/> }>

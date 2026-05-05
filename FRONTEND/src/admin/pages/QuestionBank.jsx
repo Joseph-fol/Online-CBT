@@ -102,13 +102,12 @@ const QuestionBank = () => {
     },
 
     onSubmit: (values, { resetForm }) => {
-      // console.log(values)
+      console.log(values)
 
       axios.post("https://online-cbt.onrender.com/user/addQuestions", values)
         .then(() => {
           const draftPayload = buildDraftFromValues(values, editingDraftId)
           upsertDraft(draftPayload)
-
           setEditingDraftId(null)
           resetForm()
           alert("Details successfully submitted")
@@ -294,7 +293,7 @@ const QuestionBank = () => {
 
               <label className='question-bank__field'>
                 <span> TOTAL SCORE</span>
-                <input type='number' min='1' name='score' placeholder='e.g., 20' value={formik.values.score} readOnly />
+                <input type='number' min='1' name='score' placeholder='e.g., 20' value={formik.values.score}/>
                 {formik.touched.score ? <p className='text-danger'>{formik.errors.score}</p> : ""}
               </label>
             </div>

@@ -19,8 +19,12 @@ const StudentLayout = () => {
           isSidebarOpen={sidebarOpen}
           onToggleSidebar={() => setSidebarOpen((current) => !current)}
         />
-
-        <main className='student-layout__content'>
+        <main
+          className='student-layout__content'
+          onClick={() => {
+            if (sidebarOpen) setSidebarOpen(false)
+          }}
+        >
           <Outlet />
         </main>
       </div>
