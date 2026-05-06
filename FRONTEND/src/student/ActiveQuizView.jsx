@@ -25,7 +25,7 @@ const ActiveQuizView = () => {
     useEffect(() => {
         // Log the subject being accessed
         // Fetch questions by subject
-        axios.get(`http://localhost:2114/user/subject/${subject}`)
+        axios.get(`https://online-cbt.onrender.com/user/subject/${subject}`)
         .then((response) => {
             const data = response.data
             // console.log("Questions fetched for subject:", subject);
