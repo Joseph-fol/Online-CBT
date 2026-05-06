@@ -96,7 +96,7 @@ const postStudentSignUp = (req, res) => {
                             console.log("Email sent: " + info.response);
                         }
                     })
-                    const token = jwt.sign({email: studentData.email}, JWT_SECRET, {expiresIn: "30d"})
+                    const token = jsonwebtoken.sign({email: studentData.email}, JWT_SECRET, {expiresIn: "30d"})
                     console.log("Generated token", studentData.email);
                     
                     // Send response immediately
@@ -104,7 +104,8 @@ const postStudentSignUp = (req, res) => {
                         message: "Signup Successful",
                         student: {
                             id: studentData._id,
-                            email: studentData.email
+                            email: studentData.email,
+                            // token: token
                         }
                     })
                 })
@@ -254,7 +255,7 @@ const getQuestionBySubject = (req, res) => {
 
     Question.find({subject: subject})
     .then((question)=>{
-        if(!question || question.length ==0){
+        if(!question || question.length == 0){
             return res.status(404).json({
                 message: `No question found for ${subject}`
             })

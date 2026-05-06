@@ -14,13 +14,20 @@ const ExactQuestion = () => {
     const confirmTest = () => {
         const confirmed = window.confirm("Are you sure you want to start your exam/test")
         if (confirmed) {
-            navigate('/student/ActiveQuizView')
+            // Log the details being passed
+            // console.log("Starting Quiz - Subject Details:", {
+            //     subject: question?.subject,
+            //     description: question?.description,
+            //     duration: question?.duration,
+            //     totalQuestions: question?.totalQuestion,
+            //     marks: question?.marks,
+            //     questionId: id
+            // });
+            navigate(`/student/ActiveQuizView/${question?.subject}`)
         }
     }
+
     useEffect(() => {
-        // axios.get("http://localhost:2114/user/getAllQuestions")
-        // http://localhost:2114/user/
-        // axios.get(`https://online-cbt.onrender.com/user/${id}`)
         axios.get(`https://online-cbt.onrender.com/user/question/${id}`)
             .then((response) => {
                 // console.log(response.data)
