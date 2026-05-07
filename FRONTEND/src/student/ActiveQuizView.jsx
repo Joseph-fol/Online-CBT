@@ -21,28 +21,143 @@ const ActiveQuizView = () => {
     const [timeLeft, setTimeLeft] = useState(null); // Time in total seconds
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [finalScore, setFinalScore] = useState(0);
+    const [timerActive, setTimerActive] = useState(false);
 
     useEffect(() => {
-        // Log the subject being accessed
-        // Fetch questions by subject
+        // Check if exam already started (from localStorage)
+        const examStartTime = localStorage.getItem('examStartTime');
+        const totalExamDuration = localStorage.getItem('totalExamDuration');
+        
+        if (examStartTime && totalExamDuration) {
+            // Exam already in progress - restore the timer
+            const now = Date.now();
+            const elapsedSeconds = Math.floor((now - parseInt(examStartTime)) / 1000);
+            const remaining = parseInt(totalExamDuration) - elapsedSeconds;
+            
+            if (remaining > 0) {
+                setTimeLeft(remaining);
+                setTimerActive(true);
+                
+                // Fetch questions to restore
+                axios.get(`https://online-cbt.onrender.com/user/subject/${subject}`)
+                    .then((response) => {
+                        setQuestions(response.data);
+                        setLoading(false);
+                    })
+                    .catch(() => setLoading(false));
+                return;
+            } else {
+                // Time expired
+                alert("Time's up! Your exam has been submitted.");
+                localStorage.removeItem('examStartTime');
+                localStorage.removeItem('totalExamDuration');
+                setLoading(false);
+                return;
+            }
+        }
+        
+        // Start new exam
         axios.get(`https://online-cbt.onrender.com/user/subject/${subject}`)
-        .then((response) => {
-            const data = response.data
-            // console.log("Questions fetched for subject:", subject);
-            // console.log("Subject data:", data);
-            setQuestions(data)
-            setLoading(false)
-        })
-        .catch((error) => {
-            // console.error("Error fetching questions for subject:", subject);
-            // console.error("Error details:", error)
-            setLoading(false)
-        })
+            .then((response) => {
+                const data = response.data
+                setQuestions(data)
+                
+                // Multiply duration by 60 to convert minutes to seconds
+                const durationInSeconds = data[0].duration * 60;
+                
+                // Store exam start time and duration in localStorage
+                localStorage.setItem('examStartTime', Date.now().toString());
+                localStorage.setItem('totalExamDuration', durationInSeconds.toString());
+                
+                setTimeLeft(durationInSeconds);
+                setTimerActive(true);
+                console.log(durationInSeconds);
+                setLoading(false)
+            })
+            .catch((error) => {
+                setLoading(false)
+            })
     }, [subject])
+
+    // Timer countdown effect - calculates based on localStorage start time
+    useEffect(() => {
+        if (!timerActive || !localStorage.getItem('examStartTime')) {
+            return;
+        }
+
+        const interval = setInterval(() => {
+            const examStartTime = localStorage.getItem('examStartTime');
+            const totalDuration = parseInt(localStorage.getItem('totalExamDuration'));
+            
+            if (examStartTime && totalDuration) {
+                const now = Date.now();
+                const elapsedSeconds = Math.floor((now - parseInt(examStartTime)) / 1000);
+                const remaining = totalDuration - elapsedSeconds;
+                
+                if (remaining <= 0) {
+                    setTimeLeft(0);
+                    setTimerActive(false);
+                    alert("Time's up! Your exam has been submitted.");
+                    handleSubmitExam();
+                    return;
+                }
+                
+                setTimeLeft(remaining);
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [timerActive])
+
+    // Format seconds to MM:SS
+    const formatTime = (seconds) => {
+        if (seconds === null) return "00:00";
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    // Handle exam submission
+    const handleSubmitExam = () => {
+        // Calculate score
+        let correct = 0;
+        questions.forEach(question => {
+            if (selectedAnswers[question._id] === question.correctAnswer) {
+                correct++;
+            }
+        });
+        
+        const score = (correct / questions.length) * 100;
+        setFinalScore(score);
+        setIsSubmitted(true);
+        setTimerActive(false);
+        
+        // Clear exam timer from localStorage
+        localStorage.removeItem('examStartTime');
+        localStorage.removeItem('totalExamDuration');
+        
+        // Log submission details
+        console.log("Exam Submitted", {
+            subject: subject,
+            totalQuestions: questions.length,
+            correctAnswers: correct,
+            score: score.toFixed(2) + "%",
+            answers: selectedAnswers
+        });
+    }
 
     // Get current question
     const currentQuestion = questions[currentIndex]
-    
+
+    // Restore selected answer for current question
+    useEffect(() => {
+        if (currentQuestion && selectedAnswers[currentQuestion._id]) {
+            setSelectedOption(selectedAnswers[currentQuestion._id])
+        } else {
+            setSelectedOption("")
+        }
+    }, [currentIndex, currentQuestion, selectedAnswers])
+
     // Get options from current question
     const options = currentQuestion ? [
         { id: "A", text: currentQuestion.options?.A },
@@ -72,6 +187,28 @@ const ActiveQuizView = () => {
         )
     }
 
+    // Show results after submission
+    if (isSubmitted) {
+        return (
+            <div className='d-flex justify-content-center align-items-center' style={{ minHeight: '100vh' }}>
+                <div className='text-center'>
+                    <h2 className='fw-bold' style={{ color: "#ab3500" }}>Exam Submitted!</h2>
+                    <h3 className='my-4'>Your Score: {finalScore.toFixed(2)}%</h3>
+                    <p className='text-muted mb-4'>Thank you for completing the exam.</p>
+                    <button onClick={() => navigate(-2)} className='btn' style={{backgroundColor: "#ab3500", color: "white"}}>
+                        Back to Assessments
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
+    // useEffect(() => {
+
+
+    // }, [third])
+
+
     return (
         <>
             <div className='container-sm col-lg-9 bg-white font-sans '>
@@ -81,8 +218,8 @@ const ActiveQuizView = () => {
                         <span><h4 className='fw-bold' style={{ color: "#ab3500" }}>{currentQuestion?.description || "Quiz"}</h4></span>
                     </div>
 
-                    <div className='alert alert-danger fw-bold px-4 py-2 fs-sm-5 text-center justify-content-center align-items-center gap-2 '>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#58151c" d="M12 20a8 8 0 0 0 8-8a8 8 0 0 0-8-8a8 8 0 0 0-8 8a8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10a10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67l-.75 1.23L11 13V7z" /></svg> <span>01:42</span>
+                    <div className='alert alert-danger fw-bold px-4 py-2 fs-sm-5 text-center justify-content-center align-items-center gap-2 ' style={{backgroundColor: timeLeft && timeLeft < 300 ? '#ffcccc' : ''}}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#58151c" d="M12 20a8 8 0 0 0 8-8a8 8 0 0 0-8-8a8 8 0 0 0-8 8a8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10a10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67l-.75 1.23L11 13V7z" /></svg> <span>{formatTime(timeLeft)}</span>
                     </div>
                 </div>
                 <p></p>
@@ -114,7 +251,14 @@ const ActiveQuizView = () => {
                                 return (
                                     <button
                                         key={option.id}
-                                        onClick={() => setSelectedOption(option.id)}
+                                        onClick={() => {
+                                            setSelectedOption(option.id)
+                                            // Store the answer
+                                            setSelectedAnswers({
+                                                ...selectedAnswers,
+                                                [currentQuestion._id]: option.id
+                                            })
+                                        }}
                                         className="btn text-start d-flex align-items-center p-3 rounded-3" // Kept layout classes only
                                         style={{
                                             width: '100%', // Ensures it fills container
@@ -159,23 +303,22 @@ const ActiveQuizView = () => {
 
                     <div className='py-5 d-flex flex-wrap justify-content-between align-items-center'>
                         <div>
-                            <button 
+                            <button
                                 onClick={() => {
                                     if (currentIndex > 0) {
                                         setCurrentIndex(currentIndex - 1)
-                                        setSelectedOption("")
                                     }
                                 }}
                                 disabled={currentIndex === 0}
-                                className='py-2 px-2 px-lg-5 fw-bold border-1 bg-white d-flex align-items-center gap-1' 
-                                style={{ 
-                                    color: currentIndex === 0 ? "#ccc" : "#0f172b", 
+                                className='py-2 px-2 px-lg-5 fw-bold border-1 bg-white d-flex align-items-center gap-1'
+                                style={{
+                                    color: currentIndex === 0 ? "#ccc" : "#0f172b",
                                     borderColor: "#ab3500",
                                     opacity: currentIndex === 0 ? 0.5 : 1,
                                     cursor: currentIndex === 0 ? 'not-allowed' : 'pointer'
                                 }}
-                            > 
-                                <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="#0f172b" d="M10.707 8.707a1 1 0 0 0-1.414-1.414l-4 4a1 1 0 0 0 0 1.414l4 4a1 1 0 0 0 1.414-1.414L8.414 13H18a1 1 0 1 0 0-2H8.414z" /></svg> 
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="#0f172b" d="M10.707 8.707a1 1 0 0 0-1.414-1.414l-4 4a1 1 0 0 0 0 1.414l4 4a1 1 0 0 0 1.414-1.414L8.414 13H18a1 1 0 1 0 0-2H8.414z" /></svg>
                                 Previous
                             </button>
                         </div>
@@ -183,23 +326,23 @@ const ActiveQuizView = () => {
                         <div className='d-flex gap-4 align-items-center flex-wrap'>
                             <button className='btn text-secondary fw-bold d-none d-lg-block d-md-block'>Review All <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#6b6868" d="M22 12.999V20a1 1 0 0 1-1 1h-8v-8.001zm-11 0V21H3a1 1 0 0 1-1-1v-7.001zM11 3v7.999H2V4a1 1 0 0 1 1-1zm10 0a1 1 0 0 1 1 1v6.999h-9V3z" /></svg></button>
 
-                            <button 
+                            <button
                                 onClick={() => {
                                     if (currentIndex < questions.length - 1) {
                                         setCurrentIndex(currentIndex + 1)
                                         setSelectedOption("")
                                     } else {
-                                        alert("You have reached the last question. Please submit your exam.")
+                                        handleSubmitExam()
                                     }
                                 }}
-                                className='py-2 px-4 fw-bold border border-1 d-flex align-items-center gap-2' 
-                                style={{ 
-                                    backgroundColor: "#ab3500", 
+                                className='py-2 px-4 fw-bold border border-1 d-flex align-items-center gap-2'
+                                style={{
+                                    backgroundColor: "#ab3500",
                                     color: "white",
                                     cursor: 'pointer'
                                 }}
-                            > 
-                                {currentIndex === questions.length - 1 ? "Submit" : "Next"} 
+                            >
+                                {currentIndex === questions.length - 1 ? "Submit" : "Next"}
                                 <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16"><path fill="#ffffff" fillRule="evenodd" d="M2 8a.75.75 0 0 1 .75-.75h8.69L8.22 4.03a.75.75 0 0 1 1.06-1.06l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06l3.22-3.22H2.75A.75.75 0 0 1 2 8" clipRule="evenodd" /></svg>
                             </button>
                         </div>

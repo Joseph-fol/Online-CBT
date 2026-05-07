@@ -39,7 +39,7 @@ const ExactQuestion = () => {
             .catch((error) => {
                 setLoading(false)
                 console.error("Error fetching details", error);
-                alert("Error fetching details", error);
+                alert("Error fetching details");
             })
     }, [id])
 

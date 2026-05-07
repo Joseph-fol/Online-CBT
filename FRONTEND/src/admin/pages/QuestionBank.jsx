@@ -7,7 +7,77 @@ import axios from 'axios'
 const QuestionBank = () => {
   const [draftQuestions, setDraftQuestions] = useState([])
   const [editingDraftId, setEditingDraftId] = useState(null)
+  const [subjects, setSubjects] = useState([])
+  const [isNewSubject, setIsNewSubject] = useState(false)
   const formSectionRef = useRef(null)
+
+  // Fetch existing subjects on component mount
+  useEffect(() => {
+    axios.get("https://online-cbt.onrender.com/user/getAllQuestions")
+      .then((response) => {
+        const questionsArray = response.data.questionsArray
+        // Group by subject and extract unique subjects with metadata
+        const subjectMap = {}
+        questionsArray.forEach(question => {
+          if (!subjectMap[question.subject]) {
+            subjectMap[question.subject] = {
+              name: question.subject,
+              description: question.description,
+              duration: question.duration,
+              marks: question.marks,
+              totalQuestion: question.totalQuestion,
+              score: question.score
+            }
+          }
+        })
+        const uniqueSubjectsArray = Object.values(subjectMap)
+        setSubjects(uniqueSubjectsArray)
+      })
+      .catch((error) => {
+        console.error("Error fetching subjects:", error)
+      })
+  }, [])
+
+  // Handle subject selection and auto-fill fields
+  const handleSubjectSelect = (subjectName) => {
+    if (subjectName === "new") {
+      setIsNewSubject(true)
+      formik.setValues({
+        subject: "",
+        description: "",
+        marks: '2',
+        duration: "",
+        totalQuestion: "",
+        score: "",
+        questionText: '',
+        optionA: '',
+        optionB: '',
+        optionC: '',
+        optionD: '',
+        correctAnswer: ''
+      })
+      return
+    }
+    
+    setIsNewSubject(false)
+    const selectedSubject = subjects.find(s => s.name === subjectName)
+    if (selectedSubject) {
+      formik.setValues({
+        subject: selectedSubject.name,
+        description: selectedSubject.description,
+        marks: String(selectedSubject.marks),
+        duration: String(selectedSubject.duration),
+        totalQuestion: String(selectedSubject.totalQuestion),
+        score: String(selectedSubject.score),
+        questionText: '',
+        optionA: '',
+        optionB: '',
+        optionC: '',
+        optionD: '',
+        correctAnswer: ''
+      })
+    }
+  }
 
   const buildDraftFromValues = (values, existingId = null) => {
     return {
@@ -182,20 +252,41 @@ const QuestionBank = () => {
             <div className='question-bank__field-grid'>
 
               <label className='question-bank__field'>
-                <span>SUBJECT</span>
-                <input
-                  type='text'
+                <span>SELECT SUBJECT</span>
+                <select
                   name='subject'
                   value={formik.values.subject}
-                  onChange={formik.handleChange}
+                  onChange={(e) => handleSubjectSelect(e.target.value)}
                   onBlur={formik.handleBlur}
-                  placeholder='Type subject name'
-                />
+                >
+                  <option value=''>Choose a subject</option>
+                  {subjects.map((subject) => (
+                    <option key={subject.name} value={subject.name}>
+                      {subject.name}
+                    </option>
+                  ))}
+                  <option value='new'>+ Create New Subject</option>
+                </select>
                 {formik.touched.subject ? <p className='text-danger'>{formik.errors.subject}</p> : ""}
               </label>
 
+              {isNewSubject && (
+                <label className='question-bank__field'>
+                  <span>SUBJECT NAME (NEW)</span>
+                  <input
+                    type='text'
+                    name='subject'
+                    value={formik.values.subject}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    placeholder='Enter new subject name'
+                  />
+                  {formik.touched.subject ? <p className='text-danger'>{formik.errors.subject}</p> : ""}
+                </label>
+              )}
+
               <label className='question-bank__field'>
-                <span>DESCRIPTION</span>
+                <span>DESCRIPTION {!isNewSubject && formik.values.subject && '(Auto-filled)'}</span>
                 <input
                   type='text'
                   name='description'
@@ -203,6 +294,8 @@ const QuestionBank = () => {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   placeholder='Description of the subject'
+                  readOnly={!isNewSubject && !!formik.values.subject}
+                  style={{backgroundColor: !isNewSubject && formik.values.subject ? '#f0f0f0' : '#fff'}}
                 />
                 {formik.touched.subject ? <p className='text-danger'>{formik.errors.description}</p> : ""}
               </label>
@@ -272,28 +365,38 @@ const QuestionBank = () => {
 
             <div className='question-bank__options'>
               <label className='question-bank__field'>
-                <span>MARK (PER QUESTION)</span>
+                <span>MARK (PER QUESTION) {!isNewSubject && formik.values.subject && '(Auto-filled)'}</span>
                 <input type='number' min='1' name='marks' value={formik.values.marks} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                  readOnly={!isNewSubject && !!formik.values.subject}
+                  style={{backgroundColor: !isNewSubject && formik.values.subject ? '#f0f0f0' : '#fff'}}
                 />
                 {formik.touched.marks ? <p className='text-danger'>{formik.errors.marks}</p> : ""}
               </label>
 
               <label className='question-bank__field'>
-                <span>DURATIONS (Minutes)</span>
+                <span>DURATIONS (Minutes) {!isNewSubject && formik.values.subject && '(Auto-filled)'}</span>
                 <input type='number' min='1' name='duration' value={formik.values.duration} placeholder='e.g., 50' onChange={formik.handleChange} onBlur={formik.handleBlur}
+                  readOnly={!isNewSubject && !!formik.values.subject}
+                  style={{backgroundColor: !isNewSubject && formik.values.subject ? '#f0f0f0' : '#fff'}}
                 />
                 {formik.touched.duration ? <p className='text-danger'>{formik.errors.duration}</p> : ""}
               </label>
 
               <label className='question-bank__field'>
-                <span>TOTAL QUESTIONS</span>
-                <input type='number' min='1' name='totalQuestion' placeholder='e.g., 20' value={formik.values.totalQuestion} onChange={formik.handleChange} onBlur={formik.handleBlur} />
+                <span>TOTAL QUESTIONS {!isNewSubject && formik.values.subject && '(Auto-filled)'}</span>
+                <input type='number' min='1' name='totalQuestion' placeholder='e.g., 20' value={formik.values.totalQuestion} onChange={formik.handleChange} onBlur={formik.handleBlur}
+                  readOnly={!isNewSubject && !!formik.values.subject}
+                  style={{backgroundColor: !isNewSubject && formik.values.subject ? '#f0f0f0' : '#fff'}}
+                />
                 {formik.touched.totalQuestion ? <p className='text-danger'>{formik.errors.totalQuestion}</p> : ""}
               </label>
 
               <label className='question-bank__field'>
-                <span> TOTAL SCORE</span>
-                <input type='number' min='1' name='score' placeholder='e.g., 20' value={formik.values.score}/>
+                <span>TOTAL SCORE {!isNewSubject && formik.values.subject && '(Auto-calculated)'}</span>
+                <input type='number' min='1' name='score' placeholder='e.g., 20' value={formik.values.score}
+                  readOnly={true}
+                  style={{backgroundColor: '#f0f0f0'}}
+                />
                 {formik.touched.score ? <p className='text-danger'>{formik.errors.score}</p> : ""}
               </label>
             </div>
