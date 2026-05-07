@@ -172,7 +172,7 @@ const QuestionBank = () => {
     },
 
     onSubmit: (values, { resetForm }) => {
-      console.log(values)
+      // console.log(values)
 
       axios.post("https://online-cbt.onrender.com/user/addQuestions", values)
         .then(() => {
