@@ -8,6 +8,7 @@ const AssignedObjectCard = ({title, description, question, cardSvg, questionSvg,
                 <div style={{ backgroundColor: "#f8f9fa", padding: "10px", width: "50px", borderRadius: "10px", marginBottom: "17px"}}>
                     {cardSvg}
                 </div>
+                
                 <h5 className='fw-bold fs-5'>{title}</h5>
                 <p style={{ fontSize: " 14px" }}>{description}</p>
 

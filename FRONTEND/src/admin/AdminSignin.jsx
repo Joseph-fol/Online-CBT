@@ -4,9 +4,12 @@ import * as yup from "yup"
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 const AdminSignin = () => {
     const [show, setShow] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState("")
     const handleClick = () => setShow(!show)
     const navigate = useNavigate()
 
@@ -27,15 +30,41 @@ const AdminSignin = () => {
         },
 
         onSubmit: (values, { resetForm }) => {
-            console.log(values);
-            alert("Successful")
-            resetForm()
-            navigate("/admin")
+            setLoading(true)
+            setError("")
+            
+            axios.post("http://localhost:2114/user/admin/signin", {
+                email: values.email,
+                password: values.password
+            })
+
+            .then((response) => {
+                const data = response.data
+
+                // Check if user has admin role
+                if (data.admin && data.admin.role === "admin") {
+                    console.log("Admin signin successful", data.admin)
+                    // Store admin info in localStorage
+                    localStorage.setItem("adminData", JSON.stringify(data.admin))
+                    setLoading(false)
+                    resetForm()
+                    navigate("/admin")
+                } else {
+                    setError("You do not have admin privileges")
+                    setLoading(false)
+                }
+            })
+            .catch((err) => {
+                console.error("Error during signin:", err)
+                const errorMessage = err.response?.data?.message || "An error occurred. Please try again."
+                setError(errorMessage)
+                setLoading(false)
+            })
         },
 
         validationSchema: yup.object({
             email: yup.string().email("Invalid email").required("Email is required"),
-            password: yup.string().min(8, 'Email must be at least 8 characters').required("Password is required")
+            password: yup.string().min(8, 'Password must be at least 8 characters').required("Password is required")
         })
     })
     return (
@@ -74,6 +103,12 @@ const AdminSignin = () => {
                         </div>
 
                         <div className='col-lg-6 col-md-6 bg-white p-5' data-aos="fade-up">
+                            {error && (
+                                <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                                    {error}
+                                    <button type="button" className="btn-close" onClick={() => setError("")}></button>
+                                </div>
+                            )}
                             <form class="row g-3" onSubmit={form.handleSubmit}>
                                 <div className='d-flex justify-content-between'>
                                     <h4 className='fw-bold py-0'> Admin Sign in</h4>
@@ -102,7 +137,9 @@ const AdminSignin = () => {
                                 </div>
 
                                 <div class="col-12">
-                                    <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ backgroundColor: "#ab3500" }}>Signin</button>
+                                    <button type="submit" disabled={loading} class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ backgroundColor: "#ab3500" }}>
+                                        {loading ? "Signing in..." : "Signin"}
+                                    </button>
                                 </div>
                             </form>
                         </div>

@@ -98,7 +98,6 @@ const AssignedObject = () => {
                                         />
                                     </div>
                                 </div>
-
                             )))
                         }
                         {!loading && uniqueSubjects.length === 0 && (
