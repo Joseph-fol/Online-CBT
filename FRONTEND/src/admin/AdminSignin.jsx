@@ -44,8 +44,10 @@ const AdminSignin = () => {
                 // Check if user has admin role
                 if (data.admin && data.admin.role === "admin") {
                     console.log("Admin signin successful", data.admin)
+
                     // Store admin info in localStorage
                     localStorage.setItem("adminData", JSON.stringify(data.admin))
+                    
                     setLoading(false)
                     resetForm()
                     navigate("/admin")

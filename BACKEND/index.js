@@ -24,13 +24,21 @@ dns.setDefaultResultOrder('ipv4first')
 dns.setServers(['8.8.8.8', '8.8.4.4'])
 
 app.use(cors())
-mongoose.connect(URI)
+mongoose.connect(URI, {
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+    retryWrites: true,
+})
 
 .then(()=>{
     console.log("Connected to MongoDB");
 })
 .catch((err)=>{
     console.log("Error connecting to DB", err);
+    console.log("Make sure:");
+    console.log("1. Your IP address is whitelisted in MongoDB Atlas");
+    console.log("2. Your MONGO_URI credentials are correct");
+    console.log("3. Your internet connection is stable");
 })
 app.use("/user", studentRoutes)
 

@@ -150,11 +150,23 @@ const postSignin = (req, res) => {
 
 const postAdminSignin = (req, res) => {
     const { email, password } = req.body
-    student.findOne({ email, role: "admin" })
+    console.log("Admin signin attempt with email:", email)
+    console.log("Searching for admin with email and role admin...")
+    
+    student.findOne({ email: email, role: "admin" })
         .then((foundAdmin) => {
             console.log("Found admin:", foundAdmin)
             if (!foundAdmin) {
                 console.log("Admin not found");
+                // Try to find user with this email to see if it exists
+                student.findOne({ email: email })
+                    .then((anyUser) => {
+                        if (anyUser) {
+                            console.log("User exists but role is:", anyUser.role);
+                        } else {
+                            console.log("No user found with this email");
+                        }
+                    })
                 return res.status(401).json({ message: "Admin not found" })
             }
             const isMatch = bcrypt.compareSync(password, foundAdmin.password)
@@ -162,7 +174,6 @@ const postAdminSignin = (req, res) => {
                 console.log("Invalid password");
                 return res.status(401).json({ message: "Invalid password" })
             }
-            // admin123
             console.log("Admin successfully signin ", foundAdmin.email);
             return res.json({
                 message: "Admin successfully signed in",
