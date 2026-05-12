@@ -55,17 +55,32 @@ const postStudentSignUp = (req, res) => {
                             console.error("Background email error:", err.message);
                         });
 
-                    const token = jsonwebtoken.sign({email: studentData.email}, JWT_SECRET, {expiresIn: "30d"})
-                    console.log("Generated token", studentData.email);
-                    
-                    // Send response immediately
-                    return res.status(201).json({
-                        message: "Signup Successful",
-                        student: {
-                            id: studentData._id,
-                            email: studentData.email,
-                            // token: token
+                    // Generate token and handle response
+                    return new Promise((resolve, reject) => {
+                        try {
+                            const token = jsonwebtoken.sign({email: studentData.email}, JWT_SECRET, {expiresIn: "30d"})
+                            console.log("Generated token", studentData.email);
+                            resolve(token)
+                        } catch (error) {
+                            reject(error)
                         }
+                    })
+                    .then((token) => {
+                        return res.status(201).json({
+                            message: "Signup Successful",
+                            token: token,
+                            student: {
+                                id: studentData._id,
+                                email: studentData.email,
+                            }
+                        })
+                    })
+                    .catch((error) => {
+                        console.error("Token generation error:", error);
+                        return res.status(500).json({
+                            message: "Signup failed - token generation error",
+                            error: error.message
+                        })
                     })
                 })
         })
