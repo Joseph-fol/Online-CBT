@@ -4,9 +4,6 @@ const bcrypt = require("bcrypt")
 const jsonwebtoken = require("jsonwebtoken")
 const { sendWelcomeEmail } = require("../utils/emailService")
 
-const JWT_SECRET = process.env.jwtSecretKey
-// console.log(JWT_SECRET);
-
 const getStudentSignUp = (req, res) => {
     res.render("studentSignup")
 }
@@ -58,7 +55,7 @@ const postStudentSignUp = (req, res) => {
                     // Generate token and handle response
                     return new Promise((resolve, reject) => {
                         try {
-                            const token = jsonwebtoken.sign({email: studentData.email}, JWT_SECRET, {expiresIn: "30d"})
+                            const token = jsonwebtoken.sign({email: studentData.email}, process.env.jwtSecretKey, {expiresIn: "30d"})
                             console.log("Generated token", studentData.email);
                             resolve(token)
                         } catch (error) {
@@ -108,7 +105,7 @@ const postSignin = (req, res) => {
                 })
             }
             console.log("Login successful for, ", foundStudent.email)
-            const token = jsonwebtoken.sign({email: foundStudent.email}, JWT_SECRET, {expiresIn: "30d"})
+            const token = jsonwebtoken.sign({email: foundStudent.email}, process.env.jwtSecretKey, {expiresIn: "30d"})
             return res.status(200).json({
                 message: "Signin Successful",
                 token: token,
