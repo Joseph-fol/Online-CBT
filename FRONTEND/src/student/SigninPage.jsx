@@ -5,6 +5,7 @@ import AOS from 'aos'
 import 'aos/dist/aos.css'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { setToken } from '../utils/auth'
 
 const SigninPage = () => {
     const [show, setShow] = useState(false)
@@ -33,6 +34,10 @@ const SigninPage = () => {
             axios.post("https://online-cbt.onrender.com/user/signin", values)
             .then((response) =>{
                 setLoading(false)
+                // Store token in localStorage
+                if (response.data.token) {
+                    setToken(response.data.token)
+                }
                 alert("Signin Successful!")
                 resetForm()
                 navigate("/student/dashboard")

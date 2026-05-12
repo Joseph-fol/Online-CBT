@@ -19,6 +19,7 @@ import PerformanceHistoryPage from './student/PerformanceHistoryPage'
 import PageNotFound from './component/PageNotFound'
 import ExactQuestion from './student/ExactQuestion'
 import ActiveQuizView from './student/ActiveQuizView'
+import ProtectedRoute from './component/ProtectedRoute'
 
 const App = () => {
   return (
@@ -34,7 +35,7 @@ const App = () => {
         <Route path="/student-history" element={<Navigate to='/student/performance-history' replace />} />
         <Route path='*' element={<PageNotFound/>}/>
 
-        <Route path='/student' element={<StudentLayout />}>
+        <Route path='/student' element={<ProtectedRoute><StudentLayout /></ProtectedRoute>}>
           <Route index element={<Navigate to='dashboard' replace />} />
           <Route path='dashboard' element={<StudentDashboard />} />
           <Route path='available-assessments' element={<AvailableAssessmentsPage />} />

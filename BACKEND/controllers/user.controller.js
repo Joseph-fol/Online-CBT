@@ -1,8 +1,8 @@
 const student = require("../models/user.model")
 const Question = require('../models/questions.model')
 const bcrypt = require("bcrypt")
-const nodemailer = require("nodemailer")
 const jsonwebtoken = require("jsonwebtoken")
+const { sendWelcomeEmail } = require("../utils/emailService")
 
 const JWT_SECRET = process.env.jwtSecretKey
 // console.log(JWT_SECRET);
@@ -46,56 +46,15 @@ const postStudentSignUp = (req, res) => {
                 .then((studentData) => {
                     console.log("Customer Saved", studentData);
 
-                    let transporter = nodemailer.createTransport({
-                        service: "gmail",
-                        auth: {
-                            user: "olawoyinjoseph05@gmail.com",
-                            pass: "oysa nbex vzjb bily"
-                        }
-                    })
+                    // Send welcome email
+                    sendWelcomeEmail(studentData.email, studentData.fullName)
+                        .then((result) => {
+                            console.log("Email result:", result.message);
+                        })
+                        .catch((err) => {
+                            console.error("Background email error:", err.message);
+                        });
 
-                    let mailOptions = {
-                        from: "Online CBT",
-                        to: [studentData.email],
-                        subject: "Welcome to Online CBT",
-                        html: `
-                            <div style="background-color: #f8fafc; padding: 0 0 10px; border-radius: 30px 30px 0 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-        
-        <div style="padding-top: 30px; height: 80px; border-radius: 30px 30px 0 0; background-color: #0f172b; display: flex; align-items: center; justify-content: center; text-align: center;">
-            <h1 style="color: #f8fafc; text-align: center; font-size: 26px; letter-spacing: 1px;">Welcome to Online CBT</h1>
-        </div>
-
-        <div style="padding: 40px 30px 20px; text-align: center; color: #0f172b; background-color: #ffffff;">
-            <p style="font-size: 20px; margin-top: 0;">
-                <span style="font-weight: 700; color: #ab3500;">Congratulations!</span> Your sign-up was successful.
-            </p>
-
-            <p style="line-height: 1.8; padding: 15px 10px; font-size: 16px;">
-                Welcome to <strong style="color: #0f172b;">Online CBT</strong>, a secure, seamless, and smart online cbt platform . By joining us, you have taken the first step toward unlocking a seamless and distraction-free online examination experience. 
-                <br><br>
-                We would love to hear from you! If you have any questions or require assistance navigating your new account, please do not hesitate to reach out to our support team.
-            </p>
-
-            <!-- Footer Area -->
-            <div style="padding: 20px 0 10px;">
-                <hr style="width: 50%; border: none; border-top: 1px solid #e2e8f0; margin-bottom: 20px;">
-                <p style="margin-bottom: 5px; font-size: 16px; font-weight: 600;">Best Regards,</p>
-                <p style="color: #ab3500; margin-top: 0; font-size: 18px; font-weight: bold;">Dev Joseph</p>
-            </div>
-        </div>
-    </div>
-                        `
-                    }
-
-                    // Send email asynchronously but don't wait for it
-                    transporter.sendMail(mailOptions, function (error, info) {
-                        if (error) {
-                            console.error("Email sending failed", error.message);
-                        }
-                        else {
-                            console.log("Email sent: " + info.response);
-                        }
-                    })
                     const token = jsonwebtoken.sign({email: studentData.email}, JWT_SECRET, {expiresIn: "30d"})
                     console.log("Generated token", studentData.email);
                     
@@ -134,8 +93,10 @@ const postSignin = (req, res) => {
                 })
             }
             console.log("Login successful for, ", foundStudent.email)
+            const token = jsonwebtoken.sign({email: foundStudent.email}, JWT_SECRET, {expiresIn: "30d"})
             return res.status(200).json({
                 message: "Signin Successful",
+                token: token,
                 student: {
                     id: foundStudent._id,
                     email: foundStudent.email,
@@ -169,6 +130,7 @@ const postAdminSignin = (req, res) => {
                     })
                 return res.status(401).json({ message: "Admin not found" })
             }
+            
             const isMatch = bcrypt.compareSync(password, foundAdmin.password)
             if (!isMatch) {
                 console.log("Invalid password");

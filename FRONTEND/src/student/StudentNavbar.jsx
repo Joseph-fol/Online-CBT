@@ -1,8 +1,15 @@
 import React from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { removeToken } from '../utils/auth'
 import './StudentNavbar.css'
 
 const StudentNavbar = ({ isSidebarOpen, onToggleSidebar }) => {
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    removeToken()
+    navigate('/studentSignin')
+  }
   return (
     <header className='student-navbar'>
       <div className='student-navbar__top'>
@@ -48,9 +55,13 @@ const StudentNavbar = ({ isSidebarOpen, onToggleSidebar }) => {
             Student User
           </Link>
 
-          <Link to='/studentSignin' className='student-navbar__logout'>
+          <button 
+            onClick={handleLogout}
+            className='student-navbar__logout'
+            type='button'
+          >
             Logout
-          </Link>
+          </button>
         </div>
       </div>
     </header>
