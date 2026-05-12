@@ -1,13 +1,13 @@
+const dotenv = require("dotenv")
+dotenv.config()
+
 const express = require("express")
 const app = express()
-const dotenv = require("dotenv")
 const mongoose = require("mongoose")
 const ejs = require("ejs")
 const bcrypt = require("bcrypt")
 const studentRoutes = require("./routes/student.route")
 const cors = require("cors")
-
-dotenv.config()
 
 app.set("view engine", "ejs")
 app.use(express.json())
