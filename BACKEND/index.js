@@ -34,7 +34,7 @@ mongoose.connect(URI, {
     console.log("Connected to MongoDB");
 })
 .catch((err)=>{
-    console.log("Error connecting to DB", err);
+    console.log("Error connecting to DB:", err);
     console.log("Make sure:");
     console.log("1. Your IP address is whitelisted in MongoDB Atlas");
     console.log("2. Your MONGO_URI credentials are correct");
