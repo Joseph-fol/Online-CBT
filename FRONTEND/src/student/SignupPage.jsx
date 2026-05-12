@@ -5,6 +5,7 @@ import AOS from 'aos'
 import 'aos/dist/aos.css'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from "axios"
+import { setToken } from '../utils/auth'
 
 const SignupPage = () => {
     const [show, setShow] = useState(false)
@@ -36,6 +37,10 @@ const SignupPage = () => {
             axios.post("https://online-cbt.onrender.com/user/signUp", values)
             .then((response)=>{
                 setLoading(false)
+                // Store token if provided
+                if (response.data.token) {
+                    setToken(response.data.token)
+                }
                 alert("Form Successfully Submitted")
                 resetForm()
                 navigate("/studentSignin")

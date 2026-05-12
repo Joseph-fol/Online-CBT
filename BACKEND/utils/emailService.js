@@ -1,11 +1,18 @@
 const nodemailer = require("nodemailer");
 
 const sendWelcomeEmail = (userEmail, userName) => {
+    console.log("Starting email send process for:", userEmail);
+    console.log("Email credentials - User:", process.env.EMAIL_USER);
+    
+    // Remove spaces from app password (Gmail passwords come with spaces)
+    const emailPassword = process.env.EMAIL_PASSWORD?.replace(/\s/g, '') || '';
+    console.log("Email password loaded:", emailPassword ? "YES" : "NO");
+    
     const transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
             user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASSWORD
+            pass: emailPassword
         }
     });
 
@@ -41,13 +48,20 @@ const sendWelcomeEmail = (userEmail, userName) => {
         `
     };
 
+    console.log("Mail options prepared for:", mailOptions.to);
+    
     return transporter.sendMail(mailOptions)
         .then((info) => {
-            console.log("Welcome email sent successfully:", info.response);
+            console.log("✅ Welcome email sent successfully to:", userEmail);
+            console.log("Email response:", info.response);
             return { success: true, message: "Email sent successfully" };
         })
         .catch((error) => {
-            console.error("Failed to send welcome email:", error.message);
+            console.error("❌ Failed to send welcome email to:", userEmail);
+            console.error("Email error details:", error);
+            console.error("Error code:", error.code);
+            console.error("Error response:", error.response);
+            console.error("Using email:", process.env.EMAIL_USER);
             return { success: false, error: error.message };
         });
 };
