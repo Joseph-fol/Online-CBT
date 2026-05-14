@@ -33,12 +33,8 @@ const sendWelcomeEmail = (userEmail, userName) => {
                 <!-- Main Container -->
                 <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
                     
-                    <!-- Header with Logo -->
-                    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 40px 30px; text-align: center; >
-
-                        <!-- Logo -->
-                        <img src="https://online-cbt.onrender.com/Online-cbt.jpg" alt="Online CBT Logo" style="max-width: 100px; height: auto; margin: 0 auto 15px; display: block;">
-
+                    <!-- Header -->
+                    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 20px 30px; text-align: center; border-bottom: 4px solid #ab3500;">
                         <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 0.5px;">Online CBT</h1>
                         <p style="color: #cbd5e1; margin: 5px 0 0 0; font-size: 14px;">Secure, Seamless, and Smart Online CBT Platform</p>
                     </div>
@@ -162,12 +158,11 @@ const sendAdminInvitationEmail = (invitedEmail, invitationLink, invitedByName) =
             <body style="margin: 0; padding: 0; background-color: #f5f7fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;">
                 
                 <!-- Main Container -->
-                <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
+                <div style="max-width: 600px; margin: 20px auto; background-color: #11192c; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
                     
-                    <!-- Header with Logo -->
+                    <!-- Header -->
                     <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 40px 30px; text-align: center; border-bottom: 4px solid #ab3500;">
-                        <!-- Logo -->
-                        <img src="https://online-cbt.onrender.com/Online-cbt.jpg" alt="Online CBT Logo" style="max-width: 100px; height: auto; margin: 0 auto 15px; display: block;">
+                        <div style="font-size: 40px; margin-bottom: 15px;">👨‍💼</div>
                         <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 0.5px;">Online CBT</h1>
                         <p style="color: #cbd5e1; margin: 5px 0 0 0; font-size: 14px;">Admin Invitation</p>
                     </div>
@@ -182,7 +177,7 @@ const sendAdminInvitationEmail = (invitedEmail, invitationLink, invitedByName) =
                     <div style="padding: 40px 30px; background-color: #f8fafc;">
                         
                         <!-- Welcome Message -->
-                        <div style="background-color: #ffffff; padding: 25px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #ab3500;">
+                        <div style="background-color: #ffffff; padding: 25px; border-radius: 8px; margin-bottom: 30px;>
                             <p style="color: #0f172a; margin: 0 0 15px 0; font-size: 16px; line-height: 1.8;">
                                 Hello,
                             </p>
