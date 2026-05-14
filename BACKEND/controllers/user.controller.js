@@ -414,7 +414,6 @@ const createAdminInvitation = (req, res) => {
                     message: "Only admins can create invitations"
                 })
             }
-
             const newInvitation = new Invitation({
                 invitedBy: adminEmail,
                 invitedEmail: invitedEmail || null  // Optional - can be general or specific
@@ -422,7 +421,7 @@ const createAdminInvitation = (req, res) => {
 
             return newInvitation.save()
                 .then((invitation) => {
-                    const invitationLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/admin/signup?token=${invitation.token}`
+                    const invitationLink = `${process.env.FRONTEND_URL || 'https://online-cbt.onrender.com'}/admin/signup?token=${invitation.token}`
                     console.log("Invitation created:", invitation.token);
                     
                     let response = {
