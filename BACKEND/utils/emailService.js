@@ -34,13 +34,14 @@ const sendWelcomeEmail = (userEmail, userName) => {
                 <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
                     
                     <!-- Header with Logo -->
-                    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 40px 30px; text-align: center;>
+                    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 40px 30px; text-align: center; >
 
-                        <!-- Logo Placeholder -->
+                        <!-- Logo -->
                         <img src="https://online-cbt.onrender.com/Online-cbt.jpg" alt="Online CBT Logo" style="max-width: 100px; height: auto; margin: 0 auto 15px; display: block;">
+
                         <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 0.5px;">Online CBT</h1>
-                        <p style="color: #cbd5e1; margin: 5px 0 15px 0; font-size: 14px;">A Secure, Seamless, and Smart Online CBT</p>
-                    </img>
+                        <p style="color: #cbd5e1; margin: 5px 0 0 0; font-size: 14px;">Secure, Seamless, and Smart Online CBT Platform</p>
+                    </div>
 
                     <!-- Greeting Section -->
                     <div style="padding: 40px 30px; background-color: #ffffff; border-bottom: 1px solid #e2e8f0;">
@@ -72,7 +73,7 @@ const sendWelcomeEmail = (userEmail, userName) => {
 
                         <!-- CTA Button -->
                         <div style="text-align: center; margin-bottom: 30px;">
-                            <a href="https://onlinecbt.vercel.app/studentSignin" style="display: inline-block; background: linear-gradient(135deg, #ab3500 0%, #8a2a00 100%); color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 6px; font-weight: 600; font-size: 16px; transition: all 0.3s ease; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(171, 53, 0, 0.3);">
+                            <a href="https://cbt-exam.vercel.app/studentSignin" style="display: inline-block; background: linear-gradient(135deg, #ab3500 0%, #8a2a00 100%); color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 6px; font-weight: 600; font-size: 16px; transition: all 0.3s ease; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(171, 53, 0, 0.3);">
                                 Go to Dashboard
                             </a>
                         </div>
@@ -181,7 +182,7 @@ const sendAdminInvitationEmail = (invitedEmail, invitationLink, invitedByName) =
                     <div style="padding: 40px 30px; background-color: #f8fafc;">
                         
                         <!-- Welcome Message -->
-                        <div style="background-color: #ffffff; padding: 25px; border-radius: 8px; margin-bottom: 30px;>
+                        <div style="background-color: #ffffff; padding: 25px; border-radius: 8px; margin-bottom: 30px; border-left: 4px solid #ab3500;">
                             <p style="color: #0f172a; margin: 0 0 15px 0; font-size: 16px; line-height: 1.8;">
                                 Hello,
                             </p>
