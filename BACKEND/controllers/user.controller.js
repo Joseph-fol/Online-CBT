@@ -90,8 +90,8 @@ const postStudentSignUp = (req, res) => {
 const postAdminSignUp = (req, res) => {
     const { fullName, email, password, adminCode } = req.body
 
-    // Verify admin code
-    if (adminCode !== process.env.ADMIN_REGISTRATION_CODE) {
+    
+    if (adminCode.toLowerCase() !== process.env.ADMIN_REGISTRATION_CODE.toLowerCase()) {
         return res.status(403).json({
             message: "Invalid admin registration code"
         })
