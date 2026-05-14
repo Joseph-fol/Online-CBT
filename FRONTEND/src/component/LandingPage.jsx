@@ -37,6 +37,7 @@ const LandingPage = () => {
         {
             title: "Instant Grading",
             description: "AI-powered evaluation engines provide immediate feedback and detailed performance analytics without human intervention."
+
         },
         {
             title: "Tamper-Proof Security",
@@ -64,7 +65,7 @@ const LandingPage = () => {
                 }}
             >
                 <div className="container-fluid">
-                    <a className="navbar-brand fw-bold" onClick={()=> navigate("/")} style={{cursor:"pointer"}} ><img src={logo} alt="" width={30}/> Online CBT</a>
+                    <a className="navbar-brand fw-bold" onClick={()=> navigate("/")} style={{cursor:"pointer"}} ><img src={logo} alt="Online CBT Logo" width={30}/> Online CBT</a>
                     <button className="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>
@@ -87,8 +88,8 @@ const LandingPage = () => {
                                 <a className="nav-link fw-medium text-black" href='#'>Pricing</a>
                             </li>
                         </ul>
-                        <Link to="/AdminSignin">
-                            <button className=' btn mx-3 text-decoration-none text-dark fw-bold'> Admin Signin </button>
+                        <Link to="/admin/signup">
+                            <button className=' btn mx-3 text-decoration-none text-dark fw-bold'> Admin Signup </button>
                         </Link>
 
                         <div className="d-flex justify-content-center align-items-center gap-3" >
@@ -106,7 +107,6 @@ const LandingPage = () => {
                     style={{
                         width: '300px',
                         height: 'auto',
-                        // filter: 'grayscale(100%)'
                     }}
                 />
             </div>
@@ -195,7 +195,7 @@ const LandingPage = () => {
                         <div className='col-12 col-md-4 h-100' data-aos="slide-up" data-aos-delay="0">
                             <div className='p-4 rounded-4 h-100' style={{ backgroundColor: "#fff7ed" }}>
                                 <div>
-                                    <img src="https://i.pinimg.com/1200x/8e/1c/0f/8e1c0fd51f831e6cd499fdfb24585688.jpg" alt="" className='object-fit-cover w-100 h-75 rounded-4' />
+                                    <img src="https://i.pinimg.com/1200x/8e/1c/0f/8e1c0fd51f831e6cd499fdfb24585688.jpg" title="Admin Configuration" alt="" className='object-fit-cover w-100 h-75 rounded-4' />
                                 </div>
                                 <div className='mt-3'>
                                     <h4>Admin Configuration</h4>
@@ -208,7 +208,7 @@ const LandingPage = () => {
                         <div className='col-12 col-md-4 h-100' data-aos="slide-up" data-aos-delay="200">
                             <div className='p-4 rounded-4 h-100' style={{ backgroundColor: "#fff7ed" }}>
                                 <div style={{ height: "300px", overflow: "hidden", borderRadius: "16px", marginBottom: "12px" }}>
-                                    <img src="https://i.pinimg.com/1200x/ff/4e/63/ff4e634f1fc5dfe0c573fc6e131957d3.jpg" alt="" className='object-fit-cover w-100 h-100' />
+                                    <img src="https://i.pinimg.com/1200x/ff/4e/63/ff4e634f1fc5dfe0c573fc6e131957d3.jpg" title='Student Deployment' alt="" className='object-fit-cover w-100 h-100' />
                                 </div>
                                 <div className='mt-3'>
                                     <h4>Student Deployment</h4>
@@ -219,7 +219,7 @@ const LandingPage = () => {
 
                         <div className='col-12 col-md-4 h-100' data-aos="slide-up" data-aos-delay="400">
                             <div className='p-4 rounded-4 h-100' style={{ backgroundColor: "#fff7ed" }}>
-                                <img src="https://i.pinimg.com/736x/a2/2b/46/a22b46dde9b92371769bba261ee39c81.jpg" alt="" className='object-fit-cover w-100 h-75 rounded-4' />
+                                <img src="https://i.pinimg.com/736x/a2/2b/46/a22b46dde9b92371769bba261ee39c81.jpg" title="Advanced Analytics" alt="" className='object-fit-cover w-100 h-75 rounded-4' />
                                 <div className='mt-3'>
                                     <h4>Advanced Analytics</h4>
                                     <p>Generate insights from individual scores to institutional performance trends.</p>

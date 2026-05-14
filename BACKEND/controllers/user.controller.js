@@ -87,6 +87,76 @@ const postStudentSignUp = (req, res) => {
         })
 }
 
+const postAdminSignUp = (req, res) => {
+    const { fullName, email, password } = req.body
+
+    student.findOne({ email: req.body.email })
+        .then((userExists) => {
+            if (userExists) {
+                return res.status(409).json({
+                    message: "Email already exists",
+                    email: userExists.email
+                })
+            }
+
+            let salt = bcrypt.genSaltSync(10)
+            let hashedPassword = bcrypt.hashSync(req.body.password, salt)
+            req.body.password = hashedPassword
+            req.body.role = "admin"
+
+            const adminInfo = req.body
+            const newAdminDetails = new student(adminInfo)
+
+            return newAdminDetails.save()
+                .then((adminData) => {
+                    console.log("Admin Saved", adminData);
+
+                    // Send welcome email
+                    sendWelcomeEmail(adminData.email, adminData.fullName)
+                        .then((result) => {
+                            console.log("Email result:", result.message);
+                        })
+                        .catch((err) => {
+                            console.error("Background email error:", err.message);
+                        });
+
+                    // Generate token and handle response
+                    return new Promise((resolve, reject) => {
+                        try {
+                            const token = jsonwebtoken.sign({email: adminData.email}, process.env.jwtSecretKey, {expiresIn: "30d"})
+                            console.log("Generated token for admin", adminData.email);
+                            resolve(token)
+                        } catch (error) {
+                            reject(error)
+                        }
+                    })
+                    .then((token) => {
+                        return res.status(201).json({
+                            message: "Admin Signup Successful",
+                            token: token,
+                            admin: {
+                                id: adminData._id,
+                                fullName: adminData.fullName,
+                                email: adminData.email,
+                                role: adminData.role
+                            }
+                        })
+                    })
+                    .catch((error) => {
+                        console.error("Token generation error:", error);
+                        return res.status(500).json({
+                            message: "Signup failed - token generation error",
+                            error: error.message
+                        })
+                    })
+                })
+        })
+        .catch((err) => {
+            console.log("Error saving admin to database", err);
+            return res.status(500).send(`Error: ${err.message}`)
+        })
+}
+
 const postSignin = (req, res) => {
     const { email, password } = req.body
     student.findOne({ email })
@@ -97,6 +167,7 @@ const postSignin = (req, res) => {
                     message: "Invalid email or password"
                 })
             }
+
             const isMatch = bcrypt.compareSync(password, foundStudent.password)
             if (!isMatch) {
                 console.log("Invalid password");
@@ -104,6 +175,7 @@ const postSignin = (req, res) => {
                     message: "Invalid email or password"
                 })
             }
+
             console.log("Login successful for, ", foundStudent.email)
             const token = jsonwebtoken.sign({email: foundStudent.email}, process.env.jwtSecretKey, {expiresIn: "30d"})
             return res.status(200).json({
@@ -153,6 +225,7 @@ const postAdminSignin = (req, res) => {
                 message: "Admin successfully signed in",
                 admin: {
                     id: foundAdmin._id,
+                    fullName: foundAdmin.fullName,
                     email: foundAdmin.email,
                     role: foundAdmin.role
                 }
@@ -218,6 +291,7 @@ const getAllQuestions = (req, res) => {
 
 const getQuestionById = (req, res) => {
     const { id } = req.params
+    
     Question.findById(id)
     .then((question) => {
         if(!question){
@@ -237,7 +311,6 @@ const getQuestionById = (req, res) => {
 
 const getQuestionBySubject = (req, res) => {
     const {subject} = req.params
-
     Question.find({subject: subject})
     .then((question)=>{
         if(!question || question.length == 0){
@@ -255,5 +328,40 @@ const getQuestionBySubject = (req, res) => {
     })
 }
 
+const getDashboardStats = (req, res) => {
+    Promise.all([
+        // Count total students (users with role "student")
+        student.countDocuments({ role: "student" }),
+        // Count unique subjects
+        Question.distinct("subject").then(subjects => subjects.length),
+        // Count total questions
+        Question.countDocuments(),
+        // Calculate average score
+        Question.aggregate([
+            { $match: { score: { $exists: true, $ne: null } } },
+            { $group: { _id: null, avgScore: { $avg: "$score" } } }
+        ])
+    ])
+    .then(([totalStudents, totalSubjects, totalQuestions, averageScoreData]) => {
+        const averageScore = averageScoreData.length > 0 
+            ? Math.round(averageScoreData[0].avgScore) 
+            : 0;
 
-module.exports = { getStudentSignUp, postStudentSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject }
+        res.status(200).json({
+            totalStudents,
+            totalSubjects,
+            totalQuestions,
+            averageScore
+        })
+    })
+    .catch((error) => {
+        console.error("Error fetching dashboard stats:", error);
+        res.status(500).json({
+            message: "Failed to fetch dashboard statistics",
+            details: error.message
+        })
+    })
+}
+
+
+module.exports = { getStudentSignUp, postStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, getDashboardStats }

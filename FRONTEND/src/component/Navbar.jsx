@@ -1,8 +1,21 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import './Navbar.css'
 
 const Navbar = ({ isSidebarOpen, onToggleSidebar }) => {
+  const [adminName, setAdminName] = useState('Admin User')
+
+  useEffect(() => {
+    const adminData = localStorage.getItem('adminData')
+    if (adminData) {
+      try {
+        const admin = JSON.parse(adminData)
+        setAdminName(admin.fullName || 'Admin User')
+      } catch (err) {
+        console.error('Error parsing admin data:', err)
+      }
+    }
+  }, [])
 
   return (
     <header className='admin-navbar'>
@@ -36,11 +49,11 @@ const Navbar = ({ isSidebarOpen, onToggleSidebar }) => {
             </Link>
 
           <Link to='/admin' className='admin-navbar__user-chip'>
-            <span className='admin-navbar__user-dot' aria-hidden='true'>A</span>
-            Admin User
+            <span className='admin-navbar__user-dot' aria-hidden='true'>{adminName.charAt(0).toUpperCase()}</span>
+            {adminName}
           </Link>
 
-          <Link to='/AdminSignin' className='admin-navbar__logout'>
+          <Link to='/admin/signin' className='admin-navbar__logout'>
             Logout
           </Link>
         </div>

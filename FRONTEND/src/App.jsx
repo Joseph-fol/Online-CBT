@@ -2,6 +2,7 @@ import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import LandingPage from './component/LandingPage'
 import AdminSignin from './admin/AdminSignin'
+import AdminSignup from './admin/AdminSignup'
 import SigninPage from './student/SigninPage'
 import SignupPage from './student/SignupPage'
 import ForgotPassword from './student/ForgotPassword'
@@ -26,7 +27,9 @@ const App = () => {
     <>
       <Routes>
         <Route path="/" element={<LandingPage/>}/>
-        <Route path="/AdminSignin" element={<AdminSignin/>}/>
+        <Route path="/admin/signin" element={<AdminSignin/>}/>
+        <Route path="/admin/signup" element={<AdminSignup/>}/>
+        <Route path="/AdminSignin" element={<Navigate to='/admin/signin' replace />} />
         <Route path="/studentSignin" element={<SigninPage/>}/>
         <Route path="/studentDashboard" element={<Navigate to='/student/dashboard' replace />} />
         <Route path="/createStudentAccount" element={<SignupPage/>}/>

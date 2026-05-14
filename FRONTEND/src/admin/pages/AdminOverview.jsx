@@ -1,20 +1,58 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-
-const stats = [
-  { label: 'TOTAL STUDENTS', value: '120' },
-  { label: 'ACTIVE SUBJECTS', value: '12' },
-  { label: 'QUESTION BANK', value: '25' },
-  { label: 'AVERAGE SCORE', value: '76%' },
-]
+import axios from 'axios'
 
 const AdminOverview = () => {
+  const [adminName, setAdminName] = useState('Admin')
+  const [stats, setStats] = useState([
+    { label: 'TOTAL STUDENTS', value: '0' },
+    { label: 'ACTIVE SUBJECTS', value: '0' },
+    { label: 'QUESTION BANK', value: '0' },
+    { label: 'AVERAGE SCORE', value: '0%' },
+  ])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const adminData = localStorage.getItem('adminData')
+    if (adminData) {
+      try {
+        const admin = JSON.parse(adminData)
+        setAdminName(admin.fullName || 'Admin')
+      } catch (err) {
+        console.error('Error parsing admin data:', err)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchDashboardStats()
+  }, [])
+
+  const fetchDashboardStats = () => {
+    setLoading(true)
+    axios.get('http://localhost:2114/user/dashboard-stats')
+      .then((response) => {
+        const { totalStudents, totalSubjects, totalQuestions, averageScore } = response.data
+        
+        setStats([
+          { label: 'TOTAL STUDENTS', value: totalStudents.toString() },
+          { label: 'ACTIVE SUBJECTS', value: totalSubjects.toString() },
+          { label: 'QUESTION BANK', value: totalQuestions.toString() },
+          { label: 'AVERAGE SCORE', value: `${averageScore}%` },
+        ])
+        setLoading(false)
+      })
+      .catch((error) => {
+        console.error('Error fetching dashboard stats:', error)
+        setLoading(false)
+      })
+  }
   return (
     <section className='admin-overview'>
       <div className='admin-overview-top-section'>
         <div className='admin-overview__hero'>
           <p className='admin-overview__eyebrow'>Dashboard</p>
-          <h2 className='admin-overview__title'>Welcome back, Admin.</h2>
+          <h2 className='admin-overview__title'>Welcome back, {adminName}.</h2>
           <p className='admin-overview__text'>Use the dashboard to manage subjects, question banks, and monitor student results with precision and real-time oversight.</p>
         </div>
 
@@ -30,12 +68,18 @@ const AdminOverview = () => {
       </div>
 
       <div className='admin-overview__stats'>
-        {stats.map((item) => (
-          <article key={item.label} className='admin-overview__card'>
-            <span className='admin-overview__card-label'>{item.label}</span>
-            <span className='admin-overview__card-value'>{item.value}</span>
-          </article>
-        ))}
+        {loading ? (
+          <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '20px' }}>
+            <p>Loading statistics...</p>
+          </div>
+        ) : (
+          stats.map((item) => (
+            <article key={item.label} className='admin-overview__card'>
+              <span className='admin-overview__card-label'>{item.label}</span>
+              <span className='admin-overview__card-value'>{item.value}</span>
+            </article>
+          ))
+        )}
       </div>
 
       <div className='col-lg-12 col-md-10 py-4'>

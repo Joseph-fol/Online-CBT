@@ -50,6 +50,7 @@ const AdminSignin = () => {
                     
                     setLoading(false)
                     resetForm()
+                    alert(`Welcome back, ${data.admin.fullName}!`)
                     navigate("/admin")
                 } else {
                     setError("You do not have admin privileges")
@@ -58,9 +59,18 @@ const AdminSignin = () => {
             })
             .catch((err) => {
                 console.error("Error during signin:", err)
-                const errorMessage = err.response?.data?.message || "An error occurred. Please try again."
-                setError(errorMessage)
                 setLoading(false)
+                
+                const errorMessage = err.response?.data?.message || "An error occurred. Please try again."
+                
+                // Provide specific error messages
+                if (errorMessage.toLowerCase().includes("admin not found")) {
+                    setError("No admin account found with this email. Please check your credentials or create an admin account.")
+                } else if (errorMessage.toLowerCase().includes("invalid password")) {
+                    setError("Invalid password. Please try again.")
+                } else {
+                    setError(errorMessage)
+                }xz
             })
         },
 
