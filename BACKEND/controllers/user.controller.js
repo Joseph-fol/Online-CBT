@@ -3,7 +3,7 @@ const Question = require('../models/questions.model')
 const Invitation = require("../models/invitation.model")
 const bcrypt = require("bcrypt")
 const jsonwebtoken = require("jsonwebtoken")
-const { sendWelcomeEmail, sendAdminInvitationEmail } = require("../utils/emailService")
+const { sendWelcomeEmail, sendAdminInvitationEmail, sendInvitationRevokedEmail } = require("../utils/emailService")
 
 const getStudentSignUp = (req, res) => {
     res.render("studentSignup")
@@ -573,25 +573,63 @@ const revokeInvitation = (req, res) => {
     const { token } = req.body
     const adminEmail = req.headers['x-admin-email'] || req.body.adminEmail
 
-    Invitation.findOneAndUpdate(
-        { token: token, invitedBy: adminEmail, status: "pending" },
-        { status: "expired" },
-        { new: true }
-    )
+    // First find the invitation to get its details
+    Invitation.findOne({ token: token, invitedBy: adminEmail, status: "pending" })
         .then((invitation) => {
             if (!invitation) {
                 return res.status(404).json({
                     message: "Invitation not found or already used"
                 })
             }
-            res.status(200).json({
-                message: "Invitation revoked successfully",
-                invitation: invitation
-            })
+
+            // Update the invitation status to expired
+            invitation.status = "expired"
+            return invitation.save()
+                .then((revokedInvitation) => {
+                    console.log("Invitation revoked:", token)
+
+                    // Send revocation email if invitedEmail exists
+                    if (revokedInvitation.invitedEmail) {
+                        // Get admin's full name
+                        student.findOne({ email: adminEmail })
+                            .then((admin) => {
+                                const adminName = admin?.fullName || adminEmail
+                                sendInvitationRevokedEmail(
+                                    revokedInvitation.invitedEmail, 
+                                    adminName
+                                )
+                                    .then((emailResult) => {
+                                        if (emailResult.success) {
+                                            console.log("✅ Revocation email sent to:", revokedInvitation.invitedEmail)
+                                        } else {
+                                            console.error("❌ Failed to send revocation email:", emailResult.error)
+                                        }
+                                    })
+                                    .catch((emailError) => {
+                                        console.error("❌ Revocation email error:", emailError.message)
+                                    })
+                            })
+                            .catch((err) => {
+                                console.error("Error fetching admin details:", err.message)
+                            })
+                    }
+
+                    return res.status(200).json({
+                        message: "Invitation revoked successfully",
+                        invitation: revokedInvitation
+                    })
+                })
+                .catch((err) => {
+                    console.error("Error updating invitation:", err);
+                    return res.status(500).json({
+                        message: "Failed to revoke invitation",
+                        error: err.message
+                    })
+                })
         })
         .catch((err) => {
             console.error("Error revoking invitation:", err);
-            res.status(500).json({
+            return res.status(500).json({
                 message: "Failed to revoke invitation",
                 error: err.message
             })

@@ -274,13 +274,13 @@ const sendAdminInvitationEmail = (invitedEmail, invitationLink, invitedByName) =
 
     return resend.emails.send(mailOptions)
         .then((response) => {
-            console.log("✅ Admin invitation email sent successfully to:", invitedEmail);
+            console.log("Admin invitation email sent successfully to:", invitedEmail);
             console.log("Email ID:", response.id);
             console.log("Full Resend response:", JSON.stringify(response));
             return { success: true, message: "Invitation email sent successfully", emailId: response.id };
         })
         .catch((error) => {
-            console.error("❌ Failed to send admin invitation to:", invitedEmail);
+            console.error("Failed to send admin invitation to:", invitedEmail);
             console.error("Resend error details:", JSON.stringify(error, null, 2));
             console.error("Error message:", error.message);
             console.error("Error code:", error.code);
@@ -288,4 +288,127 @@ const sendAdminInvitationEmail = (invitedEmail, invitationLink, invitedByName) =
         });
 };
 
-module.exports = { sendWelcomeEmail, sendAdminInvitationEmail };
+const sendInvitationRevokedEmail = (invitedEmail, revokedByName) => {
+    console.log("📧 Sending invitation revoked email to:", invitedEmail);
+    console.log("Resend API Key configured:", process.env.RESEND_API_KEY ? "YES" : "NO");
+    
+    // Validate API key
+    if (!process.env.RESEND_API_KEY) {
+        console.error("RESEND_API_KEY not configured");
+        return Promise.resolve({ 
+            success: false, 
+            error: "Resend API key not configured" 
+        });
+    }
+
+    const mailOptions = {
+        from: 'noreply@resend.dev',
+        to: invitedEmail,
+        subject: "Your Admin Invitation Has Been Revoked",
+        html: `
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Invitation Revoked - Online CBT</title>
+            </head>
+            <body style="margin: 0; padding: 0; background-color: #f5f7fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;">
+                
+                <!-- Main Container -->
+                <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
+                    
+                    <!-- Header -->
+                    <div style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); padding: 40px 30px; text-align: center; ">
+                        <div style="font-size: 40px; margin-bottom: 15px;">⛔</div>
+                        <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 0.5px;">Online CBT</h1>
+                        <p style="color: #fecaca; margin: 5px 0 0 0; font-size: 14px;">Invitation Revoked</p>
+                    </div>
+
+                    <!-- Main Content -->
+                    <div style="padding: 40px 30px; background-color: #f8fafc;">
+                        
+                        <!-- Notification Box -->
+                        <div style="background-color: #fee2e2; padding: 25px; border-radius: 8px;  margin-bottom: 30px;">
+                            <p style="color: #7f1d1d; margin: 0 0 15px 0; font-size: 16px; line-height: 1.8;">
+                                <strong>Your admin invitation has been revoked.</strong>
+                            </p>
+                            <p style="color: #991b1b; margin: 0; font-size: 15px; line-height: 1.8;">
+                                <strong style="color: #7f1d1d;">${revokedByName}</strong> has revoked your invitation to become an administrator on <strong>Online CBT</strong>. 
+                                <br><br>
+                                Your invitation link is no longer valid and cannot be used to create an admin account.
+                            </p>
+                        </div>
+
+                        <!-- What This Means -->
+                        <div style="background-color: #ffffff; padding: 25px; border-radius: 8px; margin-bottom: 30px;">
+                            <h3 style="color: #0f172a; margin: 0 0 15px 0; font-size: 18px; font-weight: 600;">What This Means</h3>
+                            <ul style="margin: 0; padding-left: 20px; list-style: none;">
+                                <li style="color: #475569; margin-bottom: 12px; font-size: 15px; line-height: 1.6;">
+                                    <span style="color: #dc2626; font-weight: 600;">✕</span> Your invitation link is now expired
+                                </li>
+                                <li style="color: #475569; margin-bottom: 12px; font-size: 15px; line-height: 1.6;">
+                                    <span style="color: #dc2626; font-weight: 600;">✕</span> You cannot use this invitation to create an admin account
+                                </li>
+                                <li style="color: #475569; margin-bottom: 0; font-size: 15px; line-height: 1.6;">
+                                    <span style="color: #dc2626; font-weight: 600;">✕</span> If you need access, please contact the admin team for a new invitation
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Support Section -->
+                        <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; border-left: 4px solid #3b82f6; margin-bottom: 20px;">
+                            <p style="color: #1e40af; margin: 0; font-size: 14px; line-height: 1.6;">
+                                <strong>Have Questions?</strong> Contact the admin team at <a href="mailto:support@onlinecbt.com" style="color: #ab3500; text-decoration: none; font-weight: 600;">support@onlinecbt.com</a>
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="background-color: #0f172a; padding: 30px; text-align: center; border-top: 1px solid #1e293b;">
+                        
+                        <!-- Contact Info -->
+                        <div style="border-bottom: 1px solid #1e293b; padding-bottom: 20px; margin-bottom: 20px;">
+                            <p style="color: #cbd5e1; margin: 0 0 8px 0; font-size: 13px;">
+                                <strong style="color: #ffffff;">Online CBT</strong> | Computer-Based Testing Platform
+                            </p>
+                            <p style="color: #64748b; margin: 0; font-size: 12px;">
+                                Email: <a href="mailto:admin@onlinecbt.com" style="color: #ab3500; text-decoration: none;">admin@onlinecbt.com</a>
+                            </p>
+                        </div>
+
+                        <!-- Legal Links -->
+                        <p style="margin: 0; font-size: 12px;">
+                            <a href="#" style="color: #64748b; text-decoration: none; margin-right: 15px;">Privacy Policy</a>
+                            <a href="#" style="color: #64748b; text-decoration: none; margin-right: 15px;">Terms of Service</a>
+                            <a href="#" style="color: #64748b; text-decoration: none;">Help Center</a>
+                        </p>
+
+                        <!-- Copyright -->
+                        <p style="color: #475569; margin: 15px 0 0 0; font-size: 11px;">
+                            © 2026 Online CBT. All rights reserved.
+                        </p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `
+    };
+
+    return resend.emails.send(mailOptions)
+        .then((response) => {
+            console.log("Invitation revoked email sent successfully to:", invitedEmail);
+            console.log("Email ID:", response.id);
+            return { success: true, message: "Revocation email sent successfully", emailId: response.id };
+        })
+        .catch((error) => {
+            console.error("Failed to send revocation email to:", invitedEmail);
+            console.error("Resend error details:", JSON.stringify(error, null, 2));
+            console.error("Error message:", error.message);
+            console.error("Error code:", error.code);
+            return { success: false, error: error.message || "Failed to send revocation email" };
+        });
+};
+
+module.exports = { sendWelcomeEmail, sendAdminInvitationEmail, sendInvitationRevokedEmail };
