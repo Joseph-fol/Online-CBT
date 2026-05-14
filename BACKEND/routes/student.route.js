@@ -6,15 +6,15 @@ const {postStudentSignUp, getStudentSignUp, postAdminSignUp, getStudentSignin, g
 
 // Email Configuration Check Endpoint
 router.get("/test-email-config", (req, res) => {
-    console.log("\n🔍 EMAIL CONFIGURATION CHECK");
+    console.log("\nEMAIL CONFIGURATION CHECK");
     console.log("================================");
     
     const config = {
-        EMAIL_USER: process.env.EMAIL_USER ? "✅ SET" : "❌ NOT SET",
-        EMAIL_PASSWORD: process.env.EMAIL_PASSWORD ? "✅ SET" : "❌ NOT SET",
-        EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME ? process.env.EMAIL_FROM_NAME : "⚠️ Using default",
-        MONGO_URI: process.env.MONGO_URI ? "✅ SET" : "❌ NOT SET",
-        JWT_SECRET: process.env.jwtSecretKey ? "✅ SET" : "❌ NOT SET",
+        EMAIL_USER: process.env.EMAIL_USER ? "SET" : "NOT SET",
+        EMAIL_PASSWORD: process.env.EMAIL_PASSWORD ? "SET" : "NOT SET",
+        EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME ? process.env.EMAIL_FROM_NAME : "Using default",
+        MONGO_URI: process.env.MONGO_URI ? "SET" : "NOT SET",
+        JWT_SECRET: process.env.jwtSecretKey ? "SET" : "NOT SET",
         FRONTEND_URL: process.env.FRONTEND_URL || "Using default fallback"
     };
     
@@ -26,7 +26,7 @@ router.get("/test-email-config", (req, res) => {
     if (!process.env.MONGO_URI) issues.push("MONGO_URI not configured");
     
     return res.json({
-        status: issues.length === 0 ? "✅ CONFIGURED" : "❌ MISSING CONFIG",
+        status: issues.length === 0 ? "CONFIGURED" : "MISSING CONFIG",
         config,
         issues,
         suggestions: [

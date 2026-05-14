@@ -641,10 +641,18 @@ const revokeInvitation = (req, res) => {
 const saveExamResult = (req, res) => {
     const { studentEmail, subject, totalQuestions, correctAnswers, answers, timeSpent } = req.body
 
-    console.log("Saving exam result for:", studentEmail, "Subject:", subject)
+    console.log("\n📥 RECEIVED EXAM RESULT SAVE REQUEST");
+    console.log("=====================================");
+    console.log("Student Email:", studentEmail);
+    console.log("Subject:", subject);
+    console.log("Total Questions:", totalQuestions);
+    console.log("Correct Answers:", correctAnswers);
+    console.log("Time Spent:", timeSpent);
+    console.log("Body received:", JSON.stringify(req.body, null, 2));
 
     // Validate required fields
     if (!studentEmail || !subject || totalQuestions === undefined || correctAnswers === undefined) {
+        console.error("❌ VALIDATION FAILED - Missing required fields");
         return res.status(400).json({
             message: "Missing required fields: studentEmail, subject, totalQuestions, correctAnswers"
         })
@@ -665,11 +673,17 @@ const saveExamResult = (req, res) => {
         submittedAt: new Date()
     }
 
+    console.log("📝 Creating exam result with data:", JSON.stringify(examResultData, null, 2));
+
     const newExamResult = new ExamResult(examResultData)
 
     return newExamResult.save()
         .then((result) => {
-            console.log("✅ Exam result saved:", result._id)
+            console.log("✅ EXAM RESULT SAVED SUCCESSFULLY");
+            console.log("Result ID:", result._id);
+            console.log("Score saved:", result.score);
+            console.log("Full result:", JSON.stringify(result, null, 2));
+            
             return res.status(201).json({
                 message: "Exam result saved successfully",
                 result: {
@@ -684,10 +698,15 @@ const saveExamResult = (req, res) => {
             })
         })
         .catch((err) => {
-            console.error("Error saving exam result:", err)
+            console.error("❌ ERROR SAVING EXAM RESULT");
+            console.error("Error message:", err.message);
+            console.error("Error details:", JSON.stringify(err, null, 2));
+            console.error("Stack trace:", err.stack);
+            
             return res.status(500).json({
                 message: "Failed to save exam result",
-                error: err.message
+                error: err.message,
+                details: err.toString()
             })
         })
 }

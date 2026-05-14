@@ -100,7 +100,7 @@ const ActiveQuizView = () => {
                     setTimeLeft(0);
                     setTimerActive(false);
                     showInfo("Time's up! Your exam has been submitted.");
-                    handleSubmitExam();
+                    handleSubmitExam(true);
                     return;
                 }
 
@@ -120,8 +120,133 @@ const ActiveQuizView = () => {
     }
 
     // Handle exam submission
-    const handleSubmitExam = () => {
-        // Show confirmation modal
+    const handleSubmitExam = (isAutoSubmit = false) => {
+        // Function to perform actual submission
+        const performSubmission = () => {
+            // Calculate score
+            let correct = 0;
+            questions.forEach(question => {
+                if (selectedAnswers[question._id] === question.correctAnswer) {
+                    correct++;
+                }
+            });
+
+            const score = (correct / questions.length) * 100;
+
+            // Get student email from localStorage
+            const jwtToken = localStorage.getItem('jwtSecretKey');
+            let studentEmail = '';
+            if (jwtToken) {
+                // Decode JWT to get email (basic decode, not verified)
+                try {
+                    const base64Url = jwtToken.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
+                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                    }).join(''));
+                    studentEmail = JSON.parse(jsonPayload).email;
+                    console.log("✅ Student email extracted:", studentEmail);
+                } catch (error) {
+                    console.error("❌ Error decoding JWT:", error);
+                }
+            }
+
+            // Calculate time spent
+            const examDuration = questions.length > 0 ? questions[0].duration * 60 : 0;
+            const timeSpent = Math.max(0, (timeLeft !== null ? examDuration - timeLeft : 0));
+
+            // Prepare exam result data
+            const examResultData = {
+                studentEmail: studentEmail,
+                subject: subject,
+                totalQuestions: questions.length,
+                correctAnswers: correct,
+                answers: selectedAnswers,
+                timeSpent: timeSpent
+            };
+
+            console.log("📤 Sending exam result data:", examResultData);
+
+            // Save exam result to database
+            axios.post("https://online-cbt.onrender.com/user/exam/save-result", examResultData)
+                .then((response) => {
+                    console.log("✅ Exam result saved successfully!");
+                    console.log("Response data:", response.data);
+
+                    // Set the exam as submitted and display results
+                    setFinalScore(score);
+                    setIsSubmitted(true);
+                    setTimerActive(false);
+
+                    // Clear exam timer from localStorage
+                    localStorage.removeItem('examStartTime');
+                    localStorage.removeItem('totalExamDuration');
+
+                    // Log submission details
+                    console.log("📊 Exam Submitted", {
+                        subject: subject,
+                        totalQuestions: questions.length,
+                        correctAnswers: correct,
+                        score: score.toFixed(2) + "%",
+                        answers: selectedAnswers
+                    });
+
+                    // Show success modal
+                    Swal.fire({
+                        title: 'Exam Submitted!',
+                        html: `<p style="color: #475569; margin: 10px 0;">Your exam has been submitted successfully.</p>
+                               <p style="color: #0f172a; font-size: 24px; font-weight: bold; margin: 15px 0;">Score: <span style="color: #ab3500;">${score.toFixed(2)}%</span></p>`,
+                        icon: 'success',
+                        iconColor: '#10b981',
+                        confirmButtonColor: '#ab3500',
+                        confirmButtonText: 'View Results',
+                        allowOutsideClick: false,
+                        didOpen: (modal) => {
+                            modal.querySelector('.swal2-title').style.color = '#0f172a'
+                        }
+                    });
+                })
+                .catch((error) => {
+                    console.error("❌ Error saving exam result:");
+                    console.error("Error message:", error.message);
+                    console.error("Error response:", error.response?.data);
+                    console.error("Error status:", error.response?.status);
+                    console.error("Full error:", error);
+
+                    // Still show results but show a warning about database save
+                    Swal.fire({
+                        title: 'Exam Submitted',
+                        html: `<p style="color: #475569; margin: 10px 0;">Your exam has been processed.</p>
+                               <p style="color: #0f172a; font-size: 24px; font-weight: bold; margin: 15px 0;">Score: <span style="color: #ab3500;">${score.toFixed(2)}%</span></p>
+                               <p style="color: #dc2626; margin: 10px 0; font-size: 13px;">⚠️ Note: ${error.response?.data?.message || error.message || 'There was an issue saving to the database, but your score is displayed above.'}</p>`,
+                        icon: 'warning',
+                        iconColor: '#f59e0b',
+                        confirmButtonColor: '#ab3500',
+                        confirmButtonText: 'Continue',
+                        allowOutsideClick: false,
+                        didOpen: (modal) => {
+                            modal.querySelector('.swal2-title').style.color = '#0f172a'
+                        }
+                    });
+
+                    // Still show results
+                    setFinalScore(score);
+                    setIsSubmitted(true);
+                    setTimerActive(false);
+
+                    // Clear exam timer from localStorage
+                    localStorage.removeItem('examStartTime');
+                    localStorage.removeItem('totalExamDuration');
+                });
+        };
+
+        // If auto-submit (time expired), submit directly without confirmation
+        if (isAutoSubmit) {
+            performSubmission();
+            return;
+        }
+
+        // Otherwise, show confirmation modal first
         Swal.fire({
             title: 'Submit Exam?',
             text: 'Are you sure you want to submit the exam? You cannot change your answers after submission.',
@@ -138,109 +263,7 @@ const ActiveQuizView = () => {
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                // Calculate score
-                let correct = 0;
-                questions.forEach(question => {
-                    if (selectedAnswers[question._id] === question.correctAnswer) {
-                        correct++;
-                    }
-                });
-
-                const score = (correct / questions.length) * 100;
-
-                // Get student email from localStorage
-                const jwtToken = localStorage.getItem('jwtSecretKey');
-                let studentEmail = '';
-                if (jwtToken) {
-                    // Decode JWT to get email (basic decode, not verified)
-                    try {
-                        const base64Url = jwtToken.split('.')[1];
-                        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                        const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
-                            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                        }).join(''));
-                        studentEmail = JSON.parse(jsonPayload).email;
-                    } catch (error) {
-                        console.error("Error decoding JWT:", error);
-                    }
-                }
-
-                // Prepare exam result data
-                const examResultData = {
-                    studentEmail: studentEmail,
-                    subject: subject,
-                    totalQuestions: questions.length,
-                    correctAnswers: correct,
-                    answers: selectedAnswers,
-                    timeSpent: questions[0]?.duration * 60 - timeLeft
-                };
-
-                // Save exam result to database
-                axios.post("https://online-cbt.onrender.com/user/exam/save-result", examResultData)
-                    .then((response) => {
-                        console.log("✅ Exam result saved:", response.data);
-
-                        // Set the exam as submitted and display results
-                        setFinalScore(score);
-                        setIsSubmitted(true);
-                        setTimerActive(false);
-
-                        // Clear exam timer from localStorage
-                        localStorage.removeItem('examStartTime');
-                        localStorage.removeItem('totalExamDuration');
-
-                        // Log submission details
-                        console.log("Exam Submitted", {
-                            subject: subject,
-                            totalQuestions: questions.length,
-                            correctAnswers: correct,
-                            score: score.toFixed(2) + "%",
-                            answers: selectedAnswers
-                        });
-
-                        // Show success modal
-                        Swal.fire({
-                            title: 'Exam Submitted!',
-                            html: `<p style="color: #475569; margin: 10px 0;">Your exam has been submitted successfully.</p>
-                                   <p style="color: #0f172a; font-size: 24px; font-weight: bold; margin: 15px 0;">Score: <span style="color: #ab3500;">${score.toFixed(2)}%</span></p>`,
-                            icon: 'success',
-                            iconColor: '#10b981',
-                            confirmButtonColor: '#ab3500',
-                            confirmButtonText: 'View Results',
-                            allowOutsideClick: false,
-                            didOpen: (modal) => {
-                                modal.querySelector('.swal2-title').style.color = '#0f172a'
-                            }
-                        });
-                    })
-                    .catch((error) => {
-                        console.error("Error saving exam result:", error);
-
-                        // Still show results but show a warning about database save
-                        Swal.fire({
-                            title: 'Exam Submitted',
-                            html: `<p style="color: #475569; margin: 10px 0;">Your exam has been processed.</p>
-                                   <p style="color: #0f172a; font-size: 24px; font-weight: bold; margin: 15px 0;">Score: <span style="color: #ab3500;">${score.toFixed(2)}%</span></p>
-                                   <p style="color: #dc2626; margin: 10px 0; font-size: 13px;"> Note: There was an issue saving to the database, but your score is displayed above.</p>`,
-                            icon: 'warning',
-                            iconColor: '#f59e0b',
-                            confirmButtonColor: '#ab3500',
-                            confirmButtonText: 'Continue',
-                            allowOutsideClick: false,
-                            didOpen: (modal) => {
-                                modal.querySelector('.swal2-title').style.color = '#0f172a'
-                            }
-                        });
-
-                        // Still show results
-                        setFinalScore(score);
-                        setIsSubmitted(true);
-                        setTimerActive(false);
-
-                        // Clear exam timer from localStorage
-                        localStorage.removeItem('examStartTime');
-                        localStorage.removeItem('totalExamDuration');
-                    });
+                performSubmission();
             }
         });
     }
