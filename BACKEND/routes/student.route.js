@@ -2,7 +2,7 @@ const express = require("express")
 const router = express.Router();
 const { verifyToken } = require("../middleware/auth.middleware")
 const { sendWelcomeEmail, sendAdminInvitationEmail } = require("../utils/emailService")
-const {postStudentSignUp, getStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation, saveExamResult} = require("../controllers/user.controller")
+const {postStudentSignUp, getStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation, saveExamResult, getStudentExamResults} = require("../controllers/user.controller")
 
 // Email Configuration Check Endpoint
 router.get("/test-email-config", (req, res) => {
@@ -117,5 +117,6 @@ router.post("/admin/revoke-invitation", revokeInvitation)
 
 // Exam result routes
 router.post("/exam/save-result", saveExamResult)
+router.get("/exam/student-results", getStudentExamResults)
 
 module.exports = router

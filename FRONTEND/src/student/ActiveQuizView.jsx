@@ -221,7 +221,7 @@ const ActiveQuizView = () => {
                             title: 'Exam Submitted',
                             html: `<p style="color: #475569; margin: 10px 0;">Your exam has been processed.</p>
                                    <p style="color: #0f172a; font-size: 24px; font-weight: bold; margin: 15px 0;">Score: <span style="color: #ab3500;">${score.toFixed(2)}%</span></p>
-                                   <p style="color: #dc2626; margin: 10px 0; font-size: 12px;"> Note: There was an issue saving to the database, but your score is displayed above.</p>`,
+                                   <p style="color: #dc2626; margin: 10px 0; font-size: 13px;"> Note: There was an issue saving to the database, but your score is displayed above.</p>`,
                             icon: 'warning',
                             iconColor: '#f59e0b',
                             confirmButtonColor: '#ab3500',
@@ -301,12 +301,6 @@ const ActiveQuizView = () => {
             </div>
         )
     }
-
-    // useEffect(() => {
-
-
-    // }, [third])
-
 
     return (
         <>

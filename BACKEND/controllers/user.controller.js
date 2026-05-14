@@ -692,4 +692,46 @@ const saveExamResult = (req, res) => {
         })
 }
 
-module.exports = { getStudentSignUp, postStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation, saveExamResult }
+// Get all exam results for a student
+const getStudentExamResults = (req, res) => {
+    const { studentEmail } = req.query
+
+    console.log("Fetching exam results for student:", studentEmail)
+
+    // Validate required field
+    if (!studentEmail) {
+        return res.status(400).json({
+            message: "Missing required field: studentEmail"
+        })
+    }
+
+    return ExamResult.find({ studentEmail: studentEmail })
+        .sort({ submittedAt: -1 })
+        .then((results) => {
+            console.log(`✅ Found ${results.length} exam results for:`, studentEmail)
+            return res.status(200).json({
+                message: "Exam results fetched successfully",
+                count: results.length,
+                results: results.map(result => ({
+                    id: result._id,
+                    studentEmail: result.studentEmail,
+                    subject: result.subject,
+                    totalQuestions: result.totalQuestions,
+                    correctAnswers: result.correctAnswers,
+                    score: result.score.toFixed(2),
+                    timeSpent: result.timeSpent,
+                    submittedAt: result.submittedAt,
+                    status: result.score >= 50 ? "Pass" : "Fail"
+                }))
+            })
+        })
+        .catch((err) => {
+            console.error("Error fetching exam results:", err)
+            return res.status(500).json({
+                message: "Failed to fetch exam results",
+                error: err.message
+            })
+        })
+}
+
+module.exports = { getStudentSignUp, postStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation, saveExamResult, getStudentExamResults }
