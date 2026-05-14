@@ -2,7 +2,7 @@ const express = require("express")
 const router = express.Router();
 const { verifyToken } = require("../middleware/auth.middleware")
 const { sendWelcomeEmail } = require("../utils/emailService")
-const {postStudentSignUp, getStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, getDashboardStats} = require("../controllers/user.controller")
+const {postStudentSignUp, getStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation} = require("../controllers/user.controller")
 
 // Test email endpoint
 router.get("/test-email/:email", (req, res) => {
@@ -36,5 +36,11 @@ router.post("/addQuestions", addQuestion)
 router.get("/getAllQuestions", getAllQuestions)
 router.get("/question/:id", getQuestionById)
 router.get("/subject/:subject", getQuestionBySubject)
+
+// Admin invitation routes
+router.post("/admin/create-invitation", createAdminInvitation)
+router.get("/admin/validate-invitation", validateInvitation)
+router.get("/admin/pending-invitations", getPendingInvitations)
+router.post("/admin/revoke-invitation", revokeInvitation)
 
 module.exports = router

@@ -3,7 +3,7 @@ import { useFormik } from "formik"
 import * as yup from "yup"
 import AOS from 'aos'
 import 'aos/dist/aos.css'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import axios from "axios"
 
 const AdminSignup = () => {
@@ -12,6 +12,8 @@ const AdminSignup = () => {
     const [loading, setLoading] = useState(false)
     const [emailError, setEmailError] = useState("")
     const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
+    const invitationToken = searchParams.get('token')
 
     useEffect(() => {
         AOS.init({
@@ -21,20 +23,46 @@ const AdminSignup = () => {
             easing: 'ease-in-out',
             delay: 0
         })
-    }, [])
+
+        // Validate invitation token if provided
+        if (invitationToken) {
+            axios.get(`http://localhost:2114/admin/validate-invitation?token=${invitationToken}`)
+                .then((response) => {
+                    console.log("Invitation valid:", response.data)
+                })
+                .catch((err) => {
+                    console.error("Invalid invitation:", err.response?.data?.message)
+                    alert("Invalid or expired invitation link. Please get a new invitation from an admin.")
+                    navigate("/")
+                })
+        } else {
+            alert("Please use an invitation link to sign up as admin.")
+            navigate("/")
+        }
+    }, [invitationToken, navigate])
 
     const form = useFormik({
         initialValues: {
             fullName: "",
             email: "",
             password: "",
-            adminCode: ""
+            invitationToken: invitationToken || ""
         },
 
         onSubmit: (values, { resetForm }) => {
+            if (!invitationToken) {
+                alert("Invalid invitation. Please use the invitation link.")
+                return
+            }
+
             setLoading(true)
             setEmailError("")
-            axios.post("http://localhost:2114/user/admin/signUp", values)
+            axios.post("http://localhost:2114/user/admin/signUp", {
+                fullName: values.fullName,
+                email: values.email,
+                password: values.password,
+                invitationToken: invitationToken
+            })
             .then((response)=>{
                 setLoading(false)
                 if (response.data.admin) {
@@ -53,10 +81,10 @@ const AdminSignup = () => {
                 const errorMessage = errorData?.message || err.message || ""
                 const statusCode = err.response?.status
                 
-                // Check for invalid admin code error
-                const isInvalidCode = 
+                // Check for invalid/expired invitation error
+                const isInvalidInvitation = 
                     statusCode === 403 ||
-                    errorMessage.toLowerCase().includes("admin registration code")
+                    errorMessage.toLowerCase().includes("invitation")
                 
                 // Check for duplicate email error in various formats
                 const isDuplicateEmail = 
@@ -67,8 +95,8 @@ const AdminSignup = () => {
                     errorData?.error?.toLowerCase().includes("email") ||
                     (errorData?.errors && errorData.errors.email)
                 
-                if(isInvalidCode) {
-                    alert("Invalid admin registration code. Please check and try again.")
+                if(isInvalidInvitation) {
+                    alert("Invalid or expired invitation. Please get a new invitation link from an admin.")
                 } else if(isDuplicateEmail) {
                     setEmailError("This email already exists. Please use a different email.")
                     alert("This email already exists. Please use a different email.")
@@ -81,8 +109,7 @@ const AdminSignup = () => {
         validationSchema: yup.object({
             fullName: yup.string().required("Fullname is required"),
             email: yup.string().email("Invalid email").required("Email is required"),
-            password: yup.string().min(8, 'Password must be at least 8 characters').required("Password is required"),
-            adminCode: yup.string().required("Admin code is required").min(6, "Admin code is invalid")
+            password: yup.string().min(8, 'Password must be at least 8 characters').required("Password is required")
         })
     })
 
@@ -153,12 +180,6 @@ const AdminSignup = () => {
                                         <div className='border-0 fw-medium px-2 pt-3' style={{ backgroundColor: "#e1e3e4", fontSize: "13px", cursor: "pointer" }} onClick={handleClick}>{show ? "Hide" : "Show"} </div>
                                     </div>
                                     {form.touched.password && form.errors.password ? <p className='text-danger'>{form.errors.password}</p> : ""}
-                                </div>
-
-                                <div className="col-md-12 mt-4">
-                                    <label htmlFor="adminCode" className="form-label fw-medium" style={{ fontSize: "13px" }}>ADMIN CODE</label>
-                                    <input type="password" className="form form-control border-0 text-black rounded-0 py-3 shadow-none" style={{ backgroundColor: "#e1e3e4" }} value={form.values.adminCode} name='adminCode' onChange={form.handleChange} onBlur={form.handleBlur} id="adminCode" placeholder='Enter admin registration code' />
-                                    {form.touched.adminCode && form.errors.adminCode ? <p className='text-danger'>{form.errors.adminCode}</p> : ""}
                                 </div>
 
                                 <div className="col-12">

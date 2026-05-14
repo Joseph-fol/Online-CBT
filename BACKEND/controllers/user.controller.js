@@ -1,5 +1,6 @@
 const student = require("../models/user.model")
 const Question = require('../models/questions.model')
+const Invitation = require("../models/invitation.model")
 const bcrypt = require("bcrypt")
 const jsonwebtoken = require("jsonwebtoken")
 const { sendWelcomeEmail } = require("../utils/emailService")
@@ -55,7 +56,7 @@ const postStudentSignUp = (req, res) => {
                     // Generate token and handle response
                     return new Promise((resolve, reject) => {
                         try {
-                            const token = jsonwebtoken.sign({email: studentData.email}, process.env.jwtSecretKey, {expiresIn: "30d"})
+                            const token = jsonwebtoken.sign({email: studentData.email}, process.env.jwtSecretKey, {expiresIn: "1h"})
                             console.log("Generated token", studentData.email);
                             resolve(token)
                         } catch (error) {
@@ -88,78 +89,108 @@ const postStudentSignUp = (req, res) => {
 }
 
 const postAdminSignUp = (req, res) => {
-    const { fullName, email, password, adminCode } = req.body
+    const { fullName, email, password, invitationToken } = req.body
 
-    
-    if (adminCode.toLowerCase() !== process.env.ADMIN_REGISTRATION_CODE.toLowerCase()) {
-        return res.status(403).json({
-            message: "Invalid admin registration code"
+    // Verify invitation token
+    if (!invitationToken) {
+        return res.status(400).json({
+            message: "Invitation token is required"
         })
     }
 
-    student.findOne({ email: req.body.email })
-        .then((userExists) => {
-            if (userExists) {
-                return res.status(409).json({
-                    message: "Email already exists",
-                    email: userExists.email
+    Invitation.findOne({ token: invitationToken, status: "pending" })
+        .then((invitation) => {
+            if (!invitation) {
+                return res.status(403).json({
+                    message: "Invalid or expired invitation"
                 })
             }
 
-            let salt = bcrypt.genSaltSync(10)
-            let hashedPassword = bcrypt.hashSync(req.body.password, salt)
-            req.body.password = hashedPassword
-            req.body.role = "admin"
+            // Check if invitation was for a specific email
+            if (invitation.invitedEmail && invitation.invitedEmail !== email) {
+                return res.status(403).json({
+                    message: "This invitation is for a different email address"
+                })
+            }
 
-            const adminInfo = req.body
-            const newAdminDetails = new student(adminInfo)
-
-            return newAdminDetails.save()
-                .then((adminData) => {
-                    console.log("Admin Saved", adminData);
-
-                    // Send welcome email
-                    sendWelcomeEmail(adminData.email, adminData.fullName)
-                        .then((result) => {
-                            console.log("Email result:", result.message);
+            student.findOne({ email: email })
+                .then((userExists) => {
+                    if (userExists) {
+                        return res.status(409).json({
+                            message: "Email already exists",
+                            email: userExists.email
                         })
-                        .catch((err) => {
-                            console.error("Background email error:", err.message);
-                        });
+                    }
 
-                    // Generate token and handle response
-                    return new Promise((resolve, reject) => {
-                        try {
-                            const token = jsonwebtoken.sign({email: adminData.email}, process.env.jwtSecretKey, {expiresIn: "30d"})
-                            console.log("Generated token for admin", adminData.email);
-                            resolve(token)
-                        } catch (error) {
-                            reject(error)
-                        }
-                    })
-                    .then((token) => {
-                        return res.status(201).json({
-                            message: "Admin Signup Successful",
-                            token: token,
-                            admin: {
-                                id: adminData._id,
-                                fullName: adminData.fullName,
-                                email: adminData.email,
-                                role: adminData.role
-                            }
+                    let salt = bcrypt.genSaltSync(10)
+                    let hashedPassword = bcrypt.hashSync(password, salt)
+
+                    const adminData = {
+                        fullName,
+                        email,
+                        password: hashedPassword,
+                        role: "admin"
+                    }
+
+                    const newAdminDetails = new student(adminData)
+
+                    return newAdminDetails.save()
+                        .then((admin) => {
+                            console.log("Admin Saved", admin);
+
+                            // Mark invitation as accepted
+                            invitation.status = "accepted"
+                            invitation.acceptedAt = new Date()
+                            invitation.acceptedBy = email
+                            invitation.save().catch(err => console.error("Error updating invitation:", err))
+
+                            // Send welcome email
+                            sendWelcomeEmail(admin.email, admin.fullName)
+                                .then((result) => {
+                                    console.log("Email result:", result.message);
+                                })
+                                .catch((err) => {
+                                    console.error("Background email error:", err.message);
+                                });
+
+                            // Generate token and handle response
+                            return new Promise((resolve, reject) => {
+                                try {
+                                    const token = jsonwebtoken.sign({email: admin.email}, process.env.jwtSecretKey, {expiresIn: "30d"})
+                                    console.log("Generated token for admin", admin.email);
+                                    resolve(token)
+                                } catch (error) {
+                                    reject(error)
+                                }
+                            })
+                            .then((token) => {
+                                return res.status(201).json({
+                                    message: "Admin Signup Successful",
+                                    token: token,
+                                    admin: {
+                                        id: admin._id,
+                                        fullName: admin.fullName,
+                                        email: admin.email,
+                                        role: admin.role
+                                    }
+                                })
+                            })
+                            .catch((error) => {
+                                console.error("Token generation error:", error);
+                                return res.status(500).json({
+                                    message: "Signup failed - token generation error",
+                                    error: error.message
+                                })
+                            })
                         })
-                    })
-                    .catch((error) => {
-                        console.error("Token generation error:", error);
-                        return res.status(500).json({
-                            message: "Signup failed - token generation error",
-                            error: error.message
-                        })
-                    })
+                })
+                .catch((err) => {
+                    console.log("Error saving admin to database", err);
+                    return res.status(500).send(`Error: ${err.message}`)
                 })
         })
         .catch((err) => {
-            console.log("Error saving admin to database", err);
+            console.log("Error validating invitation", err);
             return res.status(500).send(`Error: ${err.message}`)
         })
 }
@@ -184,7 +215,7 @@ const postSignin = (req, res) => {
             }
 
             console.log("Login successful for, ", foundStudent.email)
-            const token = jsonwebtoken.sign({email: foundStudent.email}, process.env.jwtSecretKey, {expiresIn: "30d"})
+            const token = jsonwebtoken.sign({email: foundStudent.email}, process.env.jwtSecretKey, {expiresIn: "1h"})
             return res.status(200).json({
                 message: "Signin Successful",
                 token: token,
@@ -370,5 +401,137 @@ const getDashboardStats = (req, res) => {
     })
 }
 
+// Create invitation link (only admins can create)
+const createAdminInvitation = (req, res) => {
+    const { invitedEmail } = req.body
+    const adminEmail = req.headers['x-admin-email'] || req.body.adminEmail  // Email of the admin creating invitation
 
-module.exports = { getStudentSignUp, postStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, getDashboardStats }
+    // Verify that the requester is an admin
+    student.findOne({ email: adminEmail, role: "admin" })
+        .then((admin) => {
+            if (!admin) {
+                return res.status(403).json({
+                    message: "Only admins can create invitations"
+                })
+            }
+
+            const newInvitation = new Invitation({
+                invitedBy: adminEmail,
+                invitedEmail: invitedEmail || null  // Optional - can be general or specific
+            })
+
+            return newInvitation.save()
+                .then((invitation) => {
+                    console.log("Invitation created:", invitation.token);
+                    res.status(201).json({
+                        message: "Invitation created successfully",
+                        invitationToken: invitation.token,
+                        invitationLink: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/admin/signup?token=${invitation.token}`,
+                        expiresIn: "7 days"
+                    })
+                })
+                .catch((err) => {
+                    console.error("Error creating invitation:", err);
+                    res.status(500).json({
+                        message: "Failed to create invitation",
+                        error: err.message
+                    })
+                })
+        })
+        .catch((err) => {
+            console.error("Error verifying admin:", err);
+            res.status(500).json({
+                message: "Failed to create invitation",
+                error: err.message
+            })
+        })
+}
+
+// Validate invitation token
+const validateInvitation = (req, res) => {
+    const { token } = req.query
+
+    if (!token) {
+        return res.status(400).json({
+            message: "Invitation token is required"
+        })
+    }
+
+    Invitation.findOne({ token: token, status: "pending" })
+        .then((invitation) => {
+            if (!invitation) {
+                return res.status(403).json({
+                    valid: false,
+                    message: "Invalid or expired invitation"
+                })
+            }
+
+            res.status(200).json({
+                valid: true,
+                message: "Invitation is valid",
+                invitedEmail: invitation.invitedEmail,
+                createdAt: invitation.createdAt
+            })
+        })
+        .catch((err) => {
+            console.error("Error validating invitation:", err);
+            res.status(500).json({
+                message: "Failed to validate invitation",
+                error: err.message
+            })
+        })
+}
+
+// Get all pending invitations (for admin dashboard)
+const getPendingInvitations = (req, res) => {
+    const adminEmail = req.headers['x-admin-email'] || req.body.adminEmail
+
+    Invitation.find({ invitedBy: adminEmail, status: "pending" })
+        .select('token invitedEmail createdAt')
+        .then((invitations) => {
+            res.status(200).json({
+                invitations: invitations
+            })
+        })
+        .catch((err) => {
+            console.error("Error fetching invitations:", err);
+            res.status(500).json({
+                message: "Failed to fetch invitations",
+                error: err.message
+            })
+        })
+}
+
+// Revoke invitation (admin can revoke sent invitations)
+const revokeInvitation = (req, res) => {
+    const { token } = req.body
+    const adminEmail = req.headers['x-admin-email'] || req.body.adminEmail
+
+    Invitation.findOneAndUpdate(
+        { token: token, invitedBy: adminEmail, status: "pending" },
+        { status: "expired" },
+        { new: true }
+    )
+        .then((invitation) => {
+            if (!invitation) {
+                return res.status(404).json({
+                    message: "Invitation not found or already used"
+                })
+            }
+
+            res.status(200).json({
+                message: "Invitation revoked successfully",
+                invitation: invitation
+            })
+        })
+        .catch((err) => {
+            console.error("Error revoking invitation:", err);
+            res.status(500).json({
+                message: "Failed to revoke invitation",
+                error: err.message
+            })
+        })
+}
+
+
+module.exports = { getStudentSignUp, postStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation }

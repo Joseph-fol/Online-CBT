@@ -88,8 +88,8 @@ const LandingPage = () => {
                                 <a className="nav-link fw-medium text-black" href='#'>Pricing</a>
                             </li>
                         </ul>
-                        <Link to="/admin/signup">
-                            <button className=' btn mx-3 text-decoration-none text-dark fw-bold'> Admin Signup </button>
+                        <Link to="/admin/signin">
+                            <button className=' btn mx-3 text-decoration-none text-dark fw-bold'> Admin Signin </button>
                         </Link>
 
                         <div className="d-flex justify-content-center align-items-center gap-3" >

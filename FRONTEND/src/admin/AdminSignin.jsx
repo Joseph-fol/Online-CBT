@@ -32,46 +32,46 @@ const AdminSignin = () => {
         onSubmit: (values, { resetForm }) => {
             setLoading(true)
             setError("")
-            
+
             axios.post("http://localhost:2114/user/admin/signin", {
                 email: values.email,
                 password: values.password
             })
 
-            .then((response) => {
-                const data = response.data
+                .then((response) => {
+                    const data = response.data
 
-                // Check if user has admin role
-                if (data.admin && data.admin.role === "admin") {
-                    console.log("Admin signin successful", data.admin)
+                    // Check if user has admin role
+                    if (data.admin && data.admin.role === "admin") {
+                        console.log("Admin signin successful", data.admin)
 
-                    // Store admin info in localStorage
-                    localStorage.setItem("adminData", JSON.stringify(data.admin))
-                    
+                        // Store admin info in localStorage
+                        localStorage.setItem("adminData", JSON.stringify(data.admin))
+
+                        setLoading(false)
+                        resetForm()
+                        alert(`Welcome back, ${data.admin.fullName}!`)
+                        navigate("/admin")
+                    } else {
+                        setError("You do not have admin privileges")
+                        setLoading(false)
+                    }
+                })
+                .catch((err) => {
+                    console.error("Error during signin:", err)
                     setLoading(false)
-                    resetForm()
-                    alert(`Welcome back, ${data.admin.fullName}!`)
-                    navigate("/admin")
-                } else {
-                    setError("You do not have admin privileges")
-                    setLoading(false)
-                }
-            })
-            .catch((err) => {
-                console.error("Error during signin:", err)
-                setLoading(false)
-                
-                const errorMessage = err.response?.data?.message || "An error occurred. Please try again."
-                
-                // Provide specific error messages
-                if (errorMessage.toLowerCase().includes("admin not found")) {
-                    setError("No admin account found with this email. Please check your credentials or create an admin account.")
-                } else if (errorMessage.toLowerCase().includes("invalid password")) {
-                    setError("Invalid password. Please try again.")
-                } else {
-                    setError(errorMessage)
-                }
-            })
+
+                    const errorMessage = err.response?.data?.message || "An error occurred. Please try again."
+
+                    // Provide specific error messages
+                    if (errorMessage.toLowerCase().includes("admin not found")) {
+                        setError("No admin account found with this email. Please check your credentials or create an admin account.")
+                    } else if (errorMessage.toLowerCase().includes("invalid password")) {
+                        setError("Invalid password. Please try again.")
+                    } else {
+                        setError(errorMessage)
+                    }
+                })
         },
 
         validationSchema: yup.object({
@@ -103,7 +103,7 @@ const AdminSignin = () => {
                             }}></div>
 
                             <div style={{ position: 'relative', zIndex: 1 }}>
-                                <h4 className='fw-bold mt-4' onClick={()=> navigate("/")} style={{cursor:"pointer"}}>Online CBT</h4>
+                                <h4 className='fw-bold mt-4' onClick={() => navigate("/")} style={{ cursor: "pointer" }}>Online CBT</h4>
                                 <div className=' mt-5 pt-5'>
                                     <h1 className='fw-bold' style={{ fontSize: "45px" }}>Orchestrate Academic Excellence.</h1>
                                     <p className='fw-medium fs-6'>Manage dynamic question banks, deploy tamper-proof assessments, and generate real-time performance analytics from your centralized command center.</p>
@@ -125,9 +125,9 @@ const AdminSignin = () => {
                                 <div className='d-flex justify-content-between'>
                                     <h4 className='fw-bold py-0'> Admin Sign in</h4>
                                     <Link to="/">
-                                    <button type="button" className='btn'>
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="#0f172b" d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42a.996.996 0 0 0-1.41 0l-6.59 6.59a.996.996 0 0 0 0 1.41l6.59 6.59a.996.996 0 1 0 1.41-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1" /></svg>
-                                    </button>
+                                        <button type="button" className='btn'>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="#0f172b" d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42a.996.996 0 0 0-1.41 0l-6.59 6.59a.996.996 0 0 0 0 1.41l6.59 6.59a.996.996 0 1 0 1.41-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1" /></svg>
+                                        </button>
                                     </Link>
                                 </div>
 
@@ -152,6 +152,12 @@ const AdminSignin = () => {
                                     <button type="submit" disabled={loading} class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ backgroundColor: "#ab3500" }}>
                                         {loading ? "Signing in..." : "Signin"}
                                     </button>
+                                </div>
+
+                                <div>
+                                    <Link to="/admin/signUp">
+                                        <button type="submit" class="btn w-100 py-2 text-black fs-6 fw-bold border border-dark border-1" >CREATE ADMIN ACCOUNT </button>
+                                    </Link>
                                 </div>
                             </form>
                         </div>
