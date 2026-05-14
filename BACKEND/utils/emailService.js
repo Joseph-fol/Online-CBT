@@ -1,30 +1,23 @@
-const nodemailer = require("nodemailer");
+const { Resend } = require('resend');
+
+// Initialize Resend with API key
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendWelcomeEmail = (userEmail, userName) => {
-    console.log("Starting email send process for:", userEmail);
-    console.log("Email User:", process.env.EMAIL_USER ? "SET" : "NOT SET");
-    console.log("Email Password:", process.env.EMAIL_PASSWORD ? "SET" : "NOT SET");
-    console.log("Email From Name:", process.env.EMAIL_FROM_NAME ? "SET" : "NOT SET");
+    console.log("📧 Sending welcome email to:", userEmail);
+    console.log("Resend API Key configured:", process.env.RESEND_API_KEY ? "✅ YES" : "❌ NO");
     
-    // Validate email environment variables
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
-        console.error("❌ EMAIL_USER or EMAIL_PASSWORD not configured in environment variables");
-        return Promise.resolve({ success: false, error: "Email service not configured" });
+    // Validate API key
+    if (!process.env.RESEND_API_KEY) {
+        console.error("❌ RESEND_API_KEY not configured in environment variables");
+        return Promise.resolve({ 
+            success: false, 
+            error: "Resend API key not configured" 
+        });
     }
-    
-    // Remove spaces from app password (Gmail passwords come with spaces)
-    const emailPassword = process.env.EMAIL_PASSWORD?.replace(/\s/g, '') || '';
-    
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: emailPassword
-        }
-    });
 
     const mailOptions = {
-        from: `"${process.env.EMAIL_FROM_NAME || 'Online CBT'}" <${process.env.EMAIL_USER}>`,
+        from: 'noreply@resend.dev',
         to: userEmail,
         subject: "Welcome to Online CBT",
         html: `
@@ -35,7 +28,7 @@ const sendWelcomeEmail = (userEmail, userName) => {
 
                 <div style="padding: 40px 30px 20px; text-align: center; color: #0f172b; background-color: #ffffff;">
                     <p style="font-size: 20px; margin-top: 0;">
-                        <span style="font-weight: 700; color: #ab3500;">Congratulations!</span> Your sign-up was successful.
+                        <span style="font-weight: 700; color: #ab3500;">Congratulations ${userName}!</span> Your sign-up was successful.
                     </p>
 
                     <p style="line-height: 1.8; padding: 15px 10px; font-size: 16px;">
@@ -48,54 +41,42 @@ const sendWelcomeEmail = (userEmail, userName) => {
                     <div style="padding: 20px 0 10px;">
                         <hr style="width: 50%; border: none; border-top: 1px solid #e2e8f0; margin-bottom: 20px;">
                         <p style="margin-bottom: 5px; font-size: 16px; font-weight: 600;">Best Regards,</p>
-                        <p style="color: #ab3500; margin-top: 0; font-size: 18px; font-weight: bold;">Dev Joseph</p>
+                        <p style="color: #ab3500; margin-top: 0; font-size: 18px; font-weight: bold;">Online CBT Team</p>
                     </div>
                 </div>
             </div>
         `
     };
 
-    console.log("Mail options prepared for:", mailOptions.to);
-    
-    return transporter.sendMail(mailOptions)
-        .then((info) => {
+    return resend.emails.send(mailOptions)
+        .then((response) => {
             console.log("✅ Welcome email sent successfully to:", userEmail);
-            console.log("Email response:", info.response);
-            return { success: true, message: "Email sent successfully" };
+            console.log("Email ID:", response.id);
+            return { success: true, message: "Email sent successfully", emailId: response.id };
         })
         .catch((error) => {
             console.error("❌ Failed to send welcome email to:", userEmail);
-            console.error("Email error details:", error);
-            console.error("Error code:", error.code);
-            console.error("Error response:", error.response);
-            console.error("Using email:", process.env.EMAIL_USER);
+            console.error("Resend error details:", error);
+            console.error("Error message:", error.message);
             return { success: false, error: error.message };
         });
 };
 
 const sendAdminInvitationEmail = (invitedEmail, invitationLink, invitedByName) => {
-    console.log("Sending admin invitation to:", invitedEmail);
-    console.log("Email User:", process.env.EMAIL_USER ? "SET" : "NOT SET");
-    console.log("Email Password:", process.env.EMAIL_PASSWORD ? "SET" : "NOT SET");
+    console.log("📧 Sending admin invitation email to:", invitedEmail);
+    console.log("Resend API Key configured:", process.env.RESEND_API_KEY ? "✅ YES" : "❌ NO");
     
-    // Validate email environment variables
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
-        console.error("❌ EMAIL_USER or EMAIL_PASSWORD not configured");
-        return Promise.resolve({ success: false, error: "Email service not configured" });
+    // Validate API key
+    if (!process.env.RESEND_API_KEY) {
+        console.error("❌ RESEND_API_KEY not configured");
+        return Promise.resolve({ 
+            success: false, 
+            error: "Resend API key not configured" 
+        });
     }
-    
-    const emailPassword = process.env.EMAIL_PASSWORD?.replace(/\s/g, '') || '';
-    
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: emailPassword
-        }
-    });
 
     const mailOptions = {
-        from: `"${process.env.EMAIL_FROM_NAME || 'Online CBT'}" <${process.env.EMAIL_USER}>`,
+        from: 'noreply@resend.dev',
         to: invitedEmail,
         subject: "You're Invited to Become an Admin on Online CBT",
         html: `
@@ -140,15 +121,16 @@ const sendAdminInvitationEmail = (invitedEmail, invitationLink, invitedByName) =
         `
     };
 
-    return transporter.sendMail(mailOptions)
-        .then((info) => {
+    return resend.emails.send(mailOptions)
+        .then((response) => {
             console.log("✅ Admin invitation email sent successfully to:", invitedEmail);
-            console.log("Email response:", info.response);
-            return { success: true, message: "Invitation email sent successfully" };
+            console.log("Email ID:", response.id);
+            return { success: true, message: "Invitation email sent successfully", emailId: response.id };
         })
         .catch((error) => {
             console.error("❌ Failed to send admin invitation to:", invitedEmail);
-            console.error("Email error details:", error);
+            console.error("Resend error details:", error);
+            console.error("Error message:", error.message);
             return { success: false, error: error.message };
         });
 };
