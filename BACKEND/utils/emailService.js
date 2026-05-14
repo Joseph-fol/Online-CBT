@@ -2,11 +2,18 @@ const nodemailer = require("nodemailer");
 
 const sendWelcomeEmail = (userEmail, userName) => {
     console.log("Starting email send process for:", userEmail);
-    console.log("Email credentials - User:", process.env.EMAIL_USER);
+    console.log("Email User:", process.env.EMAIL_USER ? "SET" : "NOT SET");
+    console.log("Email Password:", process.env.EMAIL_PASSWORD ? "SET" : "NOT SET");
+    console.log("Email From Name:", process.env.EMAIL_FROM_NAME ? "SET" : "NOT SET");
+    
+    // Validate email environment variables
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+        console.error("❌ EMAIL_USER or EMAIL_PASSWORD not configured in environment variables");
+        return Promise.resolve({ success: false, error: "Email service not configured" });
+    }
     
     // Remove spaces from app password (Gmail passwords come with spaces)
     const emailPassword = process.env.EMAIL_PASSWORD?.replace(/\s/g, '') || '';
-    console.log("Email password loaded:", emailPassword ? "YES" : "NO");
     
     const transporter = nodemailer.createTransport({
         service: "gmail",
@@ -17,7 +24,7 @@ const sendWelcomeEmail = (userEmail, userName) => {
     });
 
     const mailOptions = {
-        from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_USER}>`,
+        from: `"${process.env.EMAIL_FROM_NAME || 'Online CBT'}" <${process.env.EMAIL_USER}>`,
         to: userEmail,
         subject: "Welcome to Online CBT",
         html: `
@@ -68,6 +75,14 @@ const sendWelcomeEmail = (userEmail, userName) => {
 
 const sendAdminInvitationEmail = (invitedEmail, invitationLink, invitedByName) => {
     console.log("Sending admin invitation to:", invitedEmail);
+    console.log("Email User:", process.env.EMAIL_USER ? "SET" : "NOT SET");
+    console.log("Email Password:", process.env.EMAIL_PASSWORD ? "SET" : "NOT SET");
+    
+    // Validate email environment variables
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+        console.error("❌ EMAIL_USER or EMAIL_PASSWORD not configured");
+        return Promise.resolve({ success: false, error: "Email service not configured" });
+    }
     
     const emailPassword = process.env.EMAIL_PASSWORD?.replace(/\s/g, '') || '';
     
@@ -80,7 +95,7 @@ const sendAdminInvitationEmail = (invitedEmail, invitationLink, invitedByName) =
     });
 
     const mailOptions = {
-        from: `"${process.env.EMAIL_FROM_NAME}" <${process.env.EMAIL_USER}>`,
+        from: `"${process.env.EMAIL_FROM_NAME || 'Online CBT'}" <${process.env.EMAIL_USER}>`,
         to: invitedEmail,
         subject: "You're Invited to Become an Admin on Online CBT",
         html: `

@@ -21,178 +21,171 @@ const adminSignin = (req, res) => {
     res.render("adminSignin")
 }
 
-const postStudentSignUp = (req, res) => {
-    const { fullName, email, password } = req.body
+const postStudentSignUp = async (req, res) => {
+    try {
+        const { fullName, email, password } = req.body
 
-    student.findOne({ email: req.body.email })
-        .then((userExists) => {
-            if (userExists) {
-                return res.status(409).json({
-                    message: "User already exists",
-                    email: userExists.email
-                })
+        console.log("Student signup attempt for:", email);
+
+        // Check if user already exists
+        const userExists = await student.findOne({ email: req.body.email })
+        if (userExists) {
+            return res.status(409).json({
+                message: "User already exists",
+                email: userExists.email
+            })
+        }
+
+        // Hash password
+        let salt = bcrypt.genSaltSync(10)
+        let hashedPassword = bcrypt.hashSync(req.body.password, salt)
+        req.body.password = hashedPassword
+
+        // Create and save student
+        const studentInfo = req.body
+        const newStudentDetails = new student(studentInfo)
+        const studentData = await newStudentDetails.save()
+        
+        console.log("✅ Student Saved:", studentData.email)
+
+        // Send welcome email (with error handling, don't block signup)
+        try {
+            const emailResult = await sendWelcomeEmail(studentData.email, studentData.fullName)
+            if (emailResult.success) {
+                console.log("✅ Welcome email sent to:", studentData.email)
+            } else {
+                console.warn("⚠️ Welcome email failed to send:", emailResult.error)
             }
+        } catch (emailError) {
+            console.error("❌ Welcome email error:", emailError.message)
+            // Don't block signup if email fails
+        }
 
-            let salt = bcrypt.genSaltSync(10)
-            let hashedPassword = bcrypt.hashSync(req.body.password, salt)
-            req.body.password = hashedPassword
+        // Generate JWT token
+        const token = jsonwebtoken.sign(
+            { email: studentData.email }, 
+            process.env.jwtSecretKey, 
+            { expiresIn: "1h" }
+        )
+        console.log("✅ Generated token for:", studentData.email)
 
-            const studentInfo = req.body
-            const newStudentDetails = new student(studentInfo)
-
-            return newStudentDetails.save()
-                .then((studentData) => {
-                    console.log("Customer Saved", studentData);
-
-                    // Send welcome email
-                    sendWelcomeEmail(studentData.email, studentData.fullName)
-                        .then((result) => {
-                            console.log("Email result:", result.message);
-                        })
-                        .catch((err) => {
-                            console.error("Background email error:", err.message);
-                        });
-
-                    // Generate token and handle response
-                    return new Promise((resolve, reject) => {
-                        try {
-                            const token = jsonwebtoken.sign({email: studentData.email}, process.env.jwtSecretKey, {expiresIn: "1h"})
-                            console.log("Generated token", studentData.email);
-                            resolve(token)
-                        } catch (error) {
-                            reject(error)
-                        }
-                    })
-                    .then((token) => {
-                        return res.status(201).json({
-                            message: "Signup Successful",
-                            token: token,
-                            student: {
-                                id: studentData._id,
-                                email: studentData.email,
-                            }
-                        })
-                    })
-                    .catch((error) => {
-                        console.error("Token generation error:", error);
-                        return res.status(500).json({
-                            message: "Signup failed - token generation error",
-                            error: error.message
-                        })
-                    })
-                })
+        return res.status(201).json({
+            message: "Signup Successful",
+            token: token,
+            student: {
+                id: studentData._id,
+                email: studentData.email,
+            }
         })
-        .catch((err) => {
-            console.log("Error saving to database", err);
-            return res.status(500).send(`Error: ${err.message}`)
-        })
-}
 
-const postAdminSignUp = (req, res) => {
-    const { fullName, email, password, invitationToken } = req.body
-
-    // Verify invitation token
-    if (!invitationToken) {
-        return res.status(400).json({
-            message: "Invitation token is required"
+    } catch (error) {
+        console.error("❌ Student signup error:", error.message);
+        return res.status(500).json({
+            message: "Signup failed",
+            error: error.message
         })
     }
+}
 
-    Invitation.findOne({ token: invitationToken, status: "pending" })
-        .then((invitation) => {
-            if (!invitation) {
-                return res.status(403).json({
-                    message: "Invalid or expired invitation"
-                })
+const postAdminSignUp = async (req, res) => {
+    try {
+        const { fullName, email, password, invitationToken } = req.body
+
+        console.log("Admin signup attempt for:", email);
+
+        // Verify invitation token
+        if (!invitationToken) {
+            return res.status(400).json({
+                message: "Invitation token is required"
+            })
+        }
+
+        // Find and validate invitation
+        const invitation = await Invitation.findOne({ token: invitationToken, status: "pending" })
+        if (!invitation) {
+            return res.status(403).json({
+                message: "Invalid or expired invitation"
+            })
+        }
+
+        // Check if invitation was for a specific email
+        if (invitation.invitedEmail && invitation.invitedEmail !== email) {
+            return res.status(403).json({
+                message: "This invitation is for a different email address"
+            })
+        }
+
+        // Check if user already exists
+        const userExists = await student.findOne({ email: email })
+        if (userExists) {
+            return res.status(409).json({
+                message: "Email already exists",
+                email: userExists.email
+            })
+        }
+
+        // Hash password
+        let salt = bcrypt.genSaltSync(10)
+        let hashedPassword = bcrypt.hashSync(password, salt)
+
+        // Create and save admin
+        const adminData = {
+            fullName,
+            email,
+            password: hashedPassword,
+            role: "admin"
+        }
+
+        const newAdminDetails = new student(adminData)
+        const admin = await newAdminDetails.save()
+        
+        console.log("✅ Admin Saved:", admin.email)
+
+        // Mark invitation as accepted
+        invitation.status = "accepted"
+        invitation.acceptedAt = new Date()
+        invitation.acceptedBy = email
+        await invitation.save()
+        console.log("✅ Invitation marked as accepted")
+
+        // Send welcome email (non-blocking)
+        try {
+            const emailResult = await sendWelcomeEmail(admin.email, admin.fullName)
+            if (emailResult.success) {
+                console.log("✅ Welcome email sent to admin:", admin.email)
+            } else {
+                console.warn("⚠️ Welcome email failed:", emailResult.error)
             }
+        } catch (emailError) {
+            console.error("❌ Welcome email error:", emailError.message)
+        }
 
-            // Check if invitation was for a specific email
-            if (invitation.invitedEmail && invitation.invitedEmail !== email) {
-                return res.status(403).json({
-                    message: "This invitation is for a different email address"
-                })
+        // Generate JWT token
+        const token = jsonwebtoken.sign(
+            { email: admin.email }, 
+            process.env.jwtSecretKey, 
+            { expiresIn: "30d" }
+        )
+        console.log("✅ Generated token for admin:", admin.email)
+
+        return res.status(201).json({
+            message: "Admin Signup Successful",
+            token: token,
+            admin: {
+                id: admin._id,
+                fullName: admin.fullName,
+                email: admin.email,
+                role: admin.role
             }
-
-            student.findOne({ email: email })
-                .then((userExists) => {
-                    if (userExists) {
-                        return res.status(409).json({
-                            message: "Email already exists",
-                            email: userExists.email
-                        })
-                    }
-
-                    let salt = bcrypt.genSaltSync(10)
-                    let hashedPassword = bcrypt.hashSync(password, salt)
-
-                    const adminData = {
-                        fullName,
-                        email,
-                        password: hashedPassword,
-                        role: "admin"
-                    }
-
-                    const newAdminDetails = new student(adminData)
-
-                    return newAdminDetails.save()
-                        .then((admin) => {
-                            console.log("Admin Saved", admin);
-
-                            // Mark invitation as accepted
-                            invitation.status = "accepted"
-                            invitation.acceptedAt = new Date()
-                            invitation.acceptedBy = email
-                            invitation.save().catch(err => console.error("Error updating invitation:", err))
-
-                            // Send welcome email
-                            sendWelcomeEmail(admin.email, admin.fullName)
-                                .then((result) => {
-                                    console.log("Email result:", result.message);
-                                })
-                                .catch((err) => {
-                                    console.error("Background email error:", err.message);
-                                });
-
-                            // Generate token and handle response
-                            return new Promise((resolve, reject) => {
-                                try {
-                                    const token = jsonwebtoken.sign({email: admin.email}, process.env.jwtSecretKey, {expiresIn: "30d"})
-                                    console.log("Generated token for admin", admin.email);
-                                    resolve(token)
-                                } catch (error) {
-                                    reject(error)
-                                }
-                            })
-                            .then((token) => {
-                                return res.status(201).json({
-                                    message: "Admin Signup Successful",
-                                    token: token,
-                                    admin: {
-                                        id: admin._id,
-                                        fullName: admin.fullName,
-                                        email: admin.email,
-                                        role: admin.role
-                                    }
-                                })
-                            })
-                            .catch((error) => {
-                                console.error("Token generation error:", error);
-                                return res.status(500).json({
-                                    message: "Signup failed - token generation error",
-                                    error: error.message
-                                })
-                            })
-                        })
-                })
-                .catch((err) => {
-                    console.log("Error saving admin to database", err);
-                    return res.status(500).send(`Error: ${err.message}`)
-                })
         })
-        .catch((err) => {
-            console.log("Error validating invitation", err);
-            return res.status(500).send(`Error: ${err.message}`)
+
+    } catch (error) {
+        console.error("Admin signup error:", error.message)
+        return res.status(500).json({
+            message: "Admin signup failed",
+            error: error.message
         })
+    }
 }
 
 const postSignin = (req, res) => {
