@@ -30,7 +30,7 @@ const AdminOverview = () => {
 
   const fetchDashboardStats = () => {
     setLoading(true)
-    axios.get('http://localhost:2114/user/dashboard-stats')
+    axios.get('https://online-cbt.onrender.com/user/dashboard-stats')
       .then((response) => {
         const { totalStudents, totalSubjects, totalQuestions, averageScore } = response.data
         

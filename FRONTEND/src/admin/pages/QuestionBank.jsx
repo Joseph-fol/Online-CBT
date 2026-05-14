@@ -3,6 +3,7 @@ import './QuestionBank.css'
 import { useFormik } from 'formik'
 import * as yup from "yup"
 import axios from 'axios'
+import { showSuccess, showError, showInfo } from '../../utils/toastUtils'
 
 const QuestionBank = () => {
   const [draftQuestions, setDraftQuestions] = useState([])
@@ -180,11 +181,11 @@ const QuestionBank = () => {
           upsertDraft(draftPayload)
           setEditingDraftId(null)
           resetForm()
-          alert("Details successfully submitted")
+          showSuccess("Question submitted successfully!")
         })
         .catch((error) => {
           console.error(error)
-          alert("Failed to save question")
+          showError("Failed to save question. Please try again.")
         })
     },
     validationSchema: yup.object({
@@ -219,7 +220,7 @@ const QuestionBank = () => {
     const { questionText, optionA, optionB, optionC, optionD } = formik.values
 
     if (!questionText.trim() || !optionA.trim() || !optionB.trim() || !optionC.trim() || !optionD.trim()) {
-      alert("Add question text and all options before saving draft")
+      showError("Please add question text and all options before saving draft")
       return
     }
 
@@ -228,11 +229,11 @@ const QuestionBank = () => {
 
     if (editingDraftId) {
       setEditingDraftId(null)
-      alert("Draft updated successfully")
+      showSuccess("Draft updated successfully!")
       return
     }
 
-    alert("Successfully saved as draft")
+    showSuccess("Question saved as draft!")
   }
 
   return (

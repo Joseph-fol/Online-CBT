@@ -5,6 +5,7 @@ import AOS from 'aos'
 import 'aos/dist/aos.css'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { showSuccess, showError } from '../utils/toastUtils'
 
 const AdminSignin = () => {
     const [show, setShow] = useState(false)
@@ -33,7 +34,7 @@ const AdminSignin = () => {
             setLoading(true)
             setError("")
 
-            axios.post("http://localhost:2114/user/admin/signin", {
+            axios.post("https://online-cbt.onrender.com/user/admin/signin", {
                 email: values.email,
                 password: values.password
             })
@@ -50,8 +51,8 @@ const AdminSignin = () => {
 
                         setLoading(false)
                         resetForm()
-                        alert(`Welcome back, ${data.admin.fullName}!`)
-                        navigate("/admin")
+                        showSuccess(`Welcome back, ${data.admin.fullName}!`)
+                        setTimeout(() => navigate("/admin"), 1500)
                     } else {
                         setError("You do not have admin privileges")
                         setLoading(false)

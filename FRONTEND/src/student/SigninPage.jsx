@@ -6,6 +6,7 @@ import 'aos/dist/aos.css'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { setToken } from '../utils/auth'
+import { showSuccess, showError } from '../utils/toastUtils'
 
 const SigninPage = () => {
     const [show, setShow] = useState(false)
@@ -38,14 +39,14 @@ const SigninPage = () => {
                 if (response.data.token) {
                     setToken(response.data.token)
                 }
-                alert("Signin Successful!")
+                showSuccess("Signin Successful!")
                 resetForm()
                 navigate("/student/dashboard")
             })
             .catch((err)=>{
                 setLoading(false)
                 console.error("Error", err);
-                alert("Login fail, please check your email and password" )
+                showError("Login failed. Please check your email and password")
             })
 
         },

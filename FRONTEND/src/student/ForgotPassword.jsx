@@ -4,6 +4,7 @@ import * as yup from "yup"
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import { Link } from 'react-router-dom'
+import { showSuccess } from '../utils/toastUtils'
 
 const ForgotPassword = () => {
     const [show, setShow] = useState(false)
@@ -26,7 +27,7 @@ const ForgotPassword = () => {
 
         onSubmit: (values, { resetForm }) => {
             console.log(values);
-            alert("Recovery Link sent")
+            showSuccess("Recovery link sent to your email!")
             resetForm()
         },
 

@@ -3,6 +3,7 @@ import React from 'react'
 import { useEffect } from 'react'
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import { showError, showConfirm } from '../utils/toastUtils'
 
 const ExactQuestion = () => {
     const [questionDetail, setQuestionDetail] = useState([])
@@ -12,19 +13,12 @@ const ExactQuestion = () => {
     const { id } = useParams()
 
     const confirmTest = () => {
-        const confirmed = window.confirm("Are you sure you want to start your exam/test")
-        if (confirmed) {
-            // Log the details being passed
-            // console.log("Starting Quiz - Subject Details:", {
-            //     subject: question?.subject,
-            //     description: question?.description,
-            //     duration: question?.duration,
-            //     totalQuestions: question?.totalQuestion,
-            //     marks: question?.marks,
-            //     questionId: id
-            // });
-            navigate(`/student/ActiveQuizView/${question?.subject}`)
-        }
+        showConfirm("Start Exam?", "Are you sure you want to start this exam? Once started, you cannot change your answers after submission.", "Start", "Cancel")
+            .then((result) => {
+                if (result.isConfirmed) {
+                    navigate(`/student/ActiveQuizView/${question?.subject}`)
+                }
+            })
     }
 
     useEffect(() => {
@@ -39,7 +33,7 @@ const ExactQuestion = () => {
             .catch((error) => {
                 setLoading(false)
                 console.error("Error fetching details", error);
-                alert("Error fetching details");
+                showError("Error fetching exam details. Please try again.");
             })
     }, [id])
 

@@ -2,6 +2,7 @@ import axios from 'axios'
 import React, { useState } from 'react'
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { showInfo } from '../utils/toastUtils'
 
 const ActiveQuizView = () => {
     const [selectedOption, setSelectedOption] = useState("")
@@ -48,7 +49,7 @@ const ActiveQuizView = () => {
                 return;
             } else {
                 // Time expired
-                alert("Time's up! Your exam has been submitted.");
+                showInfo("Time's up! Your exam has been submitted.");
                 localStorage.removeItem('examStartTime');
                 localStorage.removeItem('totalExamDuration');
                 setLoading(false);
@@ -97,7 +98,7 @@ const ActiveQuizView = () => {
                 if (remaining <= 0) {
                     setTimeLeft(0);
                     setTimerActive(false);
-                    alert("Time's up! Your exam has been submitted.");
+                    showInfo("Time's up! Your exam has been submitted.");
                     handleSubmitExam();
                     return;
                 }

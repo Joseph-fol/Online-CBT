@@ -6,6 +6,7 @@ import 'aos/dist/aos.css'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from "axios"
 import { setToken } from '../utils/auth'
+import { showSuccess, showError } from '../utils/toastUtils'
 
 const SignupPage = () => {
     const [show, setShow] = useState(false)
@@ -41,7 +42,7 @@ const SignupPage = () => {
                 if (response.data.token) {
                     setToken(response.data.token)
                 }
-                alert("Form Successfully Submitted")
+                showSuccess("Account created successfully! Redirecting to sign in...")
                 resetForm()
                 navigate("/studentSignin")
             })
@@ -65,9 +66,9 @@ const SignupPage = () => {
                 
                 if(isDuplicateEmail) {
                     setEmailError("This email already exists. Please use a different email.")
-                    alert("This email already exists. Please use a different email.")
+                    showError("This email already exists. Please use a different email.")
                 } else {
-                    alert("Signup failed, please try again")
+                    showError("Signup failed. Please try again.")
                 }
             })
         },

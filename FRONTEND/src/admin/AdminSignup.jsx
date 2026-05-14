@@ -5,6 +5,7 @@ import AOS from 'aos'
 import 'aos/dist/aos.css'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import axios from "axios"
+import { showSuccess, showError, showErrorModal } from '../utils/toastUtils'
 
 const AdminSignup = () => {
     const [show, setShow] = useState(false)
@@ -26,18 +27,18 @@ const AdminSignup = () => {
 
         // Validate invitation token if provided
         if (invitationToken) {
-            axios.get(`http://localhost:2114/admin/validate-invitation?token=${invitationToken}`)
+            axios.get(`https://online-cbt.onrender.com/user/admin/validate-invitation?token=${invitationToken}`)
                 .then((response) => {
                     console.log("Invitation valid:", response.data)
                 })
                 .catch((err) => {
                     console.error("Invalid invitation:", err.response?.data?.message)
-                    alert("Invalid or expired invitation link. Please get a new invitation from an admin.")
-                    navigate("/")
+                    showErrorModal("Invalid Invitation", "This invitation link is invalid or has expired. Please get a new invitation from an admin.")
+                    setTimeout(() => navigate("/"), 2000)
                 })
         } else {
-            alert("Please use an invitation link to sign up as admin.")
-            navigate("/")
+            showErrorModal("No Invitation", "Please use an invitation link to sign up as admin.")
+            setTimeout(() => navigate("/"), 2000)
         }
     }, [invitationToken, navigate])
 
@@ -51,13 +52,13 @@ const AdminSignup = () => {
 
         onSubmit: (values, { resetForm }) => {
             if (!invitationToken) {
-                alert("Invalid invitation. Please use the invitation link.")
+                showError("Invalid invitation. Please use the invitation link.")
                 return
             }
 
             setLoading(true)
             setEmailError("")
-            axios.post("http://localhost:2114/user/admin/signUp", {
+            axios.post("https://online-cbt.onrender.com/user/admin/signUp", {
                 fullName: values.fullName,
                 email: values.email,
                 password: values.password,
@@ -68,9 +69,9 @@ const AdminSignup = () => {
                 if (response.data.admin) {
                     localStorage.setItem("adminData", JSON.stringify(response.data.admin))
                 }
-                alert("Admin Account Successfully Created! Please sign in.")
+                showSuccess("Admin account created successfully! Redirecting to sign in...")
                 resetForm()
-                navigate("/admin/signin")
+                setTimeout(() => navigate("/admin/signin"), 2000)
             })
             .catch((err) =>{
                 setLoading(false)
@@ -96,12 +97,12 @@ const AdminSignup = () => {
                     (errorData?.errors && errorData.errors.email)
                 
                 if(isInvalidInvitation) {
-                    alert("Invalid or expired invitation. Please get a new invitation link from an admin.")
+                    showError("Invalid or expired invitation. Please get a new invitation link from an admin.")
                 } else if(isDuplicateEmail) {
                     setEmailError("This email already exists. Please use a different email.")
-                    alert("This email already exists. Please use a different email.")
+                    showError("This email already exists. Please use a different email.")
                 } else {
-                    alert("Signup failed, please try again")
+                    showError("Signup failed. Please try again.")
                 }
             })
         },

@@ -1,5 +1,7 @@
 import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import LandingPage from './component/LandingPage'
 import AdminSignin from './admin/AdminSignin'
 import AdminSignup from './admin/AdminSignup'
@@ -54,7 +56,18 @@ const App = () => {
           <Route path="settings" element={<Settings />} />
           <Route path="support" element={<Support />} />
         </Route>
-      </Routes>  
+      </Routes>
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </>
   )
 }

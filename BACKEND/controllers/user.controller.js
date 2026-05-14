@@ -3,7 +3,7 @@ const Question = require('../models/questions.model')
 const Invitation = require("../models/invitation.model")
 const bcrypt = require("bcrypt")
 const jsonwebtoken = require("jsonwebtoken")
-const { sendWelcomeEmail } = require("../utils/emailService")
+const { sendWelcomeEmail, sendAdminInvitationEmail } = require("../utils/emailService")
 
 const getStudentSignUp = (req, res) => {
     res.render("studentSignup")
@@ -422,13 +422,40 @@ const createAdminInvitation = (req, res) => {
 
             return newInvitation.save()
                 .then((invitation) => {
+                    const invitationLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/admin/signup?token=${invitation.token}`
                     console.log("Invitation created:", invitation.token);
-                    res.status(201).json({
+                    
+                    let response = {
                         message: "Invitation created successfully",
                         invitationToken: invitation.token,
-                        invitationLink: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/admin/signup?token=${invitation.token}`,
+                        invitationLink: invitationLink,
                         expiresIn: "7 days"
-                    })
+                    }
+
+                    // Send email if invitedEmail is provided
+                    if (invitedEmail) {
+                        sendAdminInvitationEmail(invitedEmail, invitationLink, admin.fullName || adminEmail)
+                            .then((emailResult) => {
+                                if (emailResult.success) {
+                                    response.emailSent = true
+                                    response.emailMessage = "Invitation sent to the email address"
+                                    console.log("Email sent successfully to:", invitedEmail)
+                                } else {
+                                    response.emailSent = false
+                                    response.emailMessage = "Invitation created but email failed to send. Share the link manually."
+                                    console.error("Email failed:", emailResult.error)
+                                }
+                                res.status(201).json(response)
+                            })
+                            .catch((emailErr) => {
+                                response.emailSent = false
+                                response.emailMessage = "Invitation created but email failed to send. Share the link manually."
+                                console.error("Email error:", emailErr)
+                                res.status(201).json(response)
+                            })
+                    } else {
+                        res.status(201).json(response)
+                    }
                 })
                 .catch((err) => {
                     console.error("Error creating invitation:", err);

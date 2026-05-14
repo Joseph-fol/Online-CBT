@@ -1,21 +1,31 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import './Settings.css'
+import { showSuccess, showError, showConfirm } from '../../utils/toastUtils'
 
 const Settings = () => {
   const [invitations, setInvitations] = useState([])
   const [loading, setLoading] = useState(false)
   const [copying, setCopying] = useState(null)
   const [revoking, setRevoking] = useState(null)
+  const [invitedEmail, setInvitedEmail] = useState('')
   const adminEmail = localStorage.getItem("adminData") ? JSON.parse(localStorage.getItem("adminData")).email : null
 
   useEffect(() => {
-    fetchPendingInvitations()
-  }, [])
+    if (adminEmail) {
+      fetchPendingInvitations()
+    }
+  }, [adminEmail])
 
   const fetchPendingInvitations = () => {
+    if (!adminEmail) {
+      console.error("Admin email not found")
+      showError("Error: Admin email not found. Please log in again.")
+      return
+    }
+
     setLoading(true)
-    axios.get('http://localhost:2114/admin/pending-invitations', {
+    axios.get('https://online-cbt.onrender.com/user/admin/pending-invitations', {
       headers: { 'x-admin-email': adminEmail }
     })
       .then((response) => {
@@ -24,30 +34,41 @@ const Settings = () => {
       })
       .catch((error) => {
         console.error("Error fetching invitations:", error)
-        alert("Failed to load invitations")
+        showError("Failed to load invitations: " + (error.response?.data?.message || error.message))
         setLoading(false)
       })
   }
 
   const createNewInvitation = () => {
+    // Validate email if provided
+    if (invitedEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(invitedEmail)) {
+      showError("Please enter a valid email address")
+      return
+    }
+
     setLoading(true)
-    axios.post('http://localhost:2114/admin/create-invitation', 
-      { adminEmail },
+    axios.post('https://online-cbt.onrender.com/user/admin/create-invitation', 
+      { invitedEmail },
       { headers: { 'x-admin-email': adminEmail } }
     )
       .then((response) => {
-        alert(`Invitation created! Link copied to clipboard.\n\n${response.data.invitationLink}`)
+        if (response.data.emailSent) {
+          showSuccess(`Invitation sent to ${invitedEmail}!`)
+        } else if (invitedEmail) {
+          showSuccess("Invitation created! Email failed - share the link manually.")
+          navigator.clipboard.writeText(response.data.invitationLink)
+        } else {
+          showSuccess("Invitation created! Link copied to clipboard.")
+          navigator.clipboard.writeText(response.data.invitationLink)
+        }
         
-        // Copy to clipboard
-        navigator.clipboard.writeText(response.data.invitationLink)
-        
-        // Refresh invitations list
+        setInvitedEmail('')
         fetchPendingInvitations()
         setLoading(false)
       })
       .catch((error) => {
         console.error("Error creating invitation:", error)
-        alert("Failed to create invitation: " + (error.response?.data?.message || error.message))
+        showError("Failed to create invitation: " + (error.response?.data?.message || error.message))
         setLoading(false)
       })
   }
@@ -57,34 +78,35 @@ const Settings = () => {
     const link = `${window.location.origin}/admin/signup?token=${invitationToken}`
     navigator.clipboard.writeText(link)
       .then(() => {
-        alert("Invitation link copied to clipboard!")
+        showSuccess("Invitation link copied to clipboard!")
         setCopying(null)
       })
       .catch((error) => {
-        alert("Failed to copy to clipboard")
+        showError("Failed to copy to clipboard")
         setCopying(null)
       })
   }
 
   const revokeInvitation = (token) => {
-    if (!window.confirm("Are you sure you want to revoke this invitation?")) {
-      return
-    }
-
-    setRevoking(token)
-    axios.post('http://localhost:2114/admin/revoke-invitation', 
-      { token, adminEmail },
-      { headers: { 'x-admin-email': adminEmail } }
-    )
-      .then((response) => {
-        alert("Invitation revoked successfully")
-        fetchPendingInvitations()
-        setRevoking(null)
-      })
-      .catch((error) => {
-        console.error("Error revoking invitation:", error)
-        alert("Failed to revoke invitation: " + (error.response?.data?.message || error.message))
-        setRevoking(null)
+    showConfirm("Revoke Invitation?", "Are you sure you want to revoke this invitation? This action cannot be undone.", "Revoke", "Cancel")
+      .then((result) => {
+        if (result.isConfirmed) {
+          setRevoking(token)
+          axios.post('https://online-cbt.onrender.com/user/admin/revoke-invitation', 
+            { token, adminEmail },
+            { headers: { 'x-admin-email': adminEmail } }
+          )
+            .then((response) => {
+              showSuccess("Invitation revoked successfully")
+              fetchPendingInvitations()
+              setRevoking(null)
+            })
+            .catch((error) => {
+              console.error("Error revoking invitation:", error)
+              showError("Failed to revoke invitation: " + (error.response?.data?.message || error.message))
+              setRevoking(null)
+            })
+        }
       })
   }
 
@@ -101,13 +123,34 @@ const Settings = () => {
         <h4 className='fw-bold mb-4'>Admin Invitations</h4>
         <p className='text-muted'>Invite new administrators to the platform. Invitations expire after 7 days.</p>
 
-        <button 
-          className='btn btn-primary mb-4' 
-          onClick={createNewInvitation}
-          disabled={loading}
-        >
-          {loading ? 'Creating...' : '+ Create New Invitation'}
-        </button>
+        <div className='invitation-form mb-4'>
+          <div className='row align-items-end'>
+            <div className='col-md-8'>
+              <label htmlFor='invitedEmail' className='form-label fw-500'>
+                Email Address (Optional)
+              </label>
+              <input
+                type='email'
+                id='invitedEmail'
+                className='form-control'
+                placeholder='Enter the email of the person to invite'
+                value={invitedEmail}
+                onChange={(e) => setInvitedEmail(e.target.value)}
+                disabled={loading}
+              />
+              <small className='text-muted'>If you provide an email, the invitation link will be sent automatically. Leave empty to create a general invitation link.</small>
+            </div>
+            <div className='col-md-4'>
+              <button 
+                className='btn btn-primary w-100' 
+                onClick={createNewInvitation}
+                disabled={loading}
+              >
+                {loading ? 'Creating...' : '+ Create Invitation'}
+              </button>
+            </div>
+          </div>
+        </div>
 
         {invitations.length === 0 ? (
           <div className='alert alert-info'>
@@ -164,10 +207,10 @@ const Settings = () => {
         <div className='alert alert-warning mt-4'>
           <strong>How to use:</strong>
           <ol className='mb-0 mt-2'>
-            <li>Click "Create New Invitation" to generate a unique link</li>
-            <li>Share the link with the person you want to invite as admin</li>
-            <li>They click the link and sign up with their details</li>
-            <li>The invitation is automatically marked as accepted</li>
+            <li><strong>Option 1 - Send via Email (Recommended):</strong> Enter the email address of the person you want to invite and click "Create Invitation". The invitation link will be automatically sent to their email.</li>
+            <li><strong>Option 2 - Share Manually:</strong> Leave the email field empty and the invitation link will be copied to your clipboard. Share it however you prefer.</li>
+            <li>The invited person receives the link and clicks it to sign up as admin</li>
+            <li>The invitation is automatically marked as accepted when they sign up</li>
             <li>You can revoke unused invitations anytime</li>
           </ol>
         </div>
