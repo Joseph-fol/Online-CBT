@@ -155,7 +155,7 @@ const SignupPage = () => {
                                     <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ background: "#ab3500" }}>{loading ? "Signing up...." : "Signup"}</button>
                                 </div>
 
-                                <a href="" className='text-decoration-none text-center text-black fw-medium'><p>Already have an account ? </p></a>
+                                <span className='text-decoration-none text-center text-black fw-medium d-block'><p>Already have an account ? </p></span>
                             </form>
                             <div class="col-12">
                                 <Link to="/studentSignin">
