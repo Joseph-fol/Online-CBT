@@ -1,6 +1,7 @@
 const student = require("../models/user.model")
 const Question = require('../models/questions.model')
 const Invitation = require("../models/invitation.model")
+const ExamResult = require("../models/examResult.model")
 const bcrypt = require("bcrypt")
 const jsonwebtoken = require("jsonwebtoken")
 const { sendWelcomeEmail, sendAdminInvitationEmail, sendInvitationRevokedEmail } = require("../utils/emailService")
@@ -636,5 +637,59 @@ const revokeInvitation = (req, res) => {
         })
 }
 
+// Save exam result/score
+const saveExamResult = (req, res) => {
+    const { studentEmail, subject, totalQuestions, correctAnswers, answers, timeSpent } = req.body
 
-module.exports = { getStudentSignUp, postStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation }
+    console.log("Saving exam result for:", studentEmail, "Subject:", subject)
+
+    // Validate required fields
+    if (!studentEmail || !subject || totalQuestions === undefined || correctAnswers === undefined) {
+        return res.status(400).json({
+            message: "Missing required fields: studentEmail, subject, totalQuestions, correctAnswers"
+        })
+    }
+
+    // Calculate score
+    const score = (correctAnswers / totalQuestions) * 100
+
+    // Create new exam result
+    const examResultData = {
+        studentEmail,
+        subject,
+        totalQuestions,
+        correctAnswers,
+        score,
+        answers: answers || {},
+        timeSpent: timeSpent || null,
+        submittedAt: new Date()
+    }
+
+    const newExamResult = new ExamResult(examResultData)
+
+    return newExamResult.save()
+        .then((result) => {
+            console.log("✅ Exam result saved:", result._id)
+            return res.status(201).json({
+                message: "Exam result saved successfully",
+                result: {
+                    id: result._id,
+                    studentEmail: result.studentEmail,
+                    subject: result.subject,
+                    totalQuestions: result.totalQuestions,
+                    correctAnswers: result.correctAnswers,
+                    score: result.score.toFixed(2),
+                    submittedAt: result.submittedAt
+                }
+            })
+        })
+        .catch((err) => {
+            console.error("Error saving exam result:", err)
+            return res.status(500).json({
+                message: "Failed to save exam result",
+                error: err.message
+            })
+        })
+}
+
+module.exports = { getStudentSignUp, postStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation, saveExamResult }
