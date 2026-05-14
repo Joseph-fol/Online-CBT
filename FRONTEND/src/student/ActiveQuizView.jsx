@@ -145,9 +145,9 @@ const ActiveQuizView = () => {
                         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                     }).join(''));
                     studentEmail = JSON.parse(jsonPayload).email;
-                    console.log("✅ Student email extracted:", studentEmail);
+                    console.log("Student email extracted:", studentEmail);
                 } catch (error) {
-                    console.error("❌ Error decoding JWT:", error);
+                    console.error("Error decoding JWT:", error);
                 }
             }
 
@@ -183,7 +183,7 @@ const ActiveQuizView = () => {
                     localStorage.removeItem('totalExamDuration');
 
                     // Log submission details
-                    console.log("📊 Exam Submitted", {
+                    console.log("Exam Submitted", {
                         subject: subject,
                         totalQuestions: questions.length,
                         correctAnswers: correct,

@@ -25,12 +25,17 @@ const adminSignin = (req, res) => {
 const postStudentSignUp = (req, res) => {
     const { fullName, email, password } = req.body
 
-    console.log("Student signup attempt for:", email);
+    console.log("\n📝 STUDENT SIGNUP ATTEMPT");
+    console.log("=============================");
+    console.log("Email:", email);
+    console.log("Full Name:", fullName);
+    console.log("Resend API Key available:", !!process.env.RESEND_API_KEY);
 
     // Check if user already exists
     student.findOne({ email: req.body.email })
         .then((userExists) => {
             if (userExists) {
+                console.warn("⚠️ User already exists:", email);
                 return res.status(409).json({
                     message: "User already exists",
                     email: userExists.email
@@ -48,19 +53,24 @@ const postStudentSignUp = (req, res) => {
             
             return newStudentDetails.save()
                 .then((studentData) => {
-                    console.log("Student Saved:", studentData.email)
+                    console.log("✅ Student Saved:", studentData.email)
 
                     // Send welcome email (non-blocking)
+                    console.log("📧 Attempting to send welcome email to:", studentData.email);
                     sendWelcomeEmail(studentData.email, studentData.fullName)
                         .then((emailResult) => {
                             if (emailResult.success) {
-                                console.log("Welcome email sent to:", studentData.email)
+                                console.log("✅ Welcome email sent successfully to:", studentData.email);
+                                console.log("Email ID:", emailResult.emailId);
                             } else {
-                                console.warn("Welcome email failed to send:", emailResult.error)
+                                console.error("❌ Welcome email failed to send to:", studentData.email);
+                                console.error("Error:", emailResult.error);
                             }
                         })
                         .catch((emailError) => {
-                            console.error("Welcome email error:", emailError.message)
+                            console.error("❌ Welcome email catch error for:", studentData.email);
+                            console.error("Error message:", emailError.message);
+                            console.error("Full error:", emailError);
                         });
 
                     // Generate JWT token
@@ -69,7 +79,7 @@ const postStudentSignUp = (req, res) => {
                         process.env.jwtSecretKey, 
                         { expiresIn: "1h" }
                     )
-                    console.log("Generated token for:", studentData.email)
+                    console.log("🔑 Generated token for:", studentData.email)
 
                     return res.status(201).json({
                         message: "Signup Successful",
@@ -601,13 +611,13 @@ const revokeInvitation = (req, res) => {
                                 )
                                     .then((emailResult) => {
                                         if (emailResult.success) {
-                                            console.log("✅ Revocation email sent to:", revokedInvitation.invitedEmail)
+                                            console.log("Revocation email sent to:", revokedInvitation.invitedEmail)
                                         } else {
-                                            console.error("❌ Failed to send revocation email:", emailResult.error)
+                                            console.error("Failed to send revocation email:", emailResult.error)
                                         }
                                     })
                                     .catch((emailError) => {
-                                        console.error("❌ Revocation email error:", emailError.message)
+                                        console.error("Revocation email error:", emailError.message)
                                     })
                             })
                             .catch((err) => {
@@ -679,7 +689,7 @@ const saveExamResult = (req, res) => {
 
     return newExamResult.save()
         .then((result) => {
-            console.log("✅ EXAM RESULT SAVED SUCCESSFULLY");
+            console.log("EXAM RESULT SAVED SUCCESSFULLY");
             console.log("Result ID:", result._id);
             console.log("Score saved:", result.score);
             console.log("Full result:", JSON.stringify(result, null, 2));
@@ -698,7 +708,7 @@ const saveExamResult = (req, res) => {
             })
         })
         .catch((err) => {
-            console.error("❌ ERROR SAVING EXAM RESULT");
+            console.error("ERROR SAVING EXAM RESULT");
             console.error("Error message:", err.message);
             console.error("Error details:", JSON.stringify(err, null, 2));
             console.error("Stack trace:", err.stack);
