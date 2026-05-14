@@ -34,9 +34,9 @@ const sendWelcomeEmail = (userEmail, userName) => {
                 <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
                     
                     <!-- Header -->
-                    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 20px 30px; text-align: center; border-bottom: 4px solid #ab3500;">
+                    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 40px 30px; text-align: center; border-bottom: 4px solid #ab3500;">
                         <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 0.5px;">Online CBT</h1>
-                        <p style="color: #cbd5e1; margin: 5px 0 0 0; font-size: 14px;">Secure, Seamless, and Smart Online CBT Platform</p>
+                        <p style="color: #cbd5e1; margin: 5px 0 0 0; font-size: 14px;">A Secure, Seamless, and Smart Online CBT Platform</p>
                     </div>
 
                     <!-- Greeting Section -->
@@ -69,7 +69,7 @@ const sendWelcomeEmail = (userEmail, userName) => {
 
                         <!-- CTA Button -->
                         <div style="text-align: center; margin-bottom: 30px;">
-                            <a href="https://cbt-exam.vercel.app/studentSignin" style="display: inline-block; background: linear-gradient(135deg, #ab3500 0%, #8a2a00 100%); color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 6px; font-weight: 600; font-size: 16px; transition: all 0.3s ease; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(171, 53, 0, 0.3);">
+                            <a href="https://onlinecbt.vercel.app/studentSignin" style="display: inline-block; background: linear-gradient(135deg, #ab3500 0%, #8a2a00 100%); color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 6px; font-weight: 600; font-size: 16px; transition: all 0.3s ease; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(171, 53, 0, 0.3);">
                                 Go to Dashboard
                             </a>
                         </div>
@@ -120,13 +120,15 @@ const sendWelcomeEmail = (userEmail, userName) => {
         .then((response) => {
             console.log("Welcome email sent successfully to:", userEmail);
             console.log("Email ID:", response.id);
+            console.log("Full Resend response:", JSON.stringify(response));
             return { success: true, message: "Email sent successfully", emailId: response.id };
         })
         .catch((error) => {
-            console.error("Failed to send welcome email to:", userEmail);
-            console.error("Resend error details:", error);
+            console.error("❌ Failed to send welcome email to:", userEmail);
+            console.error("Resend error details:", JSON.stringify(error, null, 2));
             console.error("Error message:", error.message);
-            return { success: false, error: error.message };
+            console.error("Error code:", error.code);
+            return { success: false, error: error.message || "Failed to send email" };
         });
 };
 
@@ -162,14 +164,14 @@ const sendAdminInvitationEmail = (invitedEmail, invitationLink, invitedByName) =
                     
                     <!-- Header -->
                     <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 40px 30px; text-align: center; border-bottom: 4px solid #ab3500;">
-                        <div style="font-size: 40px; margin-bottom: 15px;">👨‍💼</div>
+                        <div style="font-size: 40px; margin-bottom: 15px;"></div>
                         <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 0.5px;">Online CBT</h1>
                         <p style="color: #cbd5e1; margin: 5px 0 0 0; font-size: 14px;">Admin Invitation</p>
                     </div>
 
                     <!-- Invitation Banner -->
                     <div style="background: linear-gradient(135deg, #ab3500 0%, #8a2a00 100%); padding: 30px; text-align: center; color: #ffffff;">
-                        <h2 style="margin: 0; font-size: 24px; font-weight: 700;">You've Been Selected! 🎖️</h2>
+                        <h2 style="margin: 0; font-size: 24px; font-weight: 700;">You've Been Selected! by ${invitedEmail} </h2>
                         <p style="margin: 8px 0 0 0; font-size: 16px; opacity: 0.95;">Become an Administrator on Online CBT</p>
                     </div>
 
@@ -211,7 +213,7 @@ const sendAdminInvitationEmail = (invitedEmail, invitationLink, invitedByName) =
                         <!-- Time Sensitive Warning -->
                         <div style="background-color: #fef3c7; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
                             <p style="color: #92400e; margin: 0; font-size: 14px; line-height: 1.6;">
-                                <strong>⏰ Important:</strong> This invitation expires in <strong>7 days</strong>. Please accept it before it expires.
+                                <strong>Important:</strong> This invitation expires in <strong>7 days</strong>. Please accept it before it expires.
                             </p>
                         </div>
 
@@ -273,15 +275,17 @@ const sendAdminInvitationEmail = (invitedEmail, invitationLink, invitedByName) =
 
     return resend.emails.send(mailOptions)
         .then((response) => {
-            console.log("Admin invitation email sent successfully to:", invitedEmail);
+            console.log("✅ Admin invitation email sent successfully to:", invitedEmail);
             console.log("Email ID:", response.id);
+            console.log("Full Resend response:", JSON.stringify(response));
             return { success: true, message: "Invitation email sent successfully", emailId: response.id };
         })
         .catch((error) => {
-            console.error("Failed to send admin invitation to:", invitedEmail);
-            console.error("Resend error details:", error);
+            console.error("❌ Failed to send admin invitation to:", invitedEmail);
+            console.error("Resend error details:", JSON.stringify(error, null, 2));
             console.error("Error message:", error.message);
-            return { success: false, error: error.message };
+            console.error("Error code:", error.code);
+            return { success: false, error: error.message || "Failed to send invitation email" };
         });
 };
 

@@ -454,7 +454,7 @@ const createAdminInvitation = (req, res) => {
 
             return newInvitation.save()
                 .then((savedInvitation) => {
-                    const invitationLink = `${process.env.FRONTEND_URL || 'https://online-cbt.onrender.com'}/admin/signup?token=${savedInvitation.token}`
+                    const invitationLink = `${process.env.FRONTEND_URL || 'https://onlinecbt.vercel.app'}/admin/signup?token=${savedInvitation.token}`
                     
                     console.log("Invitation created:", savedInvitation.token)
 
@@ -552,7 +552,6 @@ const validateInvitation = (req, res) => {
 // Get all pending invitations (for admin dashboard)
 const getPendingInvitations = (req, res) => {
     const adminEmail = req.headers['x-admin-email'] || req.body.adminEmail
-
     Invitation.find({ invitedBy: adminEmail, status: "pending" })
         .select('token invitedEmail createdAt')
         .then((invitations) => {
