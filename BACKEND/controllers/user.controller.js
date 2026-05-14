@@ -402,75 +402,71 @@ const getDashboardStats = (req, res) => {
 }
 
 // Create invitation link (only admins can create)
-const createAdminInvitation = (req, res) => {
-    const { invitedEmail } = req.body
-    const adminEmail = req.headers['x-admin-email'] || req.body.adminEmail  // Email of the admin creating invitation
+const createAdminInvitation = async (req, res) => {
+    try {
+        const { invitedEmail } = req.body
+        const adminEmail = req.headers['x-admin-email'] || req.body.adminEmail
 
-    // Verify that the requester is an admin
-    student.findOne({ email: adminEmail, role: "admin" })
-        .then((admin) => {
-            if (!admin) {
-                return res.status(403).json({
-                    message: "Only admins can create invitations"
-                })
+        console.log("Creating invitation for:", invitedEmail, "by:", adminEmail)
+
+        // Verify that the requester is an admin
+        const admin = await student.findOne({ email: adminEmail, role: "admin" })
+        if (!admin) {
+            return res.status(403).json({
+                message: "Only admins can create invitations"
+            })
+        }
+
+        // Create new invitation
+        const newInvitation = new Invitation({
+            invitedBy: adminEmail,
+            invitedEmail: invitedEmail || null
+        })
+
+        const savedInvitation = await newInvitation.save()
+        const invitationLink = `${process.env.FRONTEND_URL || 'https://online-cbt.onrender.com'}/admin/signup?token=${savedInvitation.token}`
+        
+        console.log("Invitation created:", savedInvitation.token)
+
+        let response = {
+            message: "Invitation created successfully",
+            invitationToken: savedInvitation.token,
+            invitationLink: invitationLink,
+            expiresIn: "7 days"
+        }
+
+        // Send email if invitedEmail is provided
+        if (invitedEmail) {
+            console.log("Sending email to:", invitedEmail)
+            const emailResult = await sendAdminInvitationEmail(
+                invitedEmail, 
+                invitationLink, 
+                admin.fullName || adminEmail
+            )
+            
+            if (emailResult.success) {
+                response.emailSent = true
+                response.emailMessage = "Invitation sent to the email address"
+                console.log("✅ Email sent successfully to:", invitedEmail)
+            } else {
+                response.emailSent = false
+                response.emailMessage = "Invitation created but email failed to send. Share the link manually."
+                console.error("❌ Email failed:", emailResult.error)
             }
-            const newInvitation = new Invitation({
-                invitedBy: adminEmail,
-                invitedEmail: invitedEmail || null  // Optional - can be general or specific
-            })
+        } else {
+            response.emailSent = false
+            response.emailMessage = "No email provided - copy link manually"
+        }
 
-            return newInvitation.save()
-                .then((invitation) => {
-                    const invitationLink = `${process.env.FRONTEND_URL || 'https://online-cbt.onrender.com'}/admin/signup?token=${invitation.token}`
-                    console.log("Invitation created:", invitation.token);
-                    
-                    let response = {
-                        message: "Invitation created successfully",
-                        invitationToken: invitation.token,
-                        invitationLink: invitationLink,
-                        expiresIn: "7 days"
-                    }
+        return res.status(201).json(response)
 
-                    // Send email if invitedEmail is provided
-                    if (invitedEmail) {
-                        sendAdminInvitationEmail(invitedEmail, invitationLink, admin.fullName || adminEmail)
-                            .then((emailResult) => {
-                                if (emailResult.success) {
-                                    response.emailSent = true
-                                    response.emailMessage = "Invitation sent to the email address"
-                                    console.log("Email sent successfully to:", invitedEmail)
-                                } else {
-                                    response.emailSent = false
-                                    response.emailMessage = "Invitation created but email failed to send. Share the link manually."
-                                    console.error("Email failed:", emailResult.error)
-                                }
-                                res.status(201).json(response)
-                            })
-                            .catch((emailErr) => {
-                                response.emailSent = false
-                                response.emailMessage = "Invitation created but email failed to send. Share the link manually."
-                                console.error("Email error:", emailErr)
-                                res.status(201).json(response)
-                            })
-                    } else {
-                        res.status(201).json(response)
-                    }
-                })
-                .catch((err) => {
-                    console.error("Error creating invitation:", err);
-                    res.status(500).json({
-                        message: "Failed to create invitation",
-                        error: err.message
-                    })
-                })
+    } catch (error) {
+        console.error("Error creating invitation:", error)
+        return res.status(500).json({
+            message: "Failed to create invitation",
+            error: error.message
         })
-        .catch((err) => {
-            console.error("Error verifying admin:", err);
-            res.status(500).json({
-                message: "Failed to create invitation",
-                error: err.message
-            })
-        })
+    }
 }
 
 // Validate invitation token
