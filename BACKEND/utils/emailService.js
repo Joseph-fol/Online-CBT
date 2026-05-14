@@ -124,7 +124,7 @@ const sendWelcomeEmail = (userEmail, userName) => {
             return { success: true, message: "Email sent successfully", emailId: response.id };
         })
         .catch((error) => {
-            console.error("❌ Failed to send welcome email to:", userEmail);
+            console.error("Failed to send welcome email to:", userEmail);
             console.error("Resend error details:", JSON.stringify(error, null, 2));
             console.error("Error message:", error.message);
             console.error("Error code:", error.code);
@@ -171,13 +171,12 @@ const sendAdminInvitationEmail = (invitedEmail, invitationLink, invitedByName) =
 
                     <!-- Invitation Banner -->
                     <div style="background: linear-gradient(135deg, #ab3500 0%, #8a2a00 100%); padding: 30px; text-align: center; color: #ffffff;">
-                        <h2 style="margin: 0; font-size: 24px; font-weight: 700;">You've Been Selected! by ${invitedEmail} </h2>
+                        <h2 style="margin: 0; font-size: 24px; font-weight: 700;">You've Been Selected! </h2>
                         <p style="margin: 8px 0 0 0; font-size: 16px; opacity: 0.95;">Become an Administrator on Online CBT</p>
                     </div>
 
                     <!-- Main Content -->
                     <div style="padding: 40px 30px; background-color: #f8fafc;">
-                        
                         <!-- Welcome Message -->
                         <div style="background-color: #ffffff; padding: 25px; border-radius: 8px; margin-bottom: 30px;>
                             <p style="color: #0f172a; margin: 0 0 15px 0; font-size: 16px; line-height: 1.8;">
