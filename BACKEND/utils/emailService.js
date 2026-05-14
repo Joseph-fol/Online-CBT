@@ -34,12 +34,12 @@ const sendWelcomeEmail = (userEmail, userName) => {
                 <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
                     
                     <!-- Header with Logo -->
-                    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 40px 30px; text-align: center; border-bottom: 4px solid #ab3500;">
+                    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); padding: 40px 30px; text-align: center;>
 
                         <!-- Logo Placeholder -->
                         <img src="https://online-cbt.onrender.com/Online-cbt.jpg" alt="Online CBT Logo" style="max-width: 100px; height: auto; margin: 0 auto 15px; display: block;">
                         <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; letter-spacing: 0.5px;">Online CBT</h1>
-                        <p style="color: #cbd5e1; margin: 5px 0 0 0; font-size: 14px;">Computer-Based Testing Platform</p>
+                        <p style="color: #cbd5e1; margin: 5px 0 15px 0; font-size: 14px;">A Secure, Seamless, and Smart Online CBT</p>
                     </img>
 
                     <!-- Greeting Section -->
@@ -72,7 +72,7 @@ const sendWelcomeEmail = (userEmail, userName) => {
 
                         <!-- CTA Button -->
                         <div style="text-align: center; margin-bottom: 30px;">
-                            <a href="https://online-cbt.onrender.com/studentSignin" style="display: inline-block; background: linear-gradient(135deg, #ab3500 0%, #8a2a00 100%); color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 6px; font-weight: 600; font-size: 16px; transition: all 0.3s ease; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(171, 53, 0, 0.3);">
+                            <a href="https://onlinecbt.vercel.app/studentSignin" style="display: inline-block; background: linear-gradient(135deg, #ab3500 0%, #8a2a00 100%); color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 6px; font-weight: 600; font-size: 16px; transition: all 0.3s ease; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(171, 53, 0, 0.3);">
                                 Go to Dashboard
                             </a>
                         </div>
@@ -89,17 +89,6 @@ const sendWelcomeEmail = (userEmail, userName) => {
 
                     <!-- Footer -->
                     <div style="background-color: #0f172a; padding: 30px; text-align: center; border-top: 1px solid #1e293b;">
-                        
-                        // <!-- Social Links -->
-                        // <div style="margin-bottom: 20px;">
-                        //     <p style="color: #cbd5e1; margin: 0 0 15px 0; font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Follow Us</p>
-                        //     <div style="display: flex; justify-content: center; gap: 15px;">
-                        //         <a href="#" style="display: inline-block; width: 36px; height: 36px; background-color: #1e293b; border-radius: 50%; text-align: center; line-height: 36px; text-decoration: none; color: #fff1eb; font-weight: bold; transition: all 0.3s ease;">f</a>
-                        //         <a href="#" style="display: inline-block; width: 36px; height: 36px; background-color: #1e293b; border-radius: 50%; text-align: center; line-height: 36px; text-decoration: none; color: #fff1eb; font-weight: bold; transition: all 0.3s ease;">𝕏</a>
-                        //         <a href="#" style="display: inline-block; width: 36px; height: 36px; background-color: #1e293b; border-radius: 50%; text-align: center; line-height: 36px; text-decoration: none; color: #fff1eb; font-weight: bold; transition: all 0.3s ease;">in</a>
-                        //     </div>
-                        // </div>
-
                         <!-- Contact Info -->
                         <div style="border-top: 1px solid #1e293b; padding-top: 20px;">
                             <p style="color: #cbd5e1; margin: 0 0 8px 0; font-size: 15px;">
@@ -124,9 +113,7 @@ const sendWelcomeEmail = (userEmail, userName) => {
                             © 2026 Online CBT. All rights reserved.
                         </p>
                     </div>
-
                 </div>
-
             </body>
             </html>
         `
@@ -279,12 +266,10 @@ const sendAdminInvitationEmail = (invitedEmail, invitationLink, invitedByName) =
 
                         <!-- Copyright -->
                         <p style="color: #475569; margin: 15px 0 0 0; font-size: 11px;">
-                            © 2024 Online CBT. All rights reserved.
+                            © 2026 Online CBT. All rights reserved.
                         </p>
                     </div>
-
                 </div>
-
             </body>
             </html>
         `
