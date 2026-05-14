@@ -24,6 +24,9 @@ dns.setDefaultResultOrder('ipv4first')
 dns.setServers(['8.8.8.8', '8.8.4.4'])
 
 app.use(cors())
+// Serve static files (images, logos, etc.)
+app.use(express.static(__dirname))
+
 mongoose.connect(URI, {
     serverSelectionTimeoutMS: 5000,
     socketTimeoutMS: 45000,
