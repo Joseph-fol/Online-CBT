@@ -17,7 +17,7 @@ const sendWelcomeEmail = (userEmail, userName) => {
     }
 
     const mailOptions = {
-        from: 'noreply@resend.dev',
+        from: 'onboarding@resend.dev',
         to: userEmail,
         subject: "Welcome to Online CBT - Your Account is Ready",
         html: `
@@ -146,7 +146,7 @@ const sendAdminInvitationEmail = (invitedEmail, invitationLink, invitedByName) =
     }
 
     const mailOptions = {
-        from: 'noreply@resend.dev',
+        from: 'onboarding@resend.dev',
         to: invitedEmail,
         subject: "Admin Invitation - Online CBT Platform",
         html: `
@@ -302,7 +302,7 @@ const sendInvitationRevokedEmail = (invitedEmail, revokedByName) => {
     }
 
     const mailOptions = {
-        from: 'noreply@resend.dev',
+        from: 'onboarding@resend.dev',
         to: invitedEmail,
         subject: "Your Admin Invitation Has Been Revoked",
         html: `

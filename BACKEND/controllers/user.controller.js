@@ -63,7 +63,7 @@ const postStudentSignUp = (req, res) => {
                                 console.log("✅ Welcome email sent successfully to:", studentData.email);
                                 console.log("Email ID:", emailResult.emailId);
                             } else {
-                                console.error("❌ Welcome email failed to send to:", studentData.email);
+                                console.error("Welcome email failed to send to:", studentData.email);
                                 console.error("Error:", emailResult.error);
                             }
                         })
