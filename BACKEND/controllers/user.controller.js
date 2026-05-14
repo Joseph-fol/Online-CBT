@@ -88,7 +88,14 @@ const postStudentSignUp = (req, res) => {
 }
 
 const postAdminSignUp = (req, res) => {
-    const { fullName, email, password } = req.body
+    const { fullName, email, password, adminCode } = req.body
+
+    // Verify admin code
+    if (adminCode !== process.env.ADMIN_REGISTRATION_CODE) {
+        return res.status(403).json({
+            message: "Invalid admin registration code"
+        })
+    }
 
     student.findOne({ email: req.body.email })
         .then((userExists) => {

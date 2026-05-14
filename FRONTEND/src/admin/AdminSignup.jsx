@@ -27,7 +27,8 @@ const AdminSignup = () => {
         initialValues: {
             fullName: "",
             email: "",
-            password: ""
+            password: "",
+            adminCode: ""
         },
 
         onSubmit: (values, { resetForm }) => {
@@ -52,6 +53,11 @@ const AdminSignup = () => {
                 const errorMessage = errorData?.message || err.message || ""
                 const statusCode = err.response?.status
                 
+                // Check for invalid admin code error
+                const isInvalidCode = 
+                    statusCode === 403 ||
+                    errorMessage.toLowerCase().includes("admin registration code")
+                
                 // Check for duplicate email error in various formats
                 const isDuplicateEmail = 
                     errorMessage.toLowerCase().includes("email") || 
@@ -61,7 +67,9 @@ const AdminSignup = () => {
                     errorData?.error?.toLowerCase().includes("email") ||
                     (errorData?.errors && errorData.errors.email)
                 
-                if(isDuplicateEmail) {
+                if(isInvalidCode) {
+                    alert("Invalid admin registration code. Please check and try again.")
+                } else if(isDuplicateEmail) {
                     setEmailError("This email already exists. Please use a different email.")
                     alert("This email already exists. Please use a different email.")
                 } else {
@@ -73,7 +81,8 @@ const AdminSignup = () => {
         validationSchema: yup.object({
             fullName: yup.string().required("Fullname is required"),
             email: yup.string().email("Invalid email").required("Email is required"),
-            password: yup.string().min(8, 'Password must be at least 8 characters').required("Password is required")
+            password: yup.string().min(8, 'Password must be at least 8 characters').required("Password is required"),
+            adminCode: yup.string().required("Admin code is required").min(6, "Admin code is invalid")
         })
     })
 
@@ -144,6 +153,12 @@ const AdminSignup = () => {
                                         <div className='border-0 fw-medium px-2 pt-3' style={{ backgroundColor: "#e1e3e4", fontSize: "13px", cursor: "pointer" }} onClick={handleClick}>{show ? "Hide" : "Show"} </div>
                                     </div>
                                     {form.touched.password && form.errors.password ? <p className='text-danger'>{form.errors.password}</p> : ""}
+                                </div>
+
+                                <div className="col-md-12 mt-4">
+                                    <label htmlFor="adminCode" className="form-label fw-medium" style={{ fontSize: "13px" }}>ADMIN CODE</label>
+                                    <input type="password" className="form form-control border-0 text-black rounded-0 py-3 shadow-none" style={{ backgroundColor: "#e1e3e4" }} value={form.values.adminCode} name='adminCode' onChange={form.handleChange} onBlur={form.handleBlur} id="adminCode" placeholder='Enter admin registration code' />
+                                    {form.touched.adminCode && form.errors.adminCode ? <p className='text-danger'>{form.errors.adminCode}</p> : ""}
                                 </div>
 
                                 <div className="col-12">

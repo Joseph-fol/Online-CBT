@@ -108,9 +108,9 @@ const AdminSignin = () => {
                                     <h1 className='fw-bold' style={{ fontSize: "45px" }}>Orchestrate Academic Excellence.</h1>
                                     <p className='fw-medium fs-6'>Manage dynamic question banks, deploy tamper-proof assessments, and generate real-time performance analytics from your centralized command center.</p>
                                 </div>
-                                {/* <div className='position-absolute bottom-0'>
+                                <div className='bottom-0 mt-5'>
                                     <p className=' w-75 fw-bold fs-6'>TRUSTED BY 12,000+ STUDENTS</p>
-                                </div> */}
+                                </div>
                             </div>
                         </div>
 
