@@ -1,14 +1,15 @@
 import React from 'react'
 import { NavLink, Link } from 'react-router-dom'
+import { FiHome, FiBook, FiDatabase, FiBarChart2, FiSettings, FiHelpCircle } from 'react-icons/fi'
 import './Sidebar.css'
 
 const navItems = [
-  { to: '/admin', label: 'Dashboard', end: true },
-  { to: '/admin/subjects', label: 'Subjects' },
-  { to: '/admin/question-bank', label: 'Question Bank' },
-  { to: '/admin/student-result', label: 'Student Result' },
-  { to: '/admin/settings', label: 'Settings' },
-  { to: '/admin/support', label: 'Support' },
+  { to: '/admin', label: 'Dashboard', icon: FiHome, end: true },
+  { to: '/admin/subjects', label: 'Subjects', icon: FiBook },
+  { to: '/admin/question-bank', label: 'Question Bank', icon: FiDatabase },
+  { to: '/admin/student-result', label: 'Student Result', icon: FiBarChart2 },
+  { to: '/admin/settings', label: 'Settings', icon: FiSettings },
+  { to: '/admin/support', label: 'Support', icon: FiHelpCircle },
 ]
 
 const Sidebar = ({ isOpen = false, onNavigate }) => {
@@ -22,12 +23,16 @@ const Sidebar = ({ isOpen = false, onNavigate }) => {
       </div>
 
       <nav className='admin-sidebar__nav' aria-label='Admin sidebar navigation'>
-        {navItems.map((item) => (
-          <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => `admin-sidebar__link ${isActive ? 'is-active' : ''}`
-          } onClick={onNavigate} >
-            {item.label}
-          </NavLink>
-        ))}
+        {navItems.map((item) => {
+          const Icon = item.icon
+          return (
+            <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => `admin-sidebar__link ${isActive ? 'is-active' : ''}`
+            } onClick={onNavigate} >
+              <Icon className='admin-sidebar__icon' />
+              <span>{item.label}</span>
+            </NavLink>
+          )
+        })}
       </nav>
 
       <Link

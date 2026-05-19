@@ -6,6 +6,7 @@ import 'aos/dist/aos.css'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import axios from "axios"
 import { showSuccess, showError, showErrorModal } from '../utils/toastUtils'
+import API_BASE_URL from '../utils/api.config'
 
 const AdminSignup = () => {
     const [show, setShow] = useState(false)
@@ -27,7 +28,7 @@ const AdminSignup = () => {
 
         // Validate invitation token if provided
         if (invitationToken) {
-            axios.get(`https://online-cbt.onrender.com/user/admin/validate-invitation?token=${invitationToken}`)
+            axios.get(`${API_BASE_URL}/user/admin/validate-invitation?token=${invitationToken}`)
                 .then((response) => {
                     console.log("Invitation valid:", response.data)
                 })
@@ -58,7 +59,7 @@ const AdminSignup = () => {
 
             setLoading(true)
             setEmailError("")
-            axios.post("https://online-cbt.onrender.com/user/admin/signUp", {
+            axios.post(`${API_BASE_URL}/user/admin/signUp`, {
                 fullName: values.fullName,
                 email: values.email,
                 password: values.password,

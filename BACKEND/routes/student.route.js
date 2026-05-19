@@ -1,8 +1,8 @@
 const express = require("express")
 const router = express.Router();
-const { verifyToken } = require("../middleware/auth.middleware")
+const { verifyToken, adminOnly } = require("../middleware/auth.middleware")
 const { sendWelcomeEmail, sendAdminInvitationEmail } = require("../utils/emailService")
-const {postStudentSignUp, getStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation, saveExamResult, getStudentExamResults} = require("../controllers/user.controller")
+const {postStudentSignUp, getStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, updateQuestion, deleteQuestion, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation, saveExamResult, getStudentExamResults} = require("../controllers/user.controller")
 
 // Email Configuration Check Endpoint
 router.get("/test-email-config", (req, res) => {
@@ -68,7 +68,7 @@ router.post("/test-email-send", async (req, res) => {
         });
         
     } catch (error) {
-        console.error("❌ Test email error:", error);
+        console.error("Test email error:", error);
         return res.status(500).json({
             success: false,
             error: error.message
@@ -86,11 +86,11 @@ router.get("/test-email/:email", (req, res) => {
     
     sendWelcomeEmail(testEmail, "Test User")
         .then((result) => {
-            console.log("✅ Test email result:", result)
+            console.log("Test email result:", result)
             res.json({ success: true, message: result.message })
         })
         .catch((error) => {
-            console.error("❌ Test email error:", error)
+            console.error("Test email error:", error)
             res.json({ success: false, error: error.message })
         })
 })
@@ -104,9 +104,11 @@ router.get("/dashboard", verifyToken, getDashboard)
 router.post("/admin/signin", postAdminSignin)
 router.get("/adminSignin", adminSignin)
 router.get("/dashboard-stats", getDashboardStats)
-router.post("/addQuestions", addQuestion)
+router.post("/addQuestions", verifyToken, adminOnly, addQuestion)
 router.get("/getAllQuestions", getAllQuestions)
 router.get("/question/:id", getQuestionById)
+router.put("/question/:id", verifyToken, adminOnly, updateQuestion)
+router.delete("/question/:id", verifyToken, adminOnly, deleteQuestion)
 router.get("/subject/:subject", getQuestionBySubject)
 
 // Admin invitation routes

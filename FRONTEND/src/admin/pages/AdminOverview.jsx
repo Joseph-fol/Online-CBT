@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
+import API_BASE_URL from '../../utils/api.config'
 
 const AdminOverview = () => {
   const [adminName, setAdminName] = useState('Admin')
@@ -30,7 +31,7 @@ const AdminOverview = () => {
 
   const fetchDashboardStats = () => {
     setLoading(true)
-    axios.get('https://online-cbt.onrender.com/user/dashboard-stats')
+    axios.get(`${API_BASE_URL}/user/dashboard-stats`)
       .then((response) => {
         const { totalStudents, totalSubjects, totalQuestions, averageScore } = response.data
         

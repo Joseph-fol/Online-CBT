@@ -7,6 +7,7 @@ const mongoose = require("mongoose")
 const ejs = require("ejs")
 const bcrypt = require("bcrypt")
 const studentRoutes = require("./routes/student.route")
+const subjectRoutes = require("./routes/subject.routes")
 const cors = require("cors")
 
 app.set("view engine", "ejs")
@@ -17,7 +18,6 @@ app.use(express.urlencoded({
 
 const port = process.env.PORT 
 const URI = process.env.MONGO_URI
-// const students = []
 
 const dns = require("node:dns");
 dns.setDefaultResultOrder('ipv4first')
@@ -38,6 +38,7 @@ mongoose.connect(URI, {
 })
 
 app.use("/user", studentRoutes)
+app.use("/subjects", subjectRoutes)
 
 // http://localhost:2114/admin/questions/addQuestions
 

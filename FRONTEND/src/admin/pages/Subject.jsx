@@ -1,40 +1,138 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import './Subject.css'
-
-const subjects = [
-  {
-    category: 'Department: STEM',
-    updatedAt: 'Last updated Oct 12',
-    title: 'Advanced Quantum Mechanics',
-    description:
-      'Fundamental theories of wave-particle duality, Schrödinger equations, and practical applications in modern particle physics labs.',
-    questions: '124 Questions',
-    students: '490 Students',
-    accent: '#6c63ff',
-  },
-  {
-    category: 'Department: Humanities',
-    updatedAt: 'Last updated Oct 11',
-    title: 'Post-Industrial Economics',
-    description:
-      'A comprehensive study of shifts from manufacturing-based economies to service and information-based global structures.',
-    questions: '245 Questions',
-    students: '1,240 Students',
-    accent: '#6366f1',
-  },
-  {
-    category: 'Department: Medicine',
-    updatedAt: 'Last updated Sep 20',
-    title: 'Anatomy & Physiology II',
-    description:
-      'Focusing on internal organ systems, metabolic processes, and homeostatic regulation within the human cardiovascular system.',
-    questions: '512 Questions',
-    students: '480 Students',
-    accent: '#c47a3f',
-  },
-]
+import { subjectApi } from '../../utils/subjectApi'
+import { toast } from 'react-toastify'
 
 const Subject = () => {
+  const [subjects, setSubjects] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingSubjectId, setEditingSubjectId] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [formData, setFormData] = useState({
+    name: '',
+    department: '',
+    description: '',
+    duration: '',
+  })
+
+  // Fetch subjects on component mount
+  useEffect(() => {
+    fetchSubjects()
+  }, [])
+
+  const fetchSubjects = () => {
+    setLoading(true)
+    setError(null)
+    
+    subjectApi.getAllSubjects()
+      .then((response) => {
+        console.log('Subjects fetched:', response.subjects)
+        setSubjects(response.subjects || [])
+        setLoading(false)
+      })
+      .catch((error) => {
+        console.error('Failed to fetch subjects:', error)
+        setError('Failed to load subjects. Please try again.')
+        setLoading(false)
+        toast.error('Failed to load subjects')
+      })
+  }
+
+  const handleAddSubject = (e) => {
+    e.preventDefault()
+
+    if (!formData.name || !formData.department || !formData.duration) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    subjectApi.createSubject(formData)
+      .then((response) => {
+        console.log('Subject created:', response.subject)
+        setSubjects([...subjects, response.subject])
+        setFormData({ name: '', department: '', description: '', duration: '' })
+        setShowAddModal(false)
+        toast.success('Subject created successfully!')
+        fetchSubjects()
+      })
+      .catch((error) => {
+        console.error('Failed to create subject:', error)
+        toast.error(error.response?.data?.message || 'Failed to create subject')
+      })
+  }
+
+  const handleDeleteSubject = (id) => {
+    if (window.confirm('Are you sure you want to delete this subject?')) {
+      subjectApi.deleteSubject(id)
+        .then(() => {
+          setSubjects(subjects.filter(s => s._id !== id))
+          toast.success('Subject deleted successfully!')
+        })
+        .catch((error) => {
+          console.error('Failed to delete subject:', error)
+          toast.error('Failed to delete subject')
+        })
+    }
+  }
+
+  const handleEditSubject = (subject) => {
+    setEditingSubjectId(subject._id)
+    setFormData({
+      name: subject.name,
+      department: subject.department,
+      description: subject.description,
+      duration: subject.duration,
+    })
+    setShowEditModal(true)
+  }
+
+  const handleUpdateSubject = (e) => {
+    e.preventDefault()
+
+    if (!formData.name || !formData.department || !formData.duration) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    subjectApi.updateSubject(editingSubjectId, formData)
+      .then((response) => {
+        console.log('Subject updated:', response.subject)
+        setSubjects(subjects.map(s => s._id === editingSubjectId ? response.subject : s))
+        setFormData({ name: '', department: '', description: '', duration: '' })
+        setShowEditModal(false)
+        setEditingSubjectId(null)
+        toast.success('Subject updated successfully!')
+      })
+      .catch((error) => {
+        console.error('Failed to update subject:', error)
+        toast.error(error.response?.data?.message || 'Failed to update subject')
+      })
+  }
+
+  const handleCancelEdit = () => {
+    setShowEditModal(false)
+    setEditingSubjectId(null)
+    setFormData({ name: '', department: '', description: '', duration: '' })
+  }
+
+  const getAccentColor = (index) => {
+    const colors = ['#6c63ff', '#6366f1', '#c47a3f', '#f59e0b', '#10b981', '#8b5cf6']
+    return colors[index % colors.length]
+  }
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+  }
+
+  const filteredSubjects = subjects.filter(subject =>
+    subject.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    subject.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    subject.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  )
   return (
     <section className='admin-subjects'>
       <div className='admin-subjects__header'>
@@ -43,78 +141,280 @@ const Subject = () => {
           <p className='admin-subjects__subtitle'>Curate and organize your academic disciplines and their respective test banks.</p>
         </div>
 
-        <button type='button' className='admin-subjects__add-button'>
+        <button type='button' className='admin-subjects__add-button' onClick={() => setShowAddModal(true)}>
           <span className='admin-subjects__add-icon'>+</span>
           Add Subject
         </button>
       </div>
 
-      <div className='admin-subjects__list'>
-        {subjects.map((subject) => (
-          <article key={subject.title} className='admin-subject-card' style={{ '--accent-color': subject.accent }}>
-            <div className='admin-subject-card__body'>
-              <div className='admin-subject-card__meta-row'>
-                <span className='admin-subject-card__meta'>{subject.category}</span>
-                <span className='admin-subject-card__meta'>{subject.updatedAt}</span>
-              </div>
-
-              <h3 className='admin-subject-card__title'>{subject.title}</h3>
-              <p className='admin-subject-card__description'>{subject.description}</p>
-
-              <div className='admin-subject-card__stats'>
-                <span className='admin-subject-card__stat'>
-                  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' aria-hidden='true'>
-                    <path fill='currentColor' d='M12 3a9 9 0 1 0 9 9a9 9 0 0 0-9-9m1 13h-2v-2h2Zm0-4h-2V7h2Z' />
-                  </svg>
-                  {subject.questions}
-                </span>
-                <span className='admin-subject-card__stat'>
-                  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' aria-hidden='true'>
-                    <path fill='currentColor' d='M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3s1.34 3 3 3m-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5S5 6.34 5 8s1.34 3 3 3m0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13m8 0c-.29 0-.62.02-.97.05C16.96 13.8 18 14.88 18 16.5V19h6v-2.5c0-2.33-4.67-3.5-8-3.5' />
-                  </svg>
-                  {subject.students}
-                </span>
-              </div>
-            </div>
-
-            <div className='admin-subject-card__actions'>
-              <button type='button' className='admin-subject-card__icon-button' aria-label={`Edit ${subject.title}`}>
-                <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' aria-hidden='true'>
-                  <path fill='currentColor' d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83l3.75 3.75z' />
-                </svg>
-              </button>
-
-              <button type='button' className='admin-subject-card__icon-button is-danger' aria-label={`Delete ${subject.title}`}>
-                <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' aria-hidden='true'>
-                  <path fill='currentColor' d='M9 3.75h6l.75 1.5H21v1.5H3v-1.5h5.25zM6 8.25h12l-1 11.25A1.5 1.5 0 0 1 15.5 21h-7a1.5 1.5 0 0 1-1.5-1.5z' />
-                </svg>
-              </button>
-            </div>
-          </article>
-        ))}
+      {/* Search Bar */}
+      <div className='admin-subjects__search'>
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
+          <circle cx='11' cy='11' r='8'></circle>
+          <path d='m21 21-4.35-4.35'></path>
+        </svg>
+        <input
+          type='text'
+          placeholder='Search by subject name, department, or description...'
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className='admin-subjects__search-input'
+        />
+        {searchTerm && (
+          <button
+            type='button'
+            onClick={() => setSearchTerm('')}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '0.25rem',
+              color: '#9ca3af',
+              display: 'flex',
+              alignItems: 'center',
+              fontSize: '1.2rem',
+            }}
+            title='Clear search'
+          >
+            ✕
+          </button>
+        )}
       </div>
 
-      <div className='admin-subjects__footer'>
-        <p className='admin-subjects__count'>Showing 1 to 3 of 24 subjects</p>
-
-        <div className='admin-subjects__pagination' aria-label='Pagination'>
-          <button type='button' className='admin-subjects__page-nav' aria-label='Previous page'>
-            <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' aria-hidden='true'>
-              <path fill='currentColor' d='M15.41 7.41L14 6l-6 6l6 6l1.41-1.41L10.83 12z' />
-            </svg>
-          </button>
-
-          <button type='button' className='admin-subjects__page is-active'>1</button>
-          <button type='button' className='admin-subjects__page'>2</button>
-          <button type='button' className='admin-subjects__page'>3</button>
-          <span className='admin-subjects__ellipsis'>...</span>
-
-          <button type='button' className='admin-subjects__page-nav' aria-label='Next page'>
-            <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' aria-hidden='true'>
-              <path fill='currentColor' d='m8.59 16.59l1.41 1.41l6-6l-6-6l-1.41 1.41L13.17 12z' />
-            </svg>
-          </button>
+      {/* Loading State */}
+      {loading && (
+        <div className='admin-subjects__loading'>
+          <p>Loading subjects...</p>
         </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className='admin-subjects__error'>
+          <p>{error}</p>
+          <button onClick={fetchSubjects}>Retry</button>
+        </div>
+      )}
+
+      {/* Subjects List */}
+      {!loading && !error && filteredSubjects.length > 0 && (
+        <div className='admin-subjects__list'>
+          {filteredSubjects.map((subject, index) => (
+            <article key={subject._id} className='admin-subject-card' style={{ '--accent-color': getAccentColor(index) }}>
+              <div className='admin-subject-card__body'>
+                <div className='admin-subject-card__meta-row'>
+                  <span className='admin-subject-card__meta'>Department: {subject.department}</span>
+                  <span className='admin-subject-card__meta'>Updated {formatDate(subject.updatedAt)}</span>
+                </div>
+
+                <h3 className='admin-subject-card__title'>{subject.name}</h3>
+                <p className='admin-subject-card__description'>{subject.description || 'No description provided'}</p>
+
+                <div className='admin-subject-card__stats'>
+                  <span className='admin-subject-card__stat'>
+                    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' aria-hidden='true'>
+                      <path fill='currentColor' d='M12 3a9 9 0 1 0 9 9a9 9 0 0 0-9-9m1 13h-2v-2h2Zm0-4h-2V7h2Z' />
+                    </svg>
+                    {subject.duration} min
+                  </span>
+                </div>
+              </div>
+
+              <div className='admin-subject-card__actions'>
+                <button 
+                  type='button' 
+                  className='admin-subject-card__icon-button' 
+                  aria-label={`Edit ${subject.name}`}
+                  onClick={() => handleEditSubject(subject)}
+                >
+                  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' aria-hidden='true'>
+                    <path fill='currentColor' d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83l3.75 3.75z' />
+                  </svg>
+                </button>
+
+                <button 
+                  type='button' 
+                  className='admin-subject-card__icon-button is-danger' 
+                  aria-label={`Delete ${subject.name}`}
+                  onClick={() => handleDeleteSubject(subject._id)}
+                >
+                  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' aria-hidden='true'>
+                    <path fill='currentColor' d='M9 3.75h6l.75 1.5H21v1.5H3v-1.5h5.25zM6 8.25h12l-1 11.25A1.5 1.5 0 0 1 15.5 21h-7a1.5 1.5 0 0 1-1.5-1.5z' />
+                  </svg>
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!loading && !error && subjects.length === 0 && (
+        <div className='admin-subjects__empty'>
+          <p>No subjects found. Click "Add Subject" to create one.</p>
+        </div>
+      )}
+
+      {/* No Search Results */}
+      {!loading && !error && subjects.length > 0 && filteredSubjects.length === 0 && (
+        <div className='admin-subjects__empty'>
+          <p>
+            <strong>No matches found</strong> for "{searchTerm}"
+            <br />
+            <span style={{ fontSize: '0.9em', color: '#6b7280' }}>Try searching with different keywords or clear the search</span>
+          </p>
+        </div>
+      )}
+
+      {/* Add Subject Modal */}
+      {showAddModal && (
+        <div className='admin-subjects__modal-overlay' onClick={() => setShowAddModal(false)}>
+          <div className='admin-subjects__modal' onClick={(e) => e.stopPropagation()}>
+            <h3 className='admin-subjects__modal-title'>Add New Subject</h3>
+            
+            <form onSubmit={handleAddSubject} className='admin-subjects__form'>
+              <div className='admin-subjects__form-group'>
+                <label htmlFor='name'>Subject Name *</label>
+                <input
+                  type='text'
+                  id='name'
+                  placeholder='e.g., CSC 101'
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className='admin-subjects__form-group'>
+                <label htmlFor='department'>Department *</label>
+                <input
+                  type='text'
+                  id='department'
+                  placeholder='e.g., Computer Science'
+                  value={formData.department}
+                  onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className='admin-subjects__form-group'>
+                <label htmlFor='duration'>Duration (minutes) *</label>
+                <input
+                  type='number'
+                  id='duration'
+                  placeholder='e.g., 60'
+                  value={formData.duration}
+                  onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) })}
+                  required
+                  min='1'
+                />
+              </div>
+
+              <div className='admin-subjects__form-group'>
+                <label htmlFor='description'>Description</label>
+                <textarea
+                  id='description'
+                  placeholder='Enter subject description'
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows='4'
+                />
+              </div>
+
+              <div className='admin-subjects__modal-actions'>
+                <button type='button' onClick={() => setShowAddModal(false)} className='admin-subjects__btn-cancel'>
+                  Cancel
+                </button>
+                <button type='submit' className='admin-subjects__btn-submit'>
+                  Create Subject
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Subject Modal */}
+      {showEditModal && (
+        <div className='admin-subjects__modal-overlay' onClick={handleCancelEdit}>
+          <div className='admin-subjects__modal' onClick={(e) => e.stopPropagation()}>
+            <h3 className='admin-subjects__modal-title'>Edit Subject</h3>
+            
+            <form onSubmit={handleUpdateSubject} className='admin-subjects__form'>
+              <div className='admin-subjects__form-group'>
+                <label htmlFor='edit-name'>Subject Name *</label>
+                <input
+                  type='text'
+                  id='edit-name'
+                  placeholder='e.g., CSC 101'
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className='admin-subjects__form-group'>
+                <label htmlFor='edit-department'>Department *</label>
+                <input
+                  type='text'
+                  id='edit-department'
+                  placeholder='e.g., Computer Science'
+                  value={formData.department}
+                  onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                  required
+                />
+              </div>
+
+              <div className='admin-subjects__form-group'>
+                <label htmlFor='edit-duration'>Duration (minutes) *</label>
+                <input
+                  type='number'
+                  id='edit-duration'
+                  placeholder='e.g., 60'
+                  value={formData.duration}
+                  onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) })}
+                  required
+                  min='1'
+                />
+              </div>
+
+              <div className='admin-subjects__form-group'>
+                <label htmlFor='edit-description'>Description</label>
+                <textarea
+                  id='edit-description'
+                  placeholder='Enter subject description'
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows='4'
+                />
+              </div>
+
+              <div className='admin-subjects__modal-actions'>
+                <button type='button' onClick={handleCancelEdit} className='admin-subjects__btn-cancel'>
+                  Cancel
+                </button>
+                <button type='submit' className='admin-subjects__btn-submit'>
+                  Update Subject
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <div className='admin-subjects__footer'>
+        <p className='admin-subjects__count'>
+          {searchTerm ? (
+            <>
+              Showing <strong>{filteredSubjects.length}</strong> of <strong>{subjects.length}</strong> subject{subjects.length !== 1 ? 's' : ''}
+              {filteredSubjects.length === 0 && ' • No matches'}
+            </>
+          ) : (
+            <>
+              Total: <strong>{subjects.length}</strong> subject{subjects.length !== 1 ? 's' : ''}
+            </>
+          )}
+        </p>
       </div>
     </section>
   )

@@ -35,7 +35,7 @@ const postStudentSignUp = (req, res) => {
     student.findOne({ email: req.body.email })
         .then((userExists) => {
             if (userExists) {
-                console.warn("⚠️ User already exists:", email);
+                console.warn("User already exists:", email);
                 return res.status(409).json({
                     message: "User already exists",
                     email: userExists.email
@@ -53,14 +53,14 @@ const postStudentSignUp = (req, res) => {
             
             return newStudentDetails.save()
                 .then((studentData) => {
-                    console.log("✅ Student Saved:", studentData.email)
+                    console.log("Student Saved:", studentData.email)
 
                     // Send welcome email (non-blocking)
-                    console.log("📧 Attempting to send welcome email to:", studentData.email);
+                    console.log("Attempting to send welcome email to:", studentData.email);
                     sendWelcomeEmail(studentData.email, studentData.fullName)
                         .then((emailResult) => {
                             if (emailResult.success) {
-                                console.log("✅ Welcome email sent successfully to:", studentData.email);
+                                console.log("Welcome email sent successfully to:", studentData.email);
                                 console.log("Email ID:", emailResult.emailId);
                             } else {
                                 console.error("Welcome email failed to send to:", studentData.email);
@@ -68,7 +68,7 @@ const postStudentSignUp = (req, res) => {
                             }
                         })
                         .catch((emailError) => {
-                            console.error("❌ Welcome email catch error for:", studentData.email);
+                            console.error("Welcome email catch error for:", studentData.email);
                             console.error("Error message:", emailError.message);
                             console.error("Full error:", emailError);
                         });
@@ -79,7 +79,7 @@ const postStudentSignUp = (req, res) => {
                         process.env.jwtSecretKey, 
                         { expiresIn: "1h" }
                     )
-                    console.log("🔑 Generated token for:", studentData.email)
+                    console.log("Generated token for:", studentData.email)
 
                     return res.status(201).json({
                         message: "Signup Successful",
@@ -281,26 +281,44 @@ const postAdminSignin = (req, res) => {
             console.log("Found admin:", foundAdmin)
             if (!foundAdmin) {
                 console.log("Admin not found");
-                // Try to find user with this email to see if it exists
-                student.findOne({ email: email })
-                    .then((anyUser) => {
-                        if (anyUser) {
-                            console.log("User exists but role is:", anyUser.role);
-                        } else {
-                            console.log("No user found with this email");
-                        }
-                    })
                 return res.status(401).json({ message: "Admin not found" })
             }
             
-            const isMatch = bcrypt.compareSync(password, foundAdmin.password)
-            if (!isMatch) {
-                console.log("Invalid password");
-                return res.status(401).json({ message: "Invalid password" })
+            try {
+                const isMatch = bcrypt.compareSync(password, foundAdmin.password)
+                if (!isMatch) {
+                    console.log("Invalid password");
+                    return res.status(401).json({ message: "Invalid password" })
+                }
+            } catch (bcryptErr) {
+                console.error("Bcrypt comparison error:", bcryptErr.message);
+                return res.status(500).json({
+                    message: "Authentication error",
+                    error: bcryptErr.message
+                })
             }
+            
             console.log("Admin successfully signin ", foundAdmin.email);
+            
+            // Check if JWT secret is set
+            if (!process.env.jwtSecretKey) {
+                console.error("JWT Secret Key not configured");
+                return res.status(500).json({
+                    message: "Server configuration error",
+                    error: "JWT Secret Key not configured"
+                })
+            }
+            
+            // Generate JWT token
+            const token = jsonwebtoken.sign(
+                { id: foundAdmin._id, email: foundAdmin.email, role: foundAdmin.role },
+                process.env.jwtSecretKey,
+                { expiresIn: "24h" }
+            )
+            
             return res.json({
                 message: "Admin successfully signed in",
+                token: token,
                 admin: {
                     id: foundAdmin._id,
                     fullName: foundAdmin.fullName,
@@ -311,8 +329,15 @@ const postAdminSignin = (req, res) => {
         })
 
         .catch((err) => {
-            console.log("Error during admin signin", err)
-            return res.status(500).send("Internal server error")
+            console.error("❌ Error during admin signin");
+            console.error("Error message:", err.message);
+            console.error("Error stack:", err.stack);
+            console.error("Full error:", err);
+            return res.status(500).json({
+                message: "Internal server error",
+                error: err.message,
+                details: process.env.NODE_ENV === 'development' ? err.stack : undefined
+            })
         })
 }
 
@@ -320,8 +345,13 @@ const addQuestion = (req, res) => {
     console.log("Incoming payload", req.body)
 
     const { subject, duration, marks, correctAnswer, totalQuestion, questionText, optionA, optionB, optionC, optionD, score, description } = req.body
+    
+    // If subject is provided as string (name), we need to either:
+    // 1. Store it as is, or
+    // 2. Look it up in Subject collection to get the ID
+    // For now, we'll create the question with the subject name
     Question.create({
-        subject,
+        subject,  // Store subject name for now
         duration,
         marks,
         description: description?.trim(),
@@ -344,7 +374,7 @@ const addQuestion = (req, res) => {
             })
         })
         .catch((err) => {
-            console.error(err);
+            console.error("Error adding question:", err);
             res.status(500).json({
                 message: "Failed to add question",
                 error: err.message
@@ -404,6 +434,75 @@ const getQuestionBySubject = (req, res) => {
             details: error.message
         })
     })
+}
+
+const updateQuestion = (req, res) => {
+    const { id } = req.params
+    const { subject, duration, marks, correctAnswer, totalQuestion, questionText, optionA, optionB, optionC, optionD, score, description } = req.body
+
+    Question.findByIdAndUpdate(
+        id,
+        {
+            subject,
+            duration,
+            marks,
+            description: description?.trim(),
+            totalQuestion,
+            questionText,
+            options: {
+                A: optionA,
+                B: optionB,
+                C: optionC,
+                D: optionD
+            },
+            correctAnswer
+        },
+        { new: true }
+    )
+        .then((updatedQuestion) => {
+            if (!updatedQuestion) {
+                return res.status(404).json({
+                    message: "Question not found"
+                })
+            }
+            console.log("Question updated successfully:", updatedQuestion._id)
+            res.status(200).json({
+                message: "Question updated successfully",
+                question: updatedQuestion
+            })
+        })
+        .catch((err) => {
+            console.error("Error updating question:", err);
+            res.status(500).json({
+                message: "Failed to update question",
+                error: err.message
+            })
+        })
+}
+
+const deleteQuestion = (req, res) => {
+    const { id } = req.params
+
+    Question.findByIdAndDelete(id)
+        .then((deletedQuestion) => {
+            if (!deletedQuestion) {
+                return res.status(404).json({
+                    message: "Question not found"
+                })
+            }
+            console.log("Question deleted successfully:", id)
+            res.status(200).json({
+                message: "Question deleted successfully",
+                question: deletedQuestion
+            })
+        })
+        .catch((err) => {
+            console.error("Error deleting question:", err);
+            res.status(500).json({
+                message: "Failed to delete question",
+                error: err.message
+            })
+        })
 }
 
 const getDashboardStats = (req, res) => {
@@ -763,4 +862,4 @@ const getStudentExamResults = (req, res) => {
         })
 }
 
-module.exports = { getStudentSignUp, postStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation, saveExamResult, getStudentExamResults }
+module.exports = { getStudentSignUp, postStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, updateQuestion, deleteQuestion, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation, saveExamResult, getStudentExamResults }

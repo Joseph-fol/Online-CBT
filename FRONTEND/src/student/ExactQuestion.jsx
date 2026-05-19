@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { showError, showConfirm } from '../utils/toastUtils'
+import API_BASE_URL from '../utils/api.config'
 
 const ExactQuestion = () => {
     const [questionDetail, setQuestionDetail] = useState([])
@@ -22,7 +23,7 @@ const ExactQuestion = () => {
     }
 
     useEffect(() => {
-        axios.get(`https://online-cbt.onrender.com/user/question/${id}`)
+        axios.get(`${API_BASE_URL}/user/question/${id}`)
             .then((response) => {
                 // console.log(response.data)
                 setQuestionDetail(response.data)

@@ -61,6 +61,12 @@
     font-weight: 600;
     font-size: 1.0rem;
     background: transparent;
+    gap: 0.75rem;
+}
+
+.admin-sidebar__icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
 }
 
 .admin-sidebar__link:hover,

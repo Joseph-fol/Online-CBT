@@ -6,7 +6,6 @@ const questionSchema = new mongoose.Schema({
         required: [true, 'A subject is required']
     },
 
-    duration: { type: Number },
     marks: { type: Number },
     score: { type: Number },
     totalQuestion:{ type: Number},
@@ -45,6 +44,8 @@ const questionSchema = new mongoose.Schema({
         required: true,
         enum: ['A','B','C','D']
     },
+    
+    duration: { type: String }
 },{timestamps: true})
 
 module.exports = mongoose.model("Question", questionSchema)

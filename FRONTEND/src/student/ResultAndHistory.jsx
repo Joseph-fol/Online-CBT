@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import StudentNavbar from './StudentNavbar'
 import axios from 'axios'
+import API_BASE_URL from '../utils/api.config'
 
 const ResultAndHistory = () => {
     const [results, setResults] = useState([])
@@ -30,7 +31,7 @@ const ResultAndHistory = () => {
 
         // Fetch exam results
         if (email) {
-            axios.get(`https://online-cbt.onrender.com/user/exam/student-results?studentEmail=${email}`)
+            axios.get(`${API_BASE_URL}/user/exam/student-results?studentEmail=${email}`)
                 .then((response) => {
                     const data = response.data.results || []
                     setResults(data)

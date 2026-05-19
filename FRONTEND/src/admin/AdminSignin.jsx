@@ -6,6 +6,8 @@ import 'aos/dist/aos.css'
 import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { showSuccess, showError } from '../utils/toastUtils'
+import { setToken } from '../utils/auth'
+import API_BASE_URL from '../utils/api.config'
 
 const AdminSignin = () => {
     const [show, setShow] = useState(false)
@@ -34,7 +36,7 @@ const AdminSignin = () => {
             setLoading(true)
             setError("")
 
-            axios.post("https://online-cbt.onrender.com/user/admin/signin", {
+            axios.post(`${API_BASE_URL}/user/admin/signin`, {
                 email: values.email,
                 password: values.password
             })
@@ -45,6 +47,12 @@ const AdminSignin = () => {
                     // Check if user has admin role
                     if (data.admin && data.admin.role === "admin") {
                         console.log("Admin signin successful", data.admin)
+
+                        // Store token in localStorage
+                        if (data.token) {
+                            setToken(data.token)
+                            console.log("Token stored in localStorage")
+                        }
 
                         // Store admin info in localStorage
                         localStorage.setItem("adminData", JSON.stringify(data.admin))
@@ -60,15 +68,24 @@ const AdminSignin = () => {
                 })
                 .catch((err) => {
                     console.error("Error during signin:", err)
+                    console.error("Error response:", err.response?.data)
+                    console.error("Error status:", err.response?.status)
                     setLoading(false)
 
-                    const errorMessage = err.response?.data?.message || "An error occurred. Please try again."
+                    const errorData = err.response?.data
+                    const errorMessage = errorData?.message || "An error occurred. Please try again."
+                    const errorDetails = errorData?.error || errorData?.details
+
+                    console.log("Final error message:", errorMessage)
+                    console.log("Error details:", errorDetails)
 
                     // Provide specific error messages
                     if (errorMessage.toLowerCase().includes("admin not found")) {
                         setError("No admin account found with this email. Please check your credentials or create an admin account.")
                     } else if (errorMessage.toLowerCase().includes("invalid password")) {
                         setError("Invalid password. Please try again.")
+                    } else if (err.response?.status === 500) {
+                        setError(`Server error: ${errorMessage}. ${errorDetails ? '(' + errorDetails + ')' : 'Please contact support.'}`)
                     } else {
                         setError(errorMessage)
                     }

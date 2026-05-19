@@ -7,6 +7,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { setToken } from '../utils/auth'
 import { showSuccess, showError } from '../utils/toastUtils'
+import API_BASE_URL from '../utils/api.config'
 
 const SigninPage = () => {
     const [show, setShow] = useState(false)
@@ -32,13 +33,22 @@ const SigninPage = () => {
 
         onSubmit: (values, { resetForm }) => {
             setLoading(true)
-            axios.post("https://online-cbt.onrender.com/user/signin", values)
+            axios.post(`${API_BASE_URL}/user/signin`, values)
             .then((response) =>{
                 setLoading(false)
+                const data = response.data
+                
                 // Store token in localStorage
-                if (response.data.token) {
-                    setToken(response.data.token)
+                if (data.token) {
+                    setToken(data.token)
+                    console.log("Token stored in localStorage")
                 }
+                
+                // Store student info if provided
+                if (data.student) {
+                    localStorage.setItem("studentData", JSON.stringify(data.student))
+                }
+                
                 showSuccess("Signin Successful!")
                 resetForm()
                 navigate("/student/dashboard")
@@ -46,7 +56,8 @@ const SigninPage = () => {
             .catch((err)=>{
                 setLoading(false)
                 console.error("Error", err);
-                showError("Login failed. Please check your email and password")
+                const errorMessage = err.response?.data?.message || "Login failed. Please check your email and password"
+                showError(errorMessage)
             })
 
         },

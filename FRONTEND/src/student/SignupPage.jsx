@@ -7,6 +7,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import axios from "axios"
 import { setToken } from '../utils/auth'
 import { showSuccess, showError } from '../utils/toastUtils'
+import API_BASE_URL from '../utils/api.config'
 
 const SignupPage = () => {
     const [show, setShow] = useState(false)
@@ -35,7 +36,7 @@ const SignupPage = () => {
         onSubmit: (values, { resetForm }) => {
             setLoading(true)
             setEmailError("")
-            axios.post("https://online-cbt.onrender.com/user/signUp", values)
+            axios.post(`${API_BASE_URL}/user/signUp`, values)
             .then((response)=>{
                 setLoading(false)
                 // Store token if provided

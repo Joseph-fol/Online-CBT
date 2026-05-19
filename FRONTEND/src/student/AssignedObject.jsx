@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import axios from 'axios'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import API_BASE_URL from '../utils/api.config'
 
 const AssignedObject = () => {
     const [questions, setQuestions] = useState([])
@@ -12,7 +13,7 @@ const AssignedObject = () => {
 
     useEffect(() => {
         // axios.get("https://online-cbt.onrender.com/user/getAllQuestions")
-        axios.get("https://online-cbt.onrender.com/user/getAllQuestions")
+        axios.get(`${API_BASE_URL}/user/getAllQuestions`)
             .then((response) => {
                 setLoading(false)
                 const questionsArray = response.data.questionsArray

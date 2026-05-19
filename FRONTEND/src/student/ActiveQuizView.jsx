@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { showInfo } from '../utils/toastUtils'
 import Swal from 'sweetalert2'
+import API_BASE_URL from '../utils/api.config'
 
 const ActiveQuizView = () => {
     const [selectedOption, setSelectedOption] = useState("")
@@ -41,7 +42,7 @@ const ActiveQuizView = () => {
                 setTimerActive(true);
 
                 // Fetch questions to restore
-                axios.get(`https://online-cbt.onrender.com/user/subject/${subject}`)
+                axios.get(`${API_BASE_URL}/user/subject/${subject}`)
                     .then((response) => {
                         setQuestions(response.data);
                         setLoading(false);
@@ -59,7 +60,7 @@ const ActiveQuizView = () => {
         }
 
         // Start new exam
-        axios.get(`https://online-cbt.onrender.com/user/subject/${subject}`)
+        axios.get(`${API_BASE_URL}/user/subject/${subject}`)
             .then((response) => {
                 const data = response.data
                 setQuestions(data)
@@ -111,12 +112,73 @@ const ActiveQuizView = () => {
         return () => clearInterval(interval);
     }, [timerActive])
 
+    // Warning alerts for time running out
+    useEffect(() => {
+        if (!timerActive || timeLeft === null) return;
+
+        // 5 minutes warning
+        if (timeLeft === 300) {
+            Swal.fire({
+                title: '⏰ 5 Minutes Remaining!',
+                text: 'You have 5 minutes left to complete the exam. Please hurry up!',
+                icon: 'warning',
+                iconColor: '#f59e0b',
+                confirmButtonColor: '#ab3500',
+                confirmButtonText: 'Okay',
+                timer: 5000,
+                timerProgressBar: true,
+                didOpen: (modal) => {
+                    modal.querySelector('.swal2-title').style.color = '#0f172a'
+                    modal.querySelector('.swal2-html-container').style.color = '#475569'
+                }
+            });
+        }
+
+        // 1 minute warning
+        if (timeLeft === 60) {
+            Swal.fire({
+                title: '⏰ 1 Minute Left!',
+                text: 'Only 1 minute remaining! You must submit soon.',
+                icon: 'warning',
+                iconColor: '#ef4444',
+                confirmButtonColor: '#ab3500',
+                confirmButtonText: 'Okay',
+                timer: 4000,
+                timerProgressBar: true,
+                didOpen: (modal) => {
+                    modal.querySelector('.swal2-title').style.color = '#0f172a'
+                    modal.querySelector('.swal2-html-container').style.color = '#475569'
+                }
+            });
+        }
+    }, [timeLeft, timerActive])
+
+    // Check if time is expired - prevent answering
+    const isTimeExpired = timerActive === false && timeLeft === 0;
+
     // Format seconds to MM:SS
     const formatTime = (seconds) => {
         if (seconds === null) return "00:00";
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    // Determine timer color based on time remaining
+    const getTimerColor = () => {
+        if (!timerActive) return '#dc2626'; // Red when expired
+        if (timeLeft === null) return '#ab3500'; // Default
+        if (timeLeft <= 60) return '#dc2626'; // Red - less than 1 min
+        if (timeLeft <= 300) return '#f59e0b'; // Amber - less than 5 min
+        return '#ab3500'; // Orange - normal
+    }
+
+    const getTimerBgColor = () => {
+        if (!timerActive) return '#fee2e2'; // Light red when expired
+        if (timeLeft === null) return '#f5e6d3'; // Default
+        if (timeLeft <= 60) return '#fee2e2'; // Light red - less than 1 min
+        if (timeLeft <= 300) return '#fef3c7'; // Light amber - less than 5 min
+        return '#f5e6d3'; // Light orange - normal
     }
 
     // Handle exam submission
@@ -168,7 +230,7 @@ const ActiveQuizView = () => {
             console.log("📤 Sending exam result data:", examResultData);
 
             // Save exam result to database
-            axios.post("https://online-cbt.onrender.com/user/exam/save-result", examResultData)
+            axios.post(`${API_BASE_URL}/user/exam/save-result`, examResultData)
                 .then((response) => {
                     console.log("✅ Exam result saved successfully!");
                     console.log("Response data:", response.data);
@@ -334,8 +396,11 @@ const ActiveQuizView = () => {
                         <span><h4 className='fw-bold' style={{ color: "#ab3500" }}>{currentQuestion?.description || "Quiz"}</h4></span>
                     </div>
 
-                    <div className='alert alert-danger fw-bold px-4 py-2 fs-sm-5 text-center justify-content-center align-items-center gap-2 ' style={{ backgroundColor: timeLeft && timeLeft < 300 ? '#ffcccc' : '' }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#58151c" d="M12 20a8 8 0 0 0 8-8a8 8 0 0 0-8-8a8 8 0 0 0-8 8a8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10a10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67l-.75 1.23L11 13V7z" /></svg> <span>{formatTime(timeLeft)}</span>
+                    <div className='alert alert-danger fw-bold px-4 py-2 fs-sm-5 text-center justify-content-center align-items-center gap-2 ' style={{ backgroundColor: getTimerBgColor(), borderColor: getTimerColor(), borderWidth: '2px', color: getTimerColor() }}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill={getTimerColor()} d="M12 20a8 8 0 0 0 8-8a8 8 0 0 0-8-8a8 8 0 0 0-8 8a8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10a10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67l-.75 1.23L11 13V7z" /></svg> 
+                        <span>{formatTime(timeLeft)}</span>
+                        {timeLeft && timeLeft <= 300 && <span style={{ marginLeft: '0.5rem', fontSize: '0.9em' }}>⚠️ Hurry!</span>}
+                        {!timerActive && timeLeft === 0 && <span style={{ marginLeft: '0.5rem', fontSize: '0.9em' }}>TIME EXPIRED</span>}
                     </div>
                 </div>
                 <p></p>
@@ -351,6 +416,28 @@ const ActiveQuizView = () => {
                         <button className='btn fw-medium' style={{ color: "#0f172b" }}> Mark for Reviews</button>
                     </div>
                 </div>
+
+                {/* Time Expired Banner */}
+                {isTimeExpired && (
+                    <div className='container col-lg-7 mb-3 alert alert-danger d-flex align-items-center gap-2' style={{ backgroundColor: '#fee2e2', borderColor: '#dc2626' }}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        <strong style={{ color: '#dc2626' }}>⏱️ Time's Up! Your exam has been automatically submitted.</strong>
+                    </div>
+                )}
+
+                {/* Disabled Answer Notice */}
+                {isTimeExpired && (
+                    <div className='container col-lg-7 mb-3 alert alert-warning d-flex align-items-center gap-2' style={{ backgroundColor: '#fef3c7', borderColor: '#f59e0b' }}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24" fill="#f59e0b">
+                            <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
+                        </svg>
+                        <span style={{ color: '#92400e' }}>You can no longer answer questions. The exam has been submitted automatically.</span>
+                    </div>
+                )}
 
                 <button className='container border border-0 bg-light px-3 my-2 text-secondary text-start fw-bold d-block d-lg-none d-md-none'>Review All <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#6b6868" d="M22 12.999V20a1 1 0 0 1-1 1h-8v-8.001zm-11 0V21H3a1 1 0 0 1-1-1v-7.001zM11 3v7.999H2V4a1 1 0 0 1 1-1zm10 0a1 1 0 0 1 1 1v6.999h-9V3z" /></svg></button>
 
@@ -368,6 +455,21 @@ const ActiveQuizView = () => {
                                     <button
                                         key={option.id}
                                         onClick={() => {
+                                            // Prevent answering if time is expired
+                                            if (isTimeExpired) {
+                                                Swal.fire({
+                                                    title: 'Time Expired',
+                                                    text: 'You cannot answer questions after time has expired.',
+                                                    icon: 'error',
+                                                    iconColor: '#dc2626',
+                                                    confirmButtonColor: '#ab3500',
+                                                    didOpen: (modal) => {
+                                                        modal.querySelector('.swal2-title').style.color = '#0f172a'
+                                                    }
+                                                });
+                                                return;
+                                            }
+
                                             setSelectedOption(option.id)
                                             // Store the answer
                                             setSelectedAnswers({
@@ -375,6 +477,7 @@ const ActiveQuizView = () => {
                                                 [currentQuestion._id]: option.id
                                             })
                                         }}
+                                        disabled={isTimeExpired}
                                         className="btn text-start d-flex align-items-center p-3 rounded-3" // Kept layout classes only
                                         style={{
                                             width: '100%', // Ensures it fills container
@@ -382,10 +485,11 @@ const ActiveQuizView = () => {
                                             borderStyle: 'solid',
                                             // Logic for Border, Background, and Shadow
                                             borderColor: isSelected ? '#ab3500' : 'transparent',
-                                            backgroundColor: isSelected ? '#ffffff' : '#f8f9fa',
+                                            backgroundColor: isTimeExpired ? '#f3f4f6' : (isSelected ? '#ffffff' : '#f8f9fa'),
                                             boxShadow: isSelected ? '0 .125rem .25rem rgba(0,0,0,.075)' : 'none',
                                             transition: 'all 0.2s ease-in-out',
-                                            cursor: 'pointer'
+                                            cursor: isTimeExpired ? 'not-allowed' : 'pointer',
+                                            opacity: isTimeExpired ? 0.6 : 1
                                         }}
                                     >
                                         <div
@@ -425,13 +529,13 @@ const ActiveQuizView = () => {
                                         setCurrentIndex(currentIndex - 1)
                                     }
                                 }}
-                                disabled={currentIndex === 0}
+                                disabled={currentIndex === 0 || isTimeExpired}
                                 className='py-2 px-2 px-lg-5 fw-bold border-1 bg-white d-flex align-items-center gap-1'
                                 style={{
-                                    color: currentIndex === 0 ? "#ccc" : "#0f172b",
+                                    color: (currentIndex === 0 || isTimeExpired) ? "#ccc" : "#0f172b",
                                     borderColor: "#ab3500",
-                                    opacity: currentIndex === 0 ? 0.5 : 1,
-                                    cursor: currentIndex === 0 ? 'not-allowed' : 'pointer'
+                                    opacity: (currentIndex === 0 || isTimeExpired) ? 0.5 : 1,
+                                    cursor: (currentIndex === 0 || isTimeExpired) ? 'not-allowed' : 'pointer'
                                 }}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="#0f172b" d="M10.707 8.707a1 1 0 0 0-1.414-1.414l-4 4a1 1 0 0 0 0 1.414l4 4a1 1 0 0 0 1.414-1.414L8.414 13H18a1 1 0 1 0 0-2H8.414z" /></svg>
@@ -451,11 +555,13 @@ const ActiveQuizView = () => {
                                         handleSubmitExam()
                                     }
                                 }}
+                                disabled={isTimeExpired}
                                 className='py-2 px-4 fw-bold border border-1 d-flex align-items-center gap-2'
                                 style={{
-                                    backgroundColor: "#ab3500",
+                                    backgroundColor: isTimeExpired ? "#ccc" : "#ab3500",
                                     color: "white",
-                                    cursor: 'pointer'
+                                    cursor: isTimeExpired ? 'not-allowed' : 'pointer',
+                                    opacity: isTimeExpired ? 0.6 : 1
                                 }}
                             >
                                 {currentIndex === questions.length - 1 ? "Submit" : "Next"}

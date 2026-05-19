@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import './Settings.css'
 import { showSuccess, showError, showConfirm } from '../../utils/toastUtils'
+import API_BASE_URL from '../../utils/api.config'
 
 const Settings = () => {
   const [invitations, setInvitations] = useState([])
@@ -25,7 +26,7 @@ const Settings = () => {
     }
 
     setLoading(true)
-    axios.get('https://online-cbt.onrender.com/user/admin/pending-invitations', {
+    axios.get(`${API_BASE_URL}/user/admin/pending-invitations`, {
       headers: { 'x-admin-email': adminEmail }
     })
       .then((response) => {
@@ -47,7 +48,7 @@ const Settings = () => {
     }
 
     setLoading(true)
-    axios.post('https://online-cbt.onrender.com/user/admin/create-invitation', 
+    axios.post(`${API_BASE_URL}/user/admin/create-invitation`, 
       { invitedEmail },
       { headers: { 'x-admin-email': adminEmail } }
     )
@@ -92,7 +93,7 @@ const Settings = () => {
       .then((result) => {
         if (result.isConfirmed) {
           setRevoking(token)
-          axios.post('https://online-cbt.onrender.com/user/admin/revoke-invitation', 
+          axios.post(`${API_BASE_URL}/user/admin/revoke-invitation`, 
             { token, adminEmail },
             { headers: { 'x-admin-email': adminEmail } }
           )

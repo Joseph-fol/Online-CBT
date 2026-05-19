@@ -2,22 +2,63 @@ import React, { useEffect, useRef, useState } from 'react'
 import './QuestionBank.css'
 import { useFormik } from 'formik'
 import * as yup from "yup"
-import axios from 'axios'
 import { showSuccess, showError, showInfo } from '../../utils/toastUtils'
+import API_BASE_URL from '../../utils/api.config'
+import { questionApi } from '../../utils/questionApi'
 
 const QuestionBank = () => {
   const [draftQuestions, setDraftQuestions] = useState([])
+  const [savedQuestions, setSavedQuestions] = useState([])
+  const [filteredSavedQuestions, setFilteredSavedQuestions] = useState([])
   const [editingDraftId, setEditingDraftId] = useState(null)
+  const [editingSavedId, setEditingSavedId] = useState(null)
   const [subjects, setSubjects] = useState([])
+  const [selectedSubject, setSelectedSubject] = useState('')
   const [isNewSubject, setIsNewSubject] = useState(false)
   const formSectionRef = useRef(null)
 
-  // Fetch existing subjects on component mount
+  // Fetch existing subjects and saved questions on component mount
   useEffect(() => {
-    axios.get("https://online-cbt.onrender.com/user/getAllQuestions")
+    fetchAllQuestions()
+  }, [])
+
+  // Filter saved questions whenever selectedSubject changes
+  useEffect(() => {
+    if (selectedSubject && selectedSubject !== 'new') {
+      const filtered = savedQuestions.filter(q => q.subject === selectedSubject)
+      setFilteredSavedQuestions(filtered)
+    } else {
+      setFilteredSavedQuestions([])
+    }
+  }, [selectedSubject, savedQuestions])
+
+  const fetchAllQuestions = () => {
+    questionApi.getAllQuestions()
       .then((response) => {
-        const questionsArray = response.data.questionsArray
-        // Group by subject and extract unique subjects with metadata
+        const questionsArray = response.questionsArray
+        
+        // Convert database questions to displayable format
+        const formattedQuestions = questionsArray.map(q => ({
+          id: q._id,
+          subject: q.subject,
+          description: q.description,
+          questionText: q.questionText,
+          marks: q.marks,
+          duration: q.duration,
+          totalQuestion: q.totalQuestion,
+          score: q.score,
+          correctAnswer: q.correctAnswer,
+          options: [
+            { key: 'A', text: q.options?.A || '' },
+            { key: 'B', text: q.options?.B || '' },
+            { key: 'C', text: q.options?.C || '' },
+            { key: 'D', text: q.options?.D || '' }
+          ]
+        }))
+        
+        setSavedQuestions(formattedQuestions)
+        
+        // Extract unique subjects
         const subjectMap = {}
         questionsArray.forEach(question => {
           if (!subjectMap[question.subject]) {
@@ -36,11 +77,14 @@ const QuestionBank = () => {
       })
       .catch((error) => {
         console.error("Error fetching subjects:", error)
+        showError("Failed to load questions")
       })
-  }, [])
+  }
 
   // Handle subject selection and auto-fill fields
   const handleSubjectSelect = (subjectName) => {
+    setSelectedSubject(subjectName)
+    
     if (subjectName === "new") {
       setIsNewSubject(true)
       formik.setValues({
@@ -156,6 +200,45 @@ const QuestionBank = () => {
     }
   }
 
+  const handleEditSavedQuestion = (savedQuestion) => {
+    formik.setValues({
+      subject: savedQuestion.subject || '',
+      marks: String(savedQuestion.marks) || '',
+      questionText: savedQuestion.questionText || '',
+      optionA: savedQuestion.options?.find((opt) => opt.key === 'A')?.text || '',
+      optionB: savedQuestion.options?.find((opt) => opt.key === 'B')?.text || '',
+      optionC: savedQuestion.options?.find((opt) => opt.key === 'C')?.text || '',
+      optionD: savedQuestion.options?.find((opt) => opt.key === 'D')?.text || '',
+      correctAnswer: savedQuestion.correctAnswer || '',
+      duration: String(savedQuestion.duration) || '',
+      totalQuestion: String(savedQuestion.totalQuestion) || '',
+      score: String(savedQuestion.score) || '',
+      description: savedQuestion.description || ''
+    })
+    setEditingSavedId(savedQuestion.id)
+
+    requestAnimationFrame(() => {
+      formSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
+
+  const handleDeleteSavedQuestion = (questionId) => {
+    if (window.confirm('Are you sure you want to delete this question? This cannot be undone.')) {
+      questionApi.deleteQuestion(questionId)
+        .then(() => {
+          setSavedQuestions((prev) => prev.filter((item) => item.id !== questionId))
+          showSuccess("Question deleted successfully!")
+          if (editingSavedId === questionId) {
+            setEditingSavedId(null)
+          }
+        })
+        .catch((error) => {
+          console.error('Error deleting question:', error)
+          showError(error.response?.data?.message || 'Failed to delete question')
+        })
+    }
+  }
+
   const formik = useFormik({
     initialValues: {
       subject: "",
@@ -175,17 +258,35 @@ const QuestionBank = () => {
     onSubmit: (values, { resetForm }) => {
       // console.log(values)
 
-      axios.post("https://online-cbt.onrender.com/user/addQuestions", values)
+      // If editing a saved question, update it instead of creating new
+      if (editingSavedId) {
+        questionApi.updateQuestion(editingSavedId, values)
+          .then(() => {
+            fetchAllQuestions()
+            setEditingSavedId(null)
+            resetForm()
+            showSuccess("Question updated successfully!")
+          })
+          .catch((error) => {
+            console.error(error)
+            showError(error.response?.data?.message || "Failed to update question. Please try again.")
+          })
+        return
+      }
+
+      // Otherwise, add as new question
+      questionApi.addQuestion(values)
         .then(() => {
           const draftPayload = buildDraftFromValues(values, editingDraftId)
           upsertDraft(draftPayload)
           setEditingDraftId(null)
           resetForm()
           showSuccess("Question submitted successfully!")
+          fetchAllQuestions()
         })
         .catch((error) => {
           console.error(error)
-          showError("Failed to save question. Please try again.")
+          showError(error.response?.data?.message || "Failed to save question. Please try again.")
         })
     },
     validationSchema: yup.object({
@@ -404,13 +505,26 @@ const QuestionBank = () => {
 
             <div className='question-bank__actions'>
               <button type='button' className='question-bank__button question-bank__button--muted' onClick={displayDraft}>{editingDraftId ? 'Update Draft' : 'Save Draft'}</button>
-              <button type='submit' className='question-bank__button question-bank__button--primary' disabled={!formik.isValid}>Save Questions</button>
+              <button type='submit' className='question-bank__button question-bank__button--primary' disabled={!formik.isValid}>{editingSavedId ? 'Update Question' : 'Save Question'}</button>
+              {(editingDraftId || editingSavedId) && (
+                <button 
+                  type='button' 
+                  className='question-bank__button question-bank__button--muted'
+                  onClick={() => {
+                    formik.resetForm()
+                    setEditingDraftId(null)
+                    setEditingSavedId(null)
+                  }}
+                >
+                  Clear
+                </button>
+              )}
             </div>
           </form>
         </article>
 
         <aside className='question-bank__panel question-bank__panel--compact'>
-          <h3 className='question-bank__panel-title'>STUDENT PREVIEW</h3>
+          <h3 className='question-bank__panel-title'>STUDENT PREVIEW {editingSavedId && '(Editing from Database)'}</h3>
           <div className='question-bank__preview'>
             {/* <p className='question-bank__preview-badge'>
               {(formik.values.subject || 'General Subject')}
@@ -495,6 +609,75 @@ const QuestionBank = () => {
                     type='button'
                     className='displayDraft__action-btn displayDraft__action-btn--delete'
                     onClick={() => handleDeleteDraft(item.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className='instruction_display my-4'>
+        <h4 className='displayDraft__title'>
+          Saved Questions in Database
+          {selectedSubject && selectedSubject !== 'new' && (
+            <span style={{ fontSize: '0.8em', fontWeight: 'normal', marginLeft: '10px' }}>
+              - {selectedSubject}
+            </span>
+          )}
+        </h4>
+
+        {!selectedSubject || selectedSubject === 'new' ? (
+          <p className='displayDraft__empty'>Please select a subject to view its questions.</p>
+        ) : filteredSavedQuestions.length === 0 ? (
+          <p className='displayDraft__empty'>No questions found for {selectedSubject}. Create a new question above.</p>
+        ) : (
+          <div className='displayDraft__list'>
+            {filteredSavedQuestions.map((item, index) => (
+
+              <article className='displayDraft__card' key={item.id}>
+                <div className='displayDraft__card-header'>
+                  <span className='displayDraft__number'>{index + 1}</span>
+                  <h5 className='displayDraft__question'>{item.questionText}</h5>
+                </div>
+
+                <p className='displayDraft__meta'>
+                  <strong>Subject:</strong> {item.subject || 'N/A'} | <strong>Description:</strong> {item.description || 'N/A'}
+                </p>
+
+                <p className='displayDraft__meta'>
+                  <strong>Total Questions:</strong> {item.totalQuestion || 'N/A'} | <strong>Duration:</strong> {item.duration || 'N/A'} mins | <strong>Marks:</strong> {item.marks || 'N/A'}
+                </p>
+
+                <ul className='displayDraft__options'>
+                  {item.options.map((option) => {
+                    const isCorrect = item.correctAnswer === option.key
+
+                    return (
+                      <li key={`${item.id}-${option.key}`} className={isCorrect ? 'displayDraft__option displayDraft__option--correct' : 'displayDraft__option'}>
+                        <span className={isCorrect ? 'displayDraft__option-icon displayDraft__option-icon--correct' : 'displayDraft__option-icon'} aria-hidden='true'>
+                          {isCorrect ? '✓' : '○'}
+                        </span>
+                        <span>{option.text}</span>
+                      </li>
+                    )
+                  })}
+                </ul>
+
+                <div className='displayDraft__actions'>
+                  <button
+                    type='button'
+                    className='displayDraft__action-btn displayDraft__action-btn--edit'
+                    onClick={() => handleEditSavedQuestion(item)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type='button'
+                    className='displayDraft__action-btn displayDraft__action-btn--delete'
+                    onClick={() => handleDeleteSavedQuestion(item.id)}
                   >
                     Delete
                   </button>

@@ -19,4 +19,21 @@ const verifyToken = (req, res, next) => {
     });
 };
 
-module.exports = { verifyToken };
+const adminOnly = (req, res, next) => {
+    // verifyToken should be called before this middleware
+    if (!req.user) {
+        return res.status(401).json({
+            message: "Authentication required"
+        });
+    }
+
+    // Check if user role is admin
+    if (req.user.role !== "admin") {
+        return res.status(403).json({
+            message: "Access denied. Admin privileges required."
+        });
+    }
+    next();
+};
+
+module.exports = { verifyToken, adminOnly };
