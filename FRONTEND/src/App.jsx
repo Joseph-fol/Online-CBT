@@ -14,7 +14,6 @@ import QuestionBank from './admin/pages/QuestionBank'
 import StudentResult from './admin/pages/StudentResult'
 import AdminOverview from './admin/pages/AdminOverview'
 import Settings from './admin/pages/Settings'
-import Support from './admin/pages/Support'
 import StudentDashboard from './student/StudentDashboard'
 import StudentLayout from './student/StudentLayout'
 import AvailableAssessmentsPage from './student/AvailableAssessmentsPage'
@@ -54,7 +53,6 @@ const App = () => {
           <Route path="question-bank" element={<QuestionBank />} />
           <Route path="student-result" element={<StudentResult />} />
           <Route path="settings" element={<Settings />} />
-          <Route path="support" element={<Support />} />
         </Route>
       </Routes>
       <ToastContainer 

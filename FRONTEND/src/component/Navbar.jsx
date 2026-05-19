@@ -33,7 +33,7 @@ const Navbar = ({ isSidebarOpen, onToggleSidebar }) => {
 
         <nav className='admin-navbar__center' aria-label='Top navigation'>
           <NavLink to='/admin/student-result' className='admin-navbar__history'>
-            My History
+            History
           </NavLink>
         </nav>
 

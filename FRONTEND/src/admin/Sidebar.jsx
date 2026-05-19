@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink, Link } from 'react-router-dom'
-import { FiHome, FiBook, FiDatabase, FiBarChart2, FiSettings, FiHelpCircle } from 'react-icons/fi'
+import { FiHome, FiBook, FiDatabase, FiBarChart2, FiSettings } from 'react-icons/fi'
 import './Sidebar.css'
 
 const navItems = [
@@ -9,7 +9,6 @@ const navItems = [
   { to: '/admin/question-bank', label: 'Question Bank', icon: FiDatabase },
   { to: '/admin/student-result', label: 'Student Result', icon: FiBarChart2 },
   { to: '/admin/settings', label: 'Settings', icon: FiSettings },
-  { to: '/admin/support', label: 'Support', icon: FiHelpCircle },
 ]
 
 const Sidebar = ({ isOpen = false, onNavigate }) => {
