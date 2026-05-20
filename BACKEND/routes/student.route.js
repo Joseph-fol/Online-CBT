@@ -1,6 +1,7 @@
 const express = require("express")
 const router = express.Router();
 const { verifyToken, adminOnly } = require("../middleware/auth.middleware")
+const mongoose = require("mongoose")
 const { sendWelcomeEmail, sendAdminInvitationEmail } = require("../utils/emailService")
 const {postStudentSignUp, getStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, updateQuestion, deleteQuestion, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation, saveExamResult, getStudentExamResults, getAllExamResults} = require("../controllers/user.controller")
 
@@ -94,6 +95,53 @@ router.get("/test-email/:email", (req, res) => {
             res.json({ success: false, error: error.message })
         })
 })
+
+// Database Connection Test Endpoint
+router.get("/test-db-connection", async (req, res) => {
+    console.log("\nDATABASE CONNECTION TEST");
+    console.log("============================");
+
+    if (!process.env.MONGO_URI) {
+        console.error("MONGO_URI is not set.");
+        return res.status(500).json({
+            status: "FAILED",
+            message: "MONGO_URI environment variable is not set."
+        });
+    }
+
+    try {
+        // Use a temporary connection to test without disrupting the main one
+        const testConn = await mongoose.createConnection(process.env.MONGO_URI, {
+            serverSelectionTimeoutMS: 5000 // Fail fast
+        }).asPromise();
+
+        await testConn.close();
+
+        console.log("✅ Database connection test successful.");
+        return res.status(200).json({
+            status: "SUCCESS",
+            message: "MongoDB connection successful."
+        });
+    } catch (error) {
+        console.error("❌ Database connection test failed.");
+        console.error("Error message:", error.message);
+        console.error("Error code:", error.code);
+
+        let detailedMessage = "Authentication failed. Check your username, password, and IP whitelist.";
+        if (error.message.includes('querySrv ESERVFAIL') || error.message.includes('querySrv ENODATA')) {
+            detailedMessage = "DNS resolution for SRV record failed. Check your cluster URL and network settings.";
+        } else if (error.message.includes('connect ETIMEDOUT')) {
+            detailedMessage = "Connection timed out. This is often an IP whitelist issue. Ensure Render's IP is allowed in MongoDB Atlas.";
+        }
+
+        return res.status(500).json({
+            status: "FAILED",
+            message: `Database connection failed: ${error.message}`,
+            detailedSuggestion: detailedMessage,
+            errorCode: error.code
+        });
+    }
+});
 
 router.get("/studentSignUp", getStudentSignUp)
 router.post("/signUp", postStudentSignUp)
