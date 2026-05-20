@@ -2,7 +2,7 @@ const express = require("express")
 const router = express.Router();
 const { verifyToken, adminOnly } = require("../middleware/auth.middleware")
 const { sendWelcomeEmail, sendAdminInvitationEmail } = require("../utils/emailService")
-const {postStudentSignUp, getStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, updateQuestion, deleteQuestion, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation, saveExamResult, getStudentExamResults} = require("../controllers/user.controller")
+const {postStudentSignUp, getStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, updateQuestion, deleteQuestion, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation, saveExamResult, getStudentExamResults, getAllExamResults} = require("../controllers/user.controller")
 
 // Email Configuration Check Endpoint
 router.get("/test-email-config", (req, res) => {
@@ -105,7 +105,7 @@ router.post("/admin/signin", postAdminSignin)
 router.get("/adminSignin", adminSignin)
 router.get("/dashboard-stats", getDashboardStats)
 router.post("/addQuestions", verifyToken, adminOnly, addQuestion)
-router.get("/getAllQuestions", getAllQuestions)
+router.get("/getAllQuestions", verifyToken, getAllQuestions)
 router.get("/question/:id", getQuestionById)
 router.put("/question/:id", verifyToken, adminOnly, updateQuestion)
 router.delete("/question/:id", verifyToken, adminOnly, deleteQuestion)
@@ -118,7 +118,8 @@ router.get("/admin/pending-invitations", getPendingInvitations)
 router.post("/admin/revoke-invitation", revokeInvitation)
 
 // Exam result routes
-router.post("/exam/save-result", saveExamResult)
+router.post("/exam/save-result", verifyToken, saveExamResult)
 router.get("/exam/student-results", getStudentExamResults)
+router.get("/exam/all-results", verifyToken, adminOnly, getAllExamResults)
 
 module.exports = router

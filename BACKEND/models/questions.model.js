@@ -6,6 +6,12 @@ const questionSchema = new mongoose.Schema({
         required: [true, 'A subject is required']
     },
 
+    adminEmail: {
+        type: String,
+        required: [true, 'Admin email is required'],
+        index: true
+    },
+
     marks: { type: Number },
     score: { type: Number },
     totalQuestion:{ type: Number},

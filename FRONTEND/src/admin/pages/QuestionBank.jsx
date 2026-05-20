@@ -15,6 +15,7 @@ const QuestionBank = () => {
   const [subjects, setSubjects] = useState([])
   const [selectedSubject, setSelectedSubject] = useState('')
   const [isNewSubject, setIsNewSubject] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const formSectionRef = useRef(null)
 
   // Fetch existing subjects and saved questions on component mount
@@ -257,6 +258,7 @@ const QuestionBank = () => {
 
     onSubmit: (values, { resetForm }) => {
       // console.log(values)
+      setIsSubmitting(true)
 
       // If editing a saved question, update it instead of creating new
       if (editingSavedId) {
@@ -266,10 +268,12 @@ const QuestionBank = () => {
             setEditingSavedId(null)
             resetForm()
             showSuccess("Question updated successfully!")
+            setIsSubmitting(false)
           })
           .catch((error) => {
             console.error(error)
             showError(error.response?.data?.message || "Failed to update question. Please try again.")
+            setIsSubmitting(false)
           })
         return
       }
@@ -283,10 +287,12 @@ const QuestionBank = () => {
           resetForm()
           showSuccess("Question submitted successfully!")
           fetchAllQuestions()
+          setIsSubmitting(false)
         })
         .catch((error) => {
           console.error(error)
           showError(error.response?.data?.message || "Failed to save question. Please try again.")
+          setIsSubmitting(false)
         })
     },
     validationSchema: yup.object({
@@ -504,8 +510,25 @@ const QuestionBank = () => {
             </div>
 
             <div className='question-bank__actions'>
-              <button type='button' className='question-bank__button question-bank__button--muted' onClick={displayDraft}>{editingDraftId ? 'Update Draft' : 'Save Draft'}</button>
-              <button type='submit' className='question-bank__button question-bank__button--primary' disabled={!formik.isValid}>{editingSavedId ? 'Update Question' : 'Save Question'}</button>
+              <button type='button' className='question-bank__button question-bank__button--muted' onClick={displayDraft} disabled={isSubmitting}>{editingDraftId ? 'Update Draft' : 'Save Draft'}</button>
+              <button 
+                type='submit' 
+                className='question-bank__button question-bank__button--primary' 
+                disabled={!formik.isValid || isSubmitting}
+                style={{
+                  opacity: isSubmitting ? 0.6 : 1,
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span style={{ marginRight: '0.5rem' }}>⏳</span>
+                    {editingSavedId ? 'Updating...' : 'Saving...'}
+                  </>
+                ) : (
+                  editingSavedId ? 'Update Question' : 'Save Question'
+                )}
+              </button>
               {(editingDraftId || editingSavedId) && (
                 <button 
                   type='button' 
@@ -515,6 +538,7 @@ const QuestionBank = () => {
                     setEditingDraftId(null)
                     setEditingSavedId(null)
                   }}
+                  disabled={isSubmitting}
                 >
                   Clear
                 </button>

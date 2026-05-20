@@ -173,6 +173,7 @@ const AdminSignin = () => {
                                 </div>
 
                                 <div>
+                                    <p className='fw-medium text-center'>Don't have an admin account?</p>
                                     <Link to="/admin/signUp">
                                         <button type="submit" class="btn w-100 py-2 text-black fs-6 fw-bold border border-dark border-1" >CREATE ADMIN ACCOUNT </button>
                                     </Link>

@@ -19,29 +19,44 @@ app.use(express.urlencoded({
 const port = process.env.PORT 
 const URI = process.env.MONGO_URI
 
+// console.log("Backend Configuration:")
+// console.log("Port:", port)
+// console.log("MongoDB URI configured:", !!URI)
+// console.log("JWT Secret configured:", !!process.env.jwtSecretKey)
+
 const dns = require("node:dns");
 dns.setDefaultResultOrder('ipv4first')
 dns.setServers(['8.8.8.8', '8.8.4.4'])
 
 app.use(cors())
-mongoose.connect(URI, {
-    serverSelectionTimeoutMS: 5000,
-    socketTimeoutMS: 45000,
-    retryWrites: true,
-})
 
-.then(()=>{
-    console.log("Connected to MongoDB");
-})
-.catch((err)=>{
-    console.log("Error connecting to DB:", err);
-})
-
+// Setup routes
 app.use("/user", studentRoutes)
 app.use("/subjects", subjectRoutes)
 
-// http://localhost:2114/admin/questions/addQuestions
+// Connect to MongoDB with improved error handling
+mongoose.connect(URI, {
+    serverSelectionTimeoutMS: 10000,
+    socketTimeoutMS: 45000,
+    retryWrites: true,
+    connectTimeoutMS: 10000,
+})
 
-app.listen(port, (req, res) =>{
-    console.log(`I am working on server ${port}`);
+.then(() => {
+    console.log("Connected to MongoDB successfully");
+    // Start server AFTER MongoDB is connected
+    app.listen(port, (req, res) => {
+        console.log(`Server running on port ${port}`);
+    })
+})
+
+.catch((err) => {
+    console.error("MongoDB Connection Failed:");
+    console.error("Error message:", err.message);
+    console.error("Error code:", err.code);
+    console.error("MongoDB URI:", URI ? "Configured" : "NOT CONFIGURED - Add MONGO_URI to .env file");
+    
+    // Exit process if can't connect to DB
+    console.error("\n Server will not start without database connection");
+    process.exit(1);
 })

@@ -27,8 +27,7 @@ const examResultSchema = new mongoose.Schema(
             max: 100
         },
         answers: {
-            type: Map,
-            of: String,
+            type: mongoose.Schema.Types.Mixed,
             default: {}
         },
         timeSpent: {
@@ -46,13 +45,5 @@ const examResultSchema = new mongoose.Schema(
 
 // Create index for faster queries by student and subject
 examResultSchema.index({ studentEmail: 1, subject: 1 });
-
-// Calculate percentage automatically
-examResultSchema.pre('save', function (next) {
-    if (this.totalQuestions > 0) {
-        this.score = (this.correctAnswers / this.totalQuestions) * 100;
-    }
-    next();
-});
 
 module.exports = mongoose.model('ExamResult', examResultSchema);

@@ -1,11 +1,11 @@
 .student-dashboard-shell {
-    min-height: calc(100vh - 80px);
+    min-height: auto;
     background: #f8f9fa;
-    padding: clamp(1rem, 3vw, 3rem);
+    padding: clamp(0.5rem, 2vw, 2rem);
     display: flex;
     align-items: center;
     justify-content: center;
-    /* margin-left: 300px; */
+    /* margin: 5px; */
 }
 
 .student-dashboard-banner {

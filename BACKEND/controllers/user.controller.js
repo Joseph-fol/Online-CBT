@@ -74,8 +74,9 @@ const postStudentSignUp = (req, res) => {
                         });
 
                     // Generate JWT token
+                    const userRole = studentData.role || "student"
                     const token = jsonwebtoken.sign(
-                        { email: studentData.email }, 
+                        { id: studentData._id, email: studentData.email, role: userRole }, 
                         process.env.jwtSecretKey, 
                         { expiresIn: "1h" }
                     )
@@ -160,7 +161,7 @@ const postAdminSignUp = (req, res) => {
                     const newAdminDetails = new student(adminData)
                     return newAdminDetails.save()
                         .then((admin) => {
-                            console.log("✅ Admin Saved:", admin.email)
+                            console.log("Admin Saved:", admin.email)
 
                             // Mark invitation as accepted
                             invitation.status = "accepted"
@@ -255,13 +256,15 @@ const postSignin = (req, res) => {
             }
 
             console.log("Login successful for, ", foundStudent.email)
-            const token = jsonwebtoken.sign({email: foundStudent.email}, process.env.jwtSecretKey, {expiresIn: "1h"})
+            const userRole = foundStudent.role || "student"
+            const token = jsonwebtoken.sign({id: foundStudent._id, email: foundStudent.email, role: userRole}, process.env.jwtSecretKey, {expiresIn: "1h"})
             return res.status(200).json({
                 message: "Signin Successful",
                 token: token,
                 student: {
                     id: foundStudent._id,
                     email: foundStudent.email,
+                    fullName: foundStudent.fullName,
                 }
             })
         })
@@ -275,6 +278,7 @@ const postAdminSignin = (req, res) => {
     const { email, password } = req.body
     console.log("Admin signin attempt with email:", email)
     console.log("Searching for admin with email and role admin...")
+    console.log("Attempting MongoDB query...")
     
     student.findOne({ email: email, role: "admin" })
         .then((foundAdmin) => {
@@ -309,9 +313,12 @@ const postAdminSignin = (req, res) => {
                 })
             }
             
+            // Ensure admin role is set (fallback for older records)
+            const adminRole = foundAdmin.role || "admin"
+            
             // Generate JWT token
             const token = jsonwebtoken.sign(
-                { id: foundAdmin._id, email: foundAdmin.email, role: foundAdmin.role },
+                { id: foundAdmin._id, email: foundAdmin.email, role: adminRole },
                 process.env.jwtSecretKey,
                 { expiresIn: "24h" }
             )
@@ -329,22 +336,45 @@ const postAdminSignin = (req, res) => {
         })
 
         .catch((err) => {
-            console.error("❌ Error during admin signin");
+            console.error("Error during admin signin");
+            console.error("Error type:", err.name);
             console.error("Error message:", err.message);
-            console.error("Error stack:", err.stack);
+            console.error("Error code:", err.code);
             console.error("Full error:", err);
+            
+            // Provide specific error messages
+            let errorMessage = "Internal server error";
+            let errorDetails = err.message;
+            
+            if (err.name === 'MongoServerError' || err.message.includes('ECONNREFUSED') || err.message.includes('buffering timed out')) {
+                errorMessage = "Database connection error";
+                errorDetails = "Cannot connect to MongoDB. Please check: 1) MongoDB is running, 2) Connection string is correct, 3) IP whitelist in MongoDB Atlas includes your IP";
+            } else if (err.message.includes('ETIMEDOUT')) {
+                errorMessage = "Database connection timeout";
+                errorDetails = "MongoDB query timed out. The database may be slow or unreachable.";
+            }
+            
             return res.status(500).json({
-                message: "Internal server error",
-                error: err.message,
-                details: process.env.NODE_ENV === 'development' ? err.stack : undefined
+                message: errorMessage,
+                error: errorDetails,
+                debug: process.env.NODE_ENV === 'development' ? err.stack : undefined
             })
         })
 }
 
 const addQuestion = (req, res) => {
     console.log("Incoming payload", req.body)
+    console.log("Admin email from token:", req.user?.email)
 
     const { subject, duration, marks, correctAnswer, totalQuestion, questionText, optionA, optionB, optionC, optionD, score, description } = req.body
+    
+    // Get admin email from verified JWT token
+    const adminEmail = req.user?.email;
+    if (!adminEmail) {
+        return res.status(401).json({
+            message: "Admin email not found in token. Please sign in again."
+        })
+    }
     
     // If subject is provided as string (name), we need to either:
     // 1. Store it as is, or
@@ -352,6 +382,7 @@ const addQuestion = (req, res) => {
     // For now, we'll create the question with the subject name
     Question.create({
         subject,  // Store subject name for now
+        adminEmail,  // Store the admin's email
         duration,
         marks,
         description: description?.trim(),
@@ -367,6 +398,7 @@ const addQuestion = (req, res) => {
     })
 
         .then((newQuestion) => {
+            console.log("Saved question for admin:", adminEmail)
             console.log("Saved question:", newQuestion)
             res.status(201).json({
                 message: "Question successfully added",
@@ -383,10 +415,40 @@ const addQuestion = (req, res) => {
 }
 
 const getAllQuestions = (req, res) => {
-    Question.find()
+    const adminEmail = req.user?.email;
+    
+    if (!adminEmail) {
+        return res.status(401).json({
+            message: "Admin email not found in token. Please sign in again."
+        })
+    }
+    
+    // Filter questions by current admin OR questions without adminEmail (for backwards compatibility)
+    // This handles existing questions that were created before the adminEmail field was added
+    Question.find({
+        $or: [
+            { adminEmail: adminEmail },  // Questions created by this admin
+            { adminEmail: { $exists: false } }  // Old questions without adminEmail (assign to current admin)
+        ]
+    })
         .then((questionsArray) => {
-            res.status(200).json({
-                questionsArray
+            console.log(`Retrieved ${questionsArray.length} questions for admin: ${adminEmail}`)
+            
+            // For questions without adminEmail, assign them to the current admin
+            const updates = questionsArray
+                .filter(q => !q.adminEmail)
+                .map(q => Question.findByIdAndUpdate(q._id, { adminEmail: adminEmail }, { new: true }))
+            
+            // Wait for all updates to complete
+            Promise.all(updates).then(() => {
+                res.status(200).json({
+                    questionsArray
+                })
+            }).catch((err) => {
+                console.error("Error updating old questions:", err)
+                res.status(200).json({
+                    questionsArray
+                })
             })
         })
         .catch((error) => {
@@ -419,6 +481,8 @@ const getQuestionById = (req, res) => {
 
 const getQuestionBySubject = (req, res) => {
     const {subject} = req.params
+    // Students can access questions from any admin for a given subject
+    // Admin isolation is only in the admin dashboard (getAllQuestions)
     Question.find({subject: subject})
     .then((question)=>{
         if(!question || question.length == 0){
@@ -438,34 +502,55 @@ const getQuestionBySubject = (req, res) => {
 
 const updateQuestion = (req, res) => {
     const { id } = req.params
+    const adminEmail = req.user?.email
     const { subject, duration, marks, correctAnswer, totalQuestion, questionText, optionA, optionB, optionC, optionD, score, description } = req.body
 
-    Question.findByIdAndUpdate(
-        id,
-        {
-            subject,
-            duration,
-            marks,
-            description: description?.trim(),
-            totalQuestion,
-            questionText,
-            options: {
-                A: optionA,
-                B: optionB,
-                C: optionC,
-                D: optionD
-            },
-            correctAnswer
-        },
-        { new: true }
-    )
+    // First, find the question to verify ownership
+    Question.findById(id)
+        .then((question) => {
+            if (!question) {
+                return res.status(404).json({
+                    message: "Question not found"
+                })
+            }
+
+            // Verify that the admin owns this question
+            if (question.adminEmail !== adminEmail) {
+                return res.status(403).json({
+                    message: "You can only update your own questions",
+                    detail: "This question was created by another admin"
+                })
+            }
+
+            // Update the question
+            return Question.findByIdAndUpdate(
+                id,
+                {
+                    subject,
+                    duration,
+                    marks,
+                    description: description?.trim(),
+                    totalQuestion,
+                    questionText,
+                    options: {
+                        A: optionA,
+                        B: optionB,
+                        C: optionC,
+                        D: optionD
+                    },
+                    correctAnswer
+                },
+                { new: true }
+            )
+        })
         .then((updatedQuestion) => {
             if (!updatedQuestion) {
                 return res.status(404).json({
                     message: "Question not found"
                 })
             }
-            console.log("Question updated successfully:", updatedQuestion._id)
+
+            console.log("Question updated successfully by admin:", adminEmail)
             res.status(200).json({
                 message: "Question updated successfully",
                 question: updatedQuestion
@@ -482,15 +567,35 @@ const updateQuestion = (req, res) => {
 
 const deleteQuestion = (req, res) => {
     const { id } = req.params
+    const adminEmail = req.user?.email
 
-    Question.findByIdAndDelete(id)
+    // First, find the question to verify ownership
+    Question.findById(id)
+        .then((question) => {
+            if (!question) {
+                return res.status(404).json({
+                    message: "Question not found"
+                })
+            }
+
+            // Verify that the admin owns this question
+            if (question.adminEmail !== adminEmail) {
+                return res.status(403).json({
+                    message: "You can only delete your own questions",
+                    detail: "This question was created by another admin"
+                })
+            }
+
+            // Delete the question
+            return Question.findByIdAndDelete(id)
+        })
         .then((deletedQuestion) => {
             if (!deletedQuestion) {
                 return res.status(404).json({
                     message: "Question not found"
                 })
             }
-            console.log("Question deleted successfully:", id)
+            console.log("Question deleted successfully by admin:", adminEmail)
             res.status(200).json({
                 message: "Question deleted successfully",
                 question: deletedQuestion
@@ -752,18 +857,26 @@ const saveExamResult = (req, res) => {
 
     console.log("\n📥 RECEIVED EXAM RESULT SAVE REQUEST");
     console.log("=====================================");
+    console.log("Request Body:", JSON.stringify(req.body, null, 2));
     console.log("Student Email:", studentEmail);
     console.log("Subject:", subject);
     console.log("Total Questions:", totalQuestions);
     console.log("Correct Answers:", correctAnswers);
     console.log("Time Spent:", timeSpent);
-    console.log("Body received:", JSON.stringify(req.body, null, 2));
 
-    // Validate required fields
-    if (!studentEmail || !subject || totalQuestions === undefined || correctAnswers === undefined) {
-        console.error("❌ VALIDATION FAILED - Missing required fields");
+    // Validate required fields and provide detailed error
+    const missingFields = [];
+    if (!studentEmail) missingFields.push("studentEmail");
+    if (!subject) missingFields.push("subject");
+    if (totalQuestions === undefined || totalQuestions === null || totalQuestions === "") missingFields.push("totalQuestions");
+    if (correctAnswers === undefined || correctAnswers === null || correctAnswers === "") missingFields.push("correctAnswers");
+
+    if (missingFields.length > 0) {
+        console.error("VALIDATION FAILED - Missing required fields:", missingFields);
         return res.status(400).json({
-            message: "Missing required fields: studentEmail, subject, totalQuestions, correctAnswers"
+            message: `Missing required fields: ${missingFields.join(", ")}`,
+            missingFields: missingFields,
+            receivedData: { studentEmail, subject, totalQuestions, correctAnswers }
         })
     }
 
@@ -784,42 +897,56 @@ const saveExamResult = (req, res) => {
 
     console.log("📝 Creating exam result with data:", JSON.stringify(examResultData, null, 2));
 
-    const newExamResult = new ExamResult(examResultData)
+    try {
+        const newExamResult = new ExamResult(examResultData)
+        console.log("✅ Exam result object created successfully");
+        console.log("Document before save:", newExamResult);
 
-    return newExamResult.save()
-        .then((result) => {
-            console.log("EXAM RESULT SAVED SUCCESSFULLY");
-            console.log("Result ID:", result._id);
-            console.log("Score saved:", result.score);
-            console.log("Full result:", JSON.stringify(result, null, 2));
-            
-            return res.status(201).json({
-                message: "Exam result saved successfully",
-                result: {
-                    id: result._id,
-                    studentEmail: result.studentEmail,
-                    subject: result.subject,
-                    totalQuestions: result.totalQuestions,
-                    correctAnswers: result.correctAnswers,
-                    score: result.score.toFixed(2),
-                    submittedAt: result.submittedAt
-                }
+        return newExamResult.save()
+            .then((result) => {
+                console.log("EXAM RESULT SAVED SUCCESSFULLY");
+                console.log("Result ID:", result._id);
+                console.log("Score saved:", result.score);
+                console.log("Full result:", JSON.stringify(result, null, 2));
+                
+                return res.status(201).json({
+                    message: "Exam result saved successfully",
+                    result: {
+                        id: result._id,
+                        studentEmail: result.studentEmail,
+                        subject: result.subject,
+                        totalQuestions: result.totalQuestions,
+                        correctAnswers: result.correctAnswers,
+                        score: result.score.toFixed(2),
+                        submittedAt: result.submittedAt
+                    }
+                })
             })
-        })
-        .catch((err) => {
-            console.error("ERROR SAVING EXAM RESULT");
-            console.error("Error message:", err.message);
-            console.error("Error details:", JSON.stringify(err, null, 2));
-            console.error("Stack trace:", err.stack);
-            
-            return res.status(500).json({
-                message: "Failed to save exam result",
-                error: err.message,
-                details: err.toString()
+            .catch((err) => {
+                console.error("ERROR SAVING EXAM RESULT");
+                console.error("Error name:", err.name);
+                console.error("Error message:", err.message);
+                console.error("Error code:", err.code);
+                console.error("Validation errors:", err.errors);
+                console.error("Stack trace:", err.stack);
+                
+                return res.status(500).json({
+                    message: "Failed to save exam result",
+                    error: err.message,
+                    details: err.errors ? Object.keys(err.errors).map(k => `${k}: ${err.errors[k].message}`) : err.toString()
+                })
             })
+    } catch (error) {
+        console.error("EXCEPTION while creating exam result:");
+        console.error("Error message:", error.message);
+        console.error("Stack trace:", error.stack);
+        
+        return res.status(500).json({
+            message: "Failed to create exam result",
+            error: error.message
         })
+    }
 }
-
 // Get all exam results for a student
 const getStudentExamResults = (req, res) => {
     const { studentEmail } = req.query
@@ -862,4 +989,37 @@ const getStudentExamResults = (req, res) => {
         })
 }
 
-module.exports = { getStudentSignUp, postStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, updateQuestion, deleteQuestion, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation, saveExamResult, getStudentExamResults }
+// Get all exam results (for admin dashboard)
+const getAllExamResults = (req, res) => {
+    console.log("Admin fetching all exam results")
+
+    return ExamResult.find({})
+        .sort({ submittedAt: -1 })
+        .then((results) => {
+            console.log(`✅ Found ${results.length} total exam results`)
+            return res.status(200).json({
+                message: "All exam results fetched successfully",
+                count: results.length,
+                results: results.map(result => ({
+                    id: result._id,
+                    studentEmail: result.studentEmail,
+                    subject: result.subject,
+                    totalQuestions: result.totalQuestions,
+                    correctAnswers: result.correctAnswers,
+                    score: result.score.toFixed(2),
+                    timeSpent: result.timeSpent,
+                    submittedAt: result.submittedAt,
+                    status: result.score >= 50 ? "Pass" : "Fail"
+                }))
+            })
+        })
+        .catch((err) => {
+            console.error("Error fetching all exam results:", err)
+            return res.status(500).json({
+                message: "Failed to fetch exam results",
+                error: err.message
+            })
+        })
+}
+
+module.exports = { getStudentSignUp, postStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, updateQuestion, deleteQuestion, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation, saveExamResult, getStudentExamResults, getAllExamResults }

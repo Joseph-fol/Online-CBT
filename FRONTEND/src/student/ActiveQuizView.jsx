@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { showInfo } from '../utils/toastUtils'
 import Swal from 'sweetalert2'
 import API_BASE_URL from '../utils/api.config'
+import { getAuthHeader } from '../utils/auth'
 
 const ActiveQuizView = () => {
     const [selectedOption, setSelectedOption] = useState("")
@@ -195,21 +196,36 @@ const ActiveQuizView = () => {
 
             const score = (correct / questions.length) * 100;
 
-            // Get student email from localStorage
-            const jwtToken = localStorage.getItem('jwtSecretKey');
+            // Get student email from stored student data or localStorage
             let studentEmail = '';
-            if (jwtToken) {
-                // Decode JWT to get email (basic decode, not verified)
+            
+            // First try to get from studentData (more reliable)
+            const studentData = localStorage.getItem('studentData');
+            if (studentData) {
                 try {
-                    const base64Url = jwtToken.split('.')[1];
-                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                    const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
-                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                    }).join(''));
-                    studentEmail = JSON.parse(jsonPayload).email;
-                    console.log("Student email extracted:", studentEmail);
+                    const parsed = JSON.parse(studentData);
+                    studentEmail = parsed.email;
+                    console.log("Student email from studentData:", studentEmail);
                 } catch (error) {
-                    console.error("Error decoding JWT:", error);
+                    console.error("Error parsing studentData:", error);
+                }
+            }
+            
+            // Fallback: decode JWT token if studentData not available
+            if (!studentEmail) {
+                const jwtToken = localStorage.getItem('token');
+                if (jwtToken) {
+                    try {
+                        const base64Url = jwtToken.split('.')[1];
+                        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                        const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
+                            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                        }).join(''));
+                        studentEmail = JSON.parse(jsonPayload).email;
+                        console.log("Student email extracted from JWT:", studentEmail);
+                    } catch (error) {
+                        console.error("Error decoding JWT:", error);
+                    }
                 }
             }
 
@@ -227,10 +243,15 @@ const ActiveQuizView = () => {
                 timeSpent: timeSpent
             };
 
-            console.log("📤 Sending exam result data:", examResultData);
+            console.log("Sending exam result data:", examResultData);
+            console.log("✓ studentEmail:", studentEmail ? "✅ " + studentEmail : "❌ EMPTY");
+            console.log("✓ subject:", subject ? "✅ " + subject : "❌ EMPTY");
+            console.log("✓ totalQuestions:", questions.length ? "✅ " + questions.length : "❌ EMPTY");
+            console.log("✓ correctAnswers:", correct !== undefined ? "✅ " + correct : "❌ EMPTY");
+            console.log("Auth headers:", getAuthHeader());
 
             // Save exam result to database
-            axios.post(`${API_BASE_URL}/user/exam/save-result`, examResultData)
+            axios.post(`${API_BASE_URL}/user/exam/save-result`, examResultData, { headers: getAuthHeader() })
                 .then((response) => {
                     console.log("✅ Exam result saved successfully!");
                     console.log("Response data:", response.data);
@@ -271,16 +292,22 @@ const ActiveQuizView = () => {
                 .catch((error) => {
                     console.error("❌ Error saving exam result:");
                     console.error("Error message:", error.message);
-                    console.error("Error response:", error.response?.data);
-                    console.error("Error status:", error.response?.status);
+                    console.error("Error response status:", error.response?.status);
+                    console.error("Error response data:", error.response?.data);
                     console.error("Full error:", error);
+
+                    // Get error message from backend
+                    const backendMessage = error.response?.data?.message || 
+                                         error.response?.data?.error ||
+                                         error.message || 
+                                         'Failed to save exam result';
 
                     // Still show results but show a warning about database save
                     Swal.fire({
                         title: 'Exam Submitted',
                         html: `<p style="color: #475569; margin: 10px 0;">Your exam has been processed.</p>
                                <p style="color: #0f172a; font-size: 24px; font-weight: bold; margin: 15px 0;">Score: <span style="color: #ab3500;">${score.toFixed(2)}%</span></p>
-                               <p style="color: #dc2626; margin: 10px 0; font-size: 13px;">⚠️ Note: ${error.response?.data?.message || error.message || 'There was an issue saving to the database, but your score is displayed above.'}</p>`,
+                               <p style="color: #dc2626; margin: 10px 0; font-size: 13px;"> Note: ${backendMessage}</p>`,
                         icon: 'warning',
                         iconColor: '#f59e0b',
                         confirmButtonColor: '#ab3500',

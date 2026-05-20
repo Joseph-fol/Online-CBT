@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { removeToken } from '../utils/auth'
 import './Navbar.css'
 
 const Navbar = ({ isSidebarOpen, onToggleSidebar }) => {
   const [adminName, setAdminName] = useState('Admin User')
+  const navigate = useNavigate()
 
   useEffect(() => {
     const adminData = localStorage.getItem('adminData')
@@ -16,6 +18,12 @@ const Navbar = ({ isSidebarOpen, onToggleSidebar }) => {
       }
     }
   }, [])
+
+  const handleLogout = () => {
+    removeToken()
+    localStorage.removeItem('adminData')
+    navigate('/admin/signin')
+  }
 
   return (
     <header className='admin-navbar'>
@@ -53,9 +61,13 @@ const Navbar = ({ isSidebarOpen, onToggleSidebar }) => {
             {adminName}
           </Link>
 
-          <Link to='/admin/signin' className='admin-navbar__logout'>
+          <button 
+            type='button'
+            className='admin-navbar__logout'
+            onClick={handleLogout}
+          >
             Logout
-          </Link>
+          </button>
         </div>
       </div>
 
