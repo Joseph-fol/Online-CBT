@@ -19,6 +19,10 @@ app.use(express.urlencoded({
 const port = process.env.PORT 
 const URI = process.env.MONGO_URI
 
+console.log('--- DEBUG: CHECKING ENVIRONMENT VARIABLES ---');
+console.log(`Attempting to connect with URI: >${URI}<`);
+console.log('--- END DEBUG ---');
+
 // console.log("Backend Configuration:")
 // console.log("Port:", port)
 // console.log("MongoDB URI configured:", !!URI)
