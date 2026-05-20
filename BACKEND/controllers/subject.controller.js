@@ -73,7 +73,6 @@ const getSubjectById = (req, res) => {
                     message: "Subject not found"
                 })
             }
-            
             console.log("Subject retrieved successfully:", subject._id)
             return res.status(200).json({
                 message: "Subject retrieved successfully",
