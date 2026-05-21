@@ -102,7 +102,7 @@ const StudentResult = () => {
                 {allResults.map((result, index) => (
                   <tr key={result.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
                     <td style={{ padding: '15px', fontWeight: '500', color: '#121d38' }}>
-                      {result.studentEmail.split('@')[0]}
+                      {result.studentName || result.studentEmail.split('@')[0]}
                     </td>
                     <td style={{ padding: '15px', color: '#555' }}>{result.subject}</td>
                     <td style={{ padding: '15px', textAlign: 'center', fontWeight: 'bold', color: getScoreColor(parseFloat(result.score)) }}>

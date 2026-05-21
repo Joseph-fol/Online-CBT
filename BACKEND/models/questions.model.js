@@ -51,7 +51,8 @@ const questionSchema = new mongoose.Schema({
         enum: ['A','B','C','D']
     },
     
-    duration: { type: String }
+    duration: { type: String },
+    status: { type: String, enum: ['draft', 'published'], default: 'draft' }
 },{timestamps: true})
 
 module.exports = mongoose.model("Question", questionSchema)

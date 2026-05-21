@@ -82,13 +82,17 @@ const postStudentSignUp = (req, res) => {
                     )
                     console.log("Generated token for:", studentData.email)
 
-                    return res.status(201).json({
-                        message: "Signup Successful",
-                        token: token,
-                        student: {
-                            id: studentData._id,
-                            email: studentData.email,
-                        }
+                    studentData.activeToken = token;
+                    return studentData.save()
+                    .then(() => {
+                        return res.status(201).json({
+                            message: "Signup Successful",
+                            token: token,
+                            student: {
+                                id: studentData._id,
+                                email: studentData.email,
+                            }
+                        })
                     })
                 })
                 .catch((error) => {
@@ -192,15 +196,18 @@ const postAdminSignUp = (req, res) => {
                                     )
                                     console.log("Generated token for admin:", admin.email)
 
-                                    return res.status(201).json({
-                                        message: "Admin Signup Successful",
-                                        token: token,
-                                        admin: {
-                                            id: admin._id,
-                                            fullName: admin.fullName,
-                                            email: admin.email,
-                                            role: admin.role
-                                        }
+                                    admin.activeToken = token;
+                                    return admin.save().then(() => {
+                                        return res.status(201).json({
+                                            message: "Admin Signup Successful",
+                                            token: token,
+                                            admin: {
+                                                id: admin._id,
+                                                fullName: admin.fullName,
+                                                email: admin.email,
+                                                role: admin.role
+                                            }
+                                        })
                                     })
                                 })
                                 .catch((inviteError) => {
@@ -258,15 +265,25 @@ const postSignin = (req, res) => {
             console.log("Login successful for, ", foundStudent.email)
             const userRole = foundStudent.role || "student"
             const token = jsonwebtoken.sign({id: foundStudent._id, email: foundStudent.email, role: userRole}, process.env.jwtSecretKey, {expiresIn: "1h"})
-            return res.status(200).json({
-                message: "Signin Successful",
-                token: token,
-                student: {
-                    id: foundStudent._id,
-                    email: foundStudent.email,
-                    fullName: foundStudent.fullName,
-                }
-            })
+
+            // Save the active token to the user document to enforce single-device login
+            foundStudent.activeToken = token;
+            return foundStudent.save()
+                .then(() => {
+                    return res.status(200).json({
+                        message: "Signin Successful",
+                        token: token,
+                        student: {
+                            id: foundStudent._id,
+                            email: foundStudent.email,
+                            fullName: foundStudent.fullName,
+                        }
+                    })
+                })
+                .catch((saveErr) => {
+                    console.error("Error saving session token:", saveErr);
+                    return res.status(500).json({ message: "Internal server error" });
+                });
         })
         .catch((err) => {
             console.error("Error during signin", err);
@@ -323,16 +340,21 @@ const postAdminSignin = (req, res) => {
                 { expiresIn: "24h" }
             )
             
-            return res.json({
-                message: "Admin successfully signed in",
-                token: token,
-                admin: {
-                    id: foundAdmin._id,
-                    fullName: foundAdmin.fullName,
-                    email: foundAdmin.email,
-                    role: foundAdmin.role
-                }
-            })
+            // Ensure admin role single device login tracking
+            foundAdmin.activeToken = token;
+            return foundAdmin.save()
+                .then(() => {
+                    return res.json({
+                        message: "Admin successfully signed in",
+                        token: token,
+                        admin: {
+                            id: foundAdmin._id,
+                            fullName: foundAdmin.fullName,
+                            email: foundAdmin.email,
+                            role: foundAdmin.role
+                        }
+                    })
+                })
         })
 
         .catch((err) => {
@@ -366,7 +388,7 @@ const addQuestion = (req, res) => {
     console.log("Incoming payload", req.body)
     console.log("Admin email from token:", req.user?.email)
 
-    const { subject, duration, marks, correctAnswer, totalQuestion, questionText, optionA, optionB, optionC, optionD, score, description } = req.body
+    const { subject, duration, marks, correctAnswer, totalQuestion, questionText, optionA, optionB, optionC, optionD, score, description, status } = req.body
     
     // Get admin email from verified JWT token
     const adminEmail = req.user?.email;
@@ -394,7 +416,8 @@ const addQuestion = (req, res) => {
             C: optionC,
             D: optionD
         },
-        correctAnswer
+        correctAnswer,
+        status: status || 'draft'
     })
 
         .then((newQuestion) => {
@@ -483,7 +506,10 @@ const getQuestionBySubject = (req, res) => {
     const {subject} = req.params
     // Students can access questions from any admin for a given subject
     // Admin isolation is only in the admin dashboard (getAllQuestions)
-    Question.find({subject: subject})
+    Question.find({
+        subject: subject,
+        $or: [ { status: 'published' }, { status: { $exists: false } } ] // Fallback for legacy quizzes
+    })
     .then((question)=>{
         if(!question || question.length == 0){
             return res.status(404).json({
@@ -503,7 +529,7 @@ const getQuestionBySubject = (req, res) => {
 const updateQuestion = (req, res) => {
     const { id } = req.params
     const adminEmail = req.user?.email
-    const { subject, duration, marks, correctAnswer, totalQuestion, questionText, optionA, optionB, optionC, optionD, score, description } = req.body
+    const { subject, duration, marks, correctAnswer, totalQuestion, questionText, optionA, optionB, optionC, optionD, score, description, status } = req.body
 
     // First, find the question to verify ownership
     Question.findById(id)
@@ -522,10 +548,7 @@ const updateQuestion = (req, res) => {
                 })
             }
 
-            // Update the question
-            return Question.findByIdAndUpdate(
-                id,
-                {
+            const updateData = {
                     subject,
                     duration,
                     marks,
@@ -539,7 +562,16 @@ const updateQuestion = (req, res) => {
                         D: optionD
                     },
                     correctAnswer
-                },
+            };
+            
+            if (status) {
+                updateData.status = status;
+            }
+
+            // Update the question
+            return Question.findByIdAndUpdate(
+                id,
+                updateData,
                 { new: true }
             )
         })
@@ -962,14 +994,18 @@ const getStudentExamResults = (req, res) => {
 
     return ExamResult.find({ studentEmail: studentEmail })
         .sort({ submittedAt: -1 })
-        .then((results) => {
+        .then(async (results) => {
             console.log(`✅ Found ${results.length} exam results for:`, studentEmail)
+            const foundStudent = await student.findOne({ email: studentEmail });
+            const studentName = foundStudent ? foundStudent.fullName : studentEmail.split('@')[0];
+            
             return res.status(200).json({
                 message: "Exam results fetched successfully",
                 count: results.length,
                 results: results.map(result => ({
                     id: result._id,
                     studentEmail: result.studentEmail,
+                    studentName: studentName,
                     subject: result.subject,
                     totalQuestions: result.totalQuestions,
                     correctAnswers: result.correctAnswers,
@@ -995,14 +1031,21 @@ const getAllExamResults = (req, res) => {
 
     return ExamResult.find({})
         .sort({ submittedAt: -1 })
-        .then((results) => {
+        .then(async (results) => {
             console.log(`✅ Found ${results.length} total exam results`)
+            
+            const emails = [...new Set(results.map(r => r.studentEmail))];
+            const students = await student.find({ email: { $in: emails } });
+            const emailToNameMap = {};
+            students.forEach(s => { emailToNameMap[s.email] = s.fullName });
+
             return res.status(200).json({
                 message: "All exam results fetched successfully",
                 count: results.length,
                 results: results.map(result => ({
                     id: result._id,
                     studentEmail: result.studentEmail,
+                    studentName: emailToNameMap[result.studentEmail] || result.studentEmail.split('@')[0],
                     subject: result.subject,
                     totalQuestions: result.totalQuestions,
                     correctAnswers: result.correctAnswers,
@@ -1022,4 +1065,20 @@ const getAllExamResults = (req, res) => {
         })
 }
 
-module.exports = { getStudentSignUp, postStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, updateQuestion, deleteQuestion, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation, saveExamResult, getStudentExamResults, getAllExamResults }
+const logout = (req, res) => {
+    const email = req.user?.email;
+    if (!email) {
+        return res.status(400).json({ message: "User email not found in request" });
+    }
+
+    student.findOneAndUpdate({ email: email }, { activeToken: null })
+        .then(() => {
+            res.status(200).json({ message: "Logged out successfully" });
+        })
+        .catch((err) => {
+            console.error("Error during logout:", err);
+            res.status(500).json({ message: "Failed to logout" });
+        });
+}
+
+module.exports = { getStudentSignUp, postStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, updateQuestion, deleteQuestion, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation, saveExamResult, getStudentExamResults, getAllExamResults, logout }

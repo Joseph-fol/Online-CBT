@@ -4,7 +4,8 @@ const studentDetails = mongoose.Schema({
     fullName: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, enum: ["student", "admin"], default: "student" }
+    role: { type: String, enum: ["student", "admin"], default: "student" },
+    activeToken: { type: String, default: null }
 })
 
 const student = mongoose.model("studentInfo", studentDetails)

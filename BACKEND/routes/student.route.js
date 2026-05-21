@@ -7,7 +7,7 @@ const {postStudentSignUp, getStudentSignUp, postAdminSignUp, getStudentSignin, g
 
 // Email Configuration Check Endpoint
 router.get("/test-email-config", (req, res) => {
-    console.log("\nEMAIL CONFIGURATION CHECK");
+    console.log("\n EMAIL CONFIGURATION CHECK");
     console.log("================================");
     
     const config = {
@@ -47,7 +47,7 @@ router.post("/test-email-send", async (req, res) => {
             return res.status(400).json({ error: "Please provide testEmail" });
         }
         
-        console.log(`\n📧 Testing ${type} email to:`, testEmail);
+        console.log(`\n Testing ${type} email to:`, testEmail);
         
         let result;
         if (type === "invitation") {
@@ -117,13 +117,13 @@ router.get("/test-db-connection", async (req, res) => {
 
         await testConn.close();
 
-        console.log("✅ Database connection test successful.");
+        console.log("Database connection test successful.");
         return res.status(200).json({
             status: "SUCCESS",
             message: "MongoDB connection successful."
         });
     } catch (error) {
-        console.error("❌ Database connection test failed.");
+        console.error("Database connection test failed.");
         console.error("Error message:", error.message);
         console.error("Error code:", error.code);
 

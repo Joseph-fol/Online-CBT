@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
 import API_BASE_URL from '../../utils/api.config'
+import { getAuthHeader } from '../../utils/auth'
 
 const AdminOverview = () => {
   const [adminName, setAdminName] = useState('Admin')
@@ -12,6 +13,7 @@ const AdminOverview = () => {
     { label: 'AVERAGE SCORE', value: '0%' },
   ])
   const [loading, setLoading] = useState(true)
+  const [recentActivity, setRecentActivity] = useState([])
 
   useEffect(() => {
     const adminData = localStorage.getItem('adminData')
@@ -27,6 +29,7 @@ const AdminOverview = () => {
 
   useEffect(() => {
     fetchDashboardStats()
+    fetchRecentActivity()
   }, [])
 
   const fetchDashboardStats = () => {
@@ -48,6 +51,34 @@ const AdminOverview = () => {
         setLoading(false)
       })
   }
+
+  const fetchRecentActivity = () => {
+    axios.get(`${API_BASE_URL}/user/exam/all-results`, { headers: getAuthHeader() })
+      .then((response) => {
+        const results = response.data.results || []
+        // Display the 5 most recent activities
+        setRecentActivity(results.slice(0, 5))
+      })
+      .catch((error) => {
+        console.error('Error fetching recent activity:', error)
+      })
+  }
+
+  const formatTimeAgo = (dateString) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffMs = now - date
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMs / 3600000)
+    const diffDays = Math.floor(diffMs / 86400000)
+
+    if (diffMins < 1) return "Just now"
+    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+    return date.toLocaleDateString()
+  }
+
   return (
     <section className='admin-overview'>
       <div className='admin-overview-top-section'>
@@ -100,38 +131,22 @@ const AdminOverview = () => {
             </thead>
 
             <tbody>
-              <tr>
-                <th scope="row" className='fw-medium'>Adesola Micheal</th>
-                <td>
-                  <span className=''>Advanced Macroeconomics</span>
-                </td>
-                <td className='fw-medium'>85%</td>
-                <td className=''>2 min ago</td>
-              </tr>
-              <tr>
-                <th scope="row" className='fw-medium'>Adesola Micheal</th>
-                <td>
-                  <span className=''>Advanced Macroeconomics</span>
-                </td>
-                <td className='fw-medium'>85%</td>
-                <td className=''>2 min ago</td>
-              </tr>
-              <tr>
-                <th scope="row" className='fw-medium'>Adesola Micheal</th>
-                <td>
-                  <span className=''>Advanced Macroeconomics</span>
-                </td>
-                <td className='fw-medium'>85%</td>
-                <td className=''>2 min ago</td>
-              </tr>
-              <tr>
-                <th scope="row" className='fw-medium'>Adesola Micheal</th>
-                <td>
-                  <span className=''>Advanced Macroeconomics</span>
-                </td>
-                <td className='fw-medium'>85%</td>
-                <td className=''>2 min ago</td>
-              </tr>
+              {recentActivity.length === 0 ? (
+                <tr>
+                  <td colSpan="4" className="text-center py-3">No recent activity found</td>
+                </tr>
+              ) : (
+                recentActivity.map((activity, index) => (
+                  <tr key={activity.id || index}>
+                    <th scope="row" className='fw-medium'>{activity.studentName || activity.studentEmail.split('@')[0]}</th>
+                    <td>
+                      <span className=''>{activity.subject}</span>
+                    </td>
+                    <td className='fw-medium'>{activity.score}%</td>
+                    <td className=''>{formatTimeAgo(activity.submittedAt)}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

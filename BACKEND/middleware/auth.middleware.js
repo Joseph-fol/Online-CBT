@@ -1,4 +1,5 @@
 const jsonwebtoken = require("jsonwebtoken");
+const student = require("../models/user.model");
 
 const verifyToken = (req, res, next) => {
     const token = req.headers.authorization?.split(" ")[1] || req.cookies?.token;
@@ -8,14 +9,32 @@ const verifyToken = (req, res, next) => {
         });
     }
 
-    jsonwebtoken.verify(token, process.env.jwtSecretKey, (err, decoded) => {
+    jsonwebtoken.verify(token, process.env.jwtSecretKey, async (err, decoded) => {
         if (err) {
             return res.status(403).json({
                 message: "Invalid or expired token. Please sign in again."
             });
         }
-        req.user = decoded;
-        next();
+        
+        try {
+            const foundUser = await student.findOne({ email: decoded.email });
+            
+            if (!foundUser || foundUser.activeToken !== token) {
+                return res.status(401).json({
+                    message: "Session expired or you logged in from another device. Please log in again."
+                });
+            }
+            
+            // Enrich req.user with role from DB, just in case token is missing it
+            req.user = {
+                ...decoded,
+                role: foundUser.role
+            };
+            next();
+        } catch (dbErr) {
+            console.error("Auth Middleware DB Error:", dbErr);
+            return res.status(500).json({ message: "Internal server error during authentication" });
+        }
     });
 };
 
