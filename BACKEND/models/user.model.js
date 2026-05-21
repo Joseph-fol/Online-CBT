@@ -6,7 +6,7 @@ const studentDetails = mongoose.Schema({
     password: { type: String, required: true },
     role: { type: String, enum: ["student", "admin"], default: "student" },
     activeToken: { type: String, default: null }
-})
+},{ timestamps: true })
 
 const student = mongoose.model("studentInfo", studentDetails)
 module.exports = student;

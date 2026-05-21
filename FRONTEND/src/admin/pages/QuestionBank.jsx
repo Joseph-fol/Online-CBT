@@ -5,6 +5,7 @@ import * as yup from "yup"
 import { showSuccess, showError, showInfo, showConfirm } from '../../utils/toastUtils'
 import API_BASE_URL from '../../utils/api.config'
 import { questionApi } from '../../utils/questionApi'
+import { subjectApi } from '../../utils/subjectApi'
 
 const QuestionBank = () => {
   const [allQuestions, setAllQuestions] = useState([])
@@ -21,6 +22,7 @@ const QuestionBank = () => {
   // Fetch existing subjects and saved questions on component mount
   useEffect(() => {
     fetchAllQuestions()
+    fetchSubjectsList()
   }, [])
 
   // Filter saved questions whenever selectedSubject changes
@@ -111,6 +113,8 @@ const QuestionBank = () => {
     setIsNewSubject(false)
     const selectedSubject = subjects.find(s => s.name === subjectName)
     if (selectedSubject) {
+      const existingQuestion = allQuestions.find(q => q.subject === subjectName)
+      
       formik.setValues({
         subject: selectedSubject.name,
         description: selectedSubject.description,
@@ -118,6 +122,11 @@ const QuestionBank = () => {
         duration: String(selectedSubject.duration),
         totalQuestion: String(selectedSubject.totalQuestion),
         score: String(selectedSubject.score),
+        description: selectedSubject.description || '',
+        marks: existingQuestion ? String(existingQuestion.marks) : '2',
+        duration: String(selectedSubject.duration || existingQuestion?.duration || ''),
+        totalQuestion: existingQuestion ? String(existingQuestion.totalQuestion) : '',
+        score: existingQuestion ? String(existingQuestion.score) : '',
         questionText: '',
         optionA: '',
         optionB: '',
