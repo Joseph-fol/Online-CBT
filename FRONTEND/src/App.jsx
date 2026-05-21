@@ -22,6 +22,7 @@ import PageNotFound from './component/PageNotFound'
 import ExactQuestion from './student/ExactQuestion'
 import ActiveQuizView from './student/ActiveQuizView'
 import ProtectedRoute from './component/ProtectedRoute'
+import HowItWorks from './component/HowItWorks'
 
 const App = () => {
   return (
@@ -36,6 +37,7 @@ const App = () => {
         <Route path="/createStudentAccount" element={<SignupPage/>}/>
         <Route path="/question/:id" element={<ExactQuestion/>}/>
         <Route path="/forgotPassword" element={<ForgotPassword/>}/>
+        <Route path="/how-it-works" element={<HowItWorks/>}/>
         <Route path="/student-history" element={<Navigate to='/student/performance-history' replace />} />
         <Route path='*' element={<PageNotFound/>}/>
 
