@@ -23,6 +23,8 @@ import ExactQuestion from './student/ExactQuestion'
 import ActiveQuizView from './student/ActiveQuizView'
 import ProtectedRoute from './component/ProtectedRoute'
 import HowItWorks from './component/HowItWorks'
+import LandingPageFooter from './component/LandingPageFooter'
+import TermsAndPolicy from './component/TermsAndPolicy'
 
 const App = () => {
   return (
@@ -38,6 +40,8 @@ const App = () => {
         <Route path="/question/:id" element={<ExactQuestion/>}/>
         <Route path="/forgotPassword" element={<ForgotPassword/>}/>
         <Route path="/how-it-works" element={<HowItWorks/>}/>
+        <Route path="/footer" element={<LandingPageFooter/>}/>
+        <Route path="/terms-and-policy" element={<TermsAndPolicy/>}/>
         <Route path="/student-history" element={<Navigate to='/student/performance-history' replace />} />
         <Route path='*' element={<PageNotFound/>}/>
 

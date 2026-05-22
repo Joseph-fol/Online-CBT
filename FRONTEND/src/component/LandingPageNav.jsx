@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import './LandingPage.css'
 import logo from '../assets/Online-cbt.jpg'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const LandingPageNav = () => {
+    const navigate = useNavigate()
+
     const [isScrolled, setIsScrolled] = useState(false)
     useEffect(() => {
         const handleScroll = () => {
@@ -34,7 +36,7 @@ const LandingPageNav = () => {
                 }}
             >
                 <div className="container-fluid">
-                    <a className="navbar-brand fw-bold" onClick={() => navigate("/")} style={{ cursor: "pointer" }} ><img src={logo} alt="Online CBT Logo" width={30} /> Online CBT</a>
+                    <a className="navbar-brand fw-bold" onClick={()=> navigate("/")} style={{ cursor: "pointer" }} ><img src={logo} alt="Online CBT Logo" width={30} /> Online CBT</a>
                     <button className="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>
