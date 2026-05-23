@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { removeToken } from '../utils/auth'
+import { removeToken, getAuthHeader } from '../utils/auth'
+import axios from 'axios'
+import API_BASE_URL from '../utils/api.config'
+import Swal from 'sweetalert2'
 import './Navbar.css'
 
 const Navbar = ({ isSidebarOpen, onToggleSidebar }) => {
@@ -20,9 +23,35 @@ const Navbar = ({ isSidebarOpen, onToggleSidebar }) => {
   }, [])
 
   const handleLogout = () => {
-    removeToken()
-    localStorage.removeItem('adminData')
-    navigate('/admin/signin')
+    Swal.fire({
+      title: 'Confirm Logout',
+      text: 'Are you sure you want to securely log out of your admin session?',
+      icon: 'question',
+      iconColor: '#ab3500',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, log out',
+      cancelButtonText: 'Cancel',
+      buttonsStyling: false,
+      customClass: {
+        popup: 'admin-logout-modal-popup',
+        title: 'admin-logout-modal-title',
+        htmlContainer: 'admin-logout-modal-text',
+        actions: 'admin-logout-modal-actions',
+        confirmButton: 'admin-logout-modal-confirm',
+        cancelButton: 'admin-logout-modal-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Notify backend to clear the active session token
+        axios.post(`${API_BASE_URL}/user/logout`, {}, { headers: getAuthHeader() })
+          .catch(err => console.error("Error logging out from server:", err))
+          .finally(() => {
+            removeToken()
+            localStorage.removeItem('adminData')
+            navigate('/admin/signin')
+          })
+      }
+    })
   }
 
   return (
@@ -63,10 +92,11 @@ const Navbar = ({ isSidebarOpen, onToggleSidebar }) => {
 
           <button 
             type='button'
-            className='admin-navbar__logout'
+            className='admin-navbar__logout d-flex align-items-center gap-2'
             onClick={handleLogout}
           >
             Logout
+            <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24"><path fill="currentColor" d="M5 5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h7v-2H5V5zm16 7l-4-4v3H9v2h8v3l4-4z"/></svg>
           </button>
         </div>
       </div>

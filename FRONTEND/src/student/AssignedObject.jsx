@@ -112,8 +112,7 @@ const AssignedObject = () => {
                 </div>
 
 
-                <div style={recentPerformance} className='container my-5'>
-
+                {/* <div style={recentPerformance} className='container my-5'>
                     <div className='d-flex justify-content-between align-items-center mb-4'>
                         <div>
                             <h3 style={{ color: "#110d43", fontWeight: "bold" }}>Recent Performance</h3>
@@ -145,9 +144,9 @@ const AssignedObject = () => {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
-                <footer className='container py-3'>
+                <footer className='container py-3 buttom-0' style={{ backgroundColor: "#f8f9fa", marginTop: "30px" }}>
                     <div className='d-flex justify-content-between' style={{ fontSize: "12px" }}>
                         <p> © {thisYear} Academic Curator CBT. Advanced Examination Systems.</p>
 

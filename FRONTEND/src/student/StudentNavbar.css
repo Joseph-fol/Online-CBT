@@ -117,6 +117,75 @@
     text-decoration: none;
     font-size: 0.9rem;
     font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    font-family: inherit;
+    transition: color 0.2s ease;
+}
+
+.student-navbar__logout:hover {
+    color: #667085;
+}
+
+/* --- SweetAlert Logout Modal --- */
+.student-logout-modal-popup {
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.student-logout-modal-title {
+    color: #0f172b;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.student-logout-modal-text {
+    color: #475569;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+.student-logout-modal-actions {
+    margin-top: 1.5rem;
+    gap: 1rem;
+}
+
+.student-logout-modal-confirm {
+    background-color: #ab3500;
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 0.6rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(171, 53, 0, 0.2);
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.student-logout-modal-confirm:hover {
+    background-color: #8a2a00;
+    transform: translateY(-1px);
+}
+
+.student-logout-modal-cancel {
+    background-color: #f8fafc;
+    color: #475569;
+    border-radius: 8px;
+    padding: 0.6rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.student-logout-modal-cancel:hover {
+    background-color: #e2e8f0;
+    color: #0f172b;
 }
 
 @media (max-width: 992px) {

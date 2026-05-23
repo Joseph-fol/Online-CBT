@@ -130,6 +130,65 @@
     color: #667085;
 }
 
+/* --- SweetAlert Logout Modal --- */
+.admin-logout-modal-popup {
+    border-radius: 16px;
+    padding: 2rem 1.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.admin-logout-modal-title {
+    color: #0f172b;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.admin-logout-modal-text {
+    color: #475569;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+.admin-logout-modal-actions {
+    margin-top: 1.5rem;
+    gap: 1rem;
+}
+
+.admin-logout-modal-confirm {
+    background-color: #ab3500;
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 0.6rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(171, 53, 0, 0.2);
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.admin-logout-modal-confirm:hover {
+    background-color: #8a2a00;
+    transform: translateY(-1px);
+}
+
+.admin-logout-modal-cancel {
+    background-color: #f8fafc;
+    color: #475569;
+    border-radius: 8px;
+    padding: 0.6rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.admin-logout-modal-cancel:hover {
+    background-color: #e2e8f0;
+    color: #0f172b;
+}
+
 @media (max-width: 992px) {
     .admin-navbar__top {
         min-height: 3rem;

@@ -1,16 +1,45 @@
 import React from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { removeToken } from '../utils/auth'
+import { removeToken, getAuthHeader } from '../utils/auth'
+import axios from 'axios'
+import API_BASE_URL from '../utils/api.config'
+import Swal from 'sweetalert2'
 import './StudentNavbar.css'
 
 const StudentNavbar = ({ isSidebarOpen, onToggleSidebar }) => {
   const navigate = useNavigate()
 
   const handleLogout = () => {
-    removeToken()
-    localStorage.removeItem('studentData')
-    localStorage.removeItem('studentResults')
-    navigate('/studentSignin')
+    Swal.fire({
+      title: 'Confirm Logout',
+      text: 'Are you sure you want to securely log out of your student session?',
+      icon: 'question',
+      iconColor: '#ab3500',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, log out',
+      cancelButtonText: 'Cancel',
+      buttonsStyling: false,
+      customClass: {
+        popup: 'student-logout-modal-popup',
+        title: 'student-logout-modal-title',
+        htmlContainer: 'student-logout-modal-text',
+        actions: 'student-logout-modal-actions',
+        confirmButton: 'student-logout-modal-confirm',
+        cancelButton: 'student-logout-modal-cancel'
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Notify backend to clear the active session token
+        axios.post(`${API_BASE_URL}/user/logout`, {}, { headers: getAuthHeader() })
+          .catch(err => console.error("Error logging out from server:", err))
+          .finally(() => {
+            removeToken()
+            localStorage.removeItem('studentData')
+            localStorage.removeItem('studentResults')
+            navigate('/studentSignin')
+          })
+      }
+    })
   }
   return (
     <header className='student-navbar'>
@@ -59,10 +88,11 @@ const StudentNavbar = ({ isSidebarOpen, onToggleSidebar }) => {
 
           <button 
             onClick={handleLogout}
-            className='student-navbar__logout'
+            className='student-navbar__logout d-flex align-items-center gap-2'
             type='button'
           >
             Logout
+            <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24"><path fill="currentColor" d="M5 5h7V3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h7v-2H5V5zm16 7l-4-4v3H9v2h8v3l4-4z"/></svg>
           </button>
         </div>
       </div>
