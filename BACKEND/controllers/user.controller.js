@@ -438,41 +438,51 @@ const addQuestion = (req, res) => {
 }
 
 const getAllQuestions = (req, res) => {
-    const adminEmail = req.user?.email;
+    const userEmail = req.user?.email;
+    const userRole = req.user?.role;
     
-    if (!adminEmail) {
+    if (!userEmail) {
         return res.status(401).json({
-            message: "Admin email not found in token. Please sign in again."
+            message: "User email not found in token. Please sign in again."
         })
     }
     
-    // Filter questions by current admin OR questions without adminEmail (for backwards compatibility)
-    // This handles existing questions that were created before the adminEmail field was added
-    Question.find({
-        $or: [
-            { adminEmail: adminEmail },  // Questions created by this admin
-            { adminEmail: { $exists: false } }  // Old questions without adminEmail (assign to current admin)
-        ]
-    })
+    let query = {};
+
+    if (userRole === 'admin') {
+        query = {
+            $or: [
+                { adminEmail: userEmail },
+                { adminEmail: { $exists: false } }
+            ]
+        };
+    } else {
+        query = {
+            $or: [
+                { status: 'published' },
+                { status: { $exists: false } }
+            ]
+        };
+    }
+    
+    Question.find(query)
         .then((questionsArray) => {
-            console.log(`Retrieved ${questionsArray.length} questions for admin: ${adminEmail}`)
+            console.log(`Retrieved ${questionsArray.length} questions for user: ${userEmail} (Role: ${userRole})`)
             
-            // For questions without adminEmail, assign them to the current admin
-            const updates = questionsArray
-                .filter(q => !q.adminEmail)
-                .map(q => Question.findByIdAndUpdate(q._id, { adminEmail: adminEmail }, { new: true }))
-            
-            // Wait for all updates to complete
-            Promise.all(updates).then(() => {
-                res.status(200).json({
-                    questionsArray
+            if (userRole === 'admin') {
+                const updates = questionsArray
+                    .filter(q => !q.adminEmail)
+                    .map(q => Question.findByIdAndUpdate(q._id, { adminEmail: userEmail }, { new: true }))
+                
+                Promise.all(updates).then(() => {
+                    res.status(200).json({ questionsArray })
+                }).catch((err) => {
+                    console.error("Error updating old questions:", err)
+                    res.status(200).json({ questionsArray })
                 })
-            }).catch((err) => {
-                console.error("Error updating old questions:", err)
-                res.status(200).json({
-                    questionsArray
-                })
-            })
+            } else {
+                res.status(200).json({ questionsArray })
+            }
         })
         .catch((error) => {
             res.status(500).json({

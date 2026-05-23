@@ -19,12 +19,12 @@ const AssignedObject = () => {
                 // Safely extract questions, handling different possible backend responses
                 const questionsArray = response.data.questionsArray || response.data.questions || response.data || []
                 setQuestions(questionsArray)
-                
+
                 if (Array.isArray(questionsArray)) {
                     // Group ONLY published questions by subject (students shouldn't see drafts)
                     const subjectMap = {}
                     const publishedQuestions = questionsArray.filter(q => q.status === 'published' || !q.status)
-                    
+
                     publishedQuestions.forEach(question => {
                         if (!subjectMap[question.subject]) {
                             subjectMap[question.subject] = {
@@ -37,7 +37,7 @@ const AssignedObject = () => {
                         }
                         subjectMap[question.subject].questionCount += 1
                     })
-                    
+
                     const uniqueSubjectsArray = Object.values(subjectMap)
                     setUniqueSubjects(uniqueSubjectsArray)
                 }
@@ -82,7 +82,7 @@ const AssignedObject = () => {
 
                         <div className='fw-bold'>
                             <Link to="/student/available-assessments" className='text-decoration-none d-flex align-items-center gap-1' style={{ color: "#121d38" }}>
-                                <span style={{ fontSize: " 14px" }}>View all curriculum </span> 
+                                <span style={{ fontSize: " 14px" }}>View all curriculum </span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24"><g fill="none"><path d="M24 0v24H0V0zM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035q-.016-.005-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.017-.018m.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01z" /><path fill="#121d38" d="m15.06 5.283l5.657 5.657a1.5 1.5 0 0 1 0 2.12l-5.656 5.658a1.5 1.5 0 0 1-2.122-2.122l3.096-3.096H4.5a1.5 1.5 0 0 1 0-3h11.535L12.94 7.404a1.5 1.5 0 0 1 2.122-2.121Z" /></g></svg>
                             </Link>
                         </div>
@@ -157,13 +157,15 @@ const AssignedObject = () => {
 
                 <footer className='container py-3 buttom-0' style={{ backgroundColor: "#f8f9fa", marginTop: "30px" }}>
                     <div className='d-flex justify-content-between' style={{ fontSize: "12px" }}>
-                        <p> © {thisYear} Academic Curator CBT. Advanced Examination Systems.</p>
+                        <p> © {thisYear} Online CBT | Excel in your academic performance</p>
 
                         <div className=''>
                             <ul className='d-flex gap-3'>
-                                <li style={{ listStyle: "none" }}><a href="#" style={{ textDecoration: "none", color: "black", fontWeight: "medium", fontSize: "12px" }}>Honor Code</a></li>
                                 <li style={{ listStyle: "none" }}><a href="#" style={{ textDecoration: "none", color: "black", fontWeight: "medium", fontSize: "12px" }}>Support</a></li>
-                                <li style={{ listStyle: "none" }}><a href="#" style={{ textDecoration: "none", color: "black", fontWeight: "medium", fontSize: "12px" }}>Privacy</a></li>
+
+                                <Link to="/privacy-policy" className='text-decoration-none'>
+                                    <li style={{ listStyle: "none" }}><a href="#" style={{ textDecoration: "none", color: "black", fontWeight: "medium", fontSize: "12px" }}>Privacy</a></li>
+                                </Link>
                             </ul>
                         </div>
                     </div>

@@ -135,7 +135,7 @@ const SignupPage = () => {
                                 </div>
 
                                 <div class="col-md-12 mt-4">
-                                    <label for="fullname" class="form-label fw-medium" style={{ fontSize: "13px" }}>INSTITUTIONAL EMAIL</label>
+                                    <label for="fullname" class="form-label fw-medium" style={{ fontSize: "13px" }}>EMAIL</label>
                                     <input type="text" className="form form-control border-0 text-black rounded-0 py-3 shadow-none" style={{ backgroundColor: "#e1e3e4" }} value={form.values.email} name='email' onChange={form.handleChange} onBlur={form.handleBlur} id="userEmail" placeholder='a.dot@university.edu' />
                                     {form.touched.email && form.errors.email ? <p className='text-danger'>{form.errors.email}</p> : ""}
                                     {emailError ? <p className='text-danger'>{emailError}</p> : ""}
