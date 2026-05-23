@@ -9,7 +9,7 @@ const LandingPageFooter = () => {
                 <div className='container'>
                     <div className='row g-1'>
                         <div className='col-lg-3 col-md-4'>
-                            <h5>CBT</h5>
+                            <h5>Online CBT</h5>
                             <p>Curating high-stakes digital examinations with unmatched precision and military-grade security.</p>
                         </div>
 

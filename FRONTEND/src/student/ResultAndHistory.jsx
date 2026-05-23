@@ -11,7 +11,7 @@ const ResultAndHistory = () => {
 
     useEffect(() => {
         // Get student email from JWT token
-        const jwtToken = localStorage.getItem('jwtSecretKey')
+        const jwtToken = localStorage.getItem('token')
         let email = ''
         if (jwtToken) {
             try {

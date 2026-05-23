@@ -16,28 +16,37 @@ const AssignedObject = () => {
         // axios.get("https://online-cbt.onrender.com/user/getAllQuestions")
         axios.get(`${API_BASE_URL}/user/getAllQuestions`, { headers: getAuthHeader() })
             .then((response) => {
-                setLoading(false)
-                const questionsArray = response.data.questionsArray
+                // Safely extract questions, handling different possible backend responses
+                const questionsArray = response.data.questionsArray || response.data.questions || response.data || []
                 setQuestions(questionsArray)
                 
-                // Group questions by subject
-                const subjectMap = {}
-                questionsArray.forEach(question => {
-                    if (!subjectMap[question.subject]) {
-                        subjectMap[question.subject] = {
-                            subject: question.subject,
-                            description: question.description,
-                            duration: question.duration,
-                            questionCount: 0,
-                            firstQuestionId: question._id
+                if (Array.isArray(questionsArray)) {
+                    // Group ONLY published questions by subject (students shouldn't see drafts)
+                    const subjectMap = {}
+                    const publishedQuestions = questionsArray.filter(q => q.status === 'published' || !q.status)
+                    
+                    publishedQuestions.forEach(question => {
+                        if (!subjectMap[question.subject]) {
+                            subjectMap[question.subject] = {
+                                subject: question.subject,
+                                description: question.description,
+                                duration: question.duration,
+                                questionCount: 0,
+                                firstQuestionId: question._id || question.id
+                            }
                         }
-                    }
-                    subjectMap[question.subject].questionCount += 1
-                })
-                
-                // Convert to array of unique subjects
-                const uniqueSubjectsArray = Object.values(subjectMap)
-                setUniqueSubjects(uniqueSubjectsArray)
+                        subjectMap[question.subject].questionCount += 1
+                    })
+                    
+                    const uniqueSubjectsArray = Object.values(subjectMap)
+                    setUniqueSubjects(uniqueSubjectsArray)
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching assigned subjects:", error)
+            })
+            .finally(() => {
+                setLoading(false)
             })
     }, [])
 
