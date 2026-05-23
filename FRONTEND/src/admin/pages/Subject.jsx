@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import './Subject.css'
 import { subjectApi } from '../../utils/subjectApi'
+import { questionApi } from '../../utils/questionApi'
 import { toast } from 'react-toastify'
+import { showConfirm } from '../../utils/toastUtils'
 
 const Subject = () => {
   const [subjects, setSubjects] = useState([])
@@ -64,18 +66,41 @@ const Subject = () => {
       })
   }
 
-  const handleDeleteSubject = (id) => {
-    if (window.confirm('Are you sure you want to delete this subject?')) {
-      subjectApi.deleteSubject(id)
-        .then(() => {
-          setSubjects(subjects.filter(s => s._id !== id))
-          toast.success('Subject deleted successfully!')
-        })
-        .catch((error) => {
-          console.error('Failed to delete subject:', error)
-          toast.error('Failed to delete subject')
-        })
-    }
+  const handleDeleteSubject = (subject) => {
+    showConfirm(
+      "Delete Subject",
+      `Are you sure you want to delete "${subject.name}"? All questions in its question bank will also be deleted permanently.`,
+      "Yes, Delete",
+      "Cancel"
+    ).then((result) => {
+      if (result.isConfirmed) {
+        subjectApi.deleteSubject(subject._id)
+          .then(() => {
+            setSubjects(subjects.filter(s => s._id !== subject._id))
+            toast.success('Subject deleted successfully!')
+            
+            // Automatically delete all questions linked to this subject
+            questionApi.getAllQuestions()
+              .then(res => {
+                const questionsArray = res.questionsArray || []
+                const questionsToDelete = questionsArray.filter(q => q.subject === subject.name)
+                
+                if (questionsToDelete.length > 0) {
+                  const deletePromises = questionsToDelete.map(q => questionApi.deleteQuestion(q._id || q.id))
+                  Promise.all(deletePromises)
+                    .then(() => console.log(`Successfully deleted ${questionsToDelete.length} associated questions.`))
+                    .catch(err => console.error('Error deleting associated questions:', err))
+                }
+              })
+              .catch(err => console.error('Error fetching questions for cleanup:', err))
+              
+          })
+          .catch((error) => {
+            console.error('Failed to delete subject:', error)
+            toast.error('Failed to delete subject')
+          })
+      }
+    })
   }
 
   const handleEditSubject = (subject) => {
@@ -236,7 +261,7 @@ const Subject = () => {
                   type='button' 
                   className='admin-subject-card__icon-button is-danger' 
                   aria-label={`Delete ${subject.name}`}
-                  onClick={() => handleDeleteSubject(subject._id)}
+                  onClick={() => handleDeleteSubject(subject)}
                 >
                   <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' aria-hidden='true'>
                     <path fill='currentColor' d='M9 3.75h6l.75 1.5H21v1.5H3v-1.5h5.25zM6 8.25h12l-1 11.25A1.5 1.5 0 0 1 15.5 21h-7a1.5 1.5 0 0 1-1.5-1.5z' />

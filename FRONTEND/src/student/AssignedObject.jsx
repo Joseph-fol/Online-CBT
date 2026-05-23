@@ -13,8 +13,8 @@ const AssignedObject = () => {
     const [uniqueSubjects, setUniqueSubjects] = useState([])
 
     useEffect(() => {
-        // axios.get("https://online-cbt.onrender.com/user/getAllQuestions")
-        axios.get(`${API_BASE_URL}/user/getAllQuestions`, { headers: getAuthHeader() })
+        // Add a cache-busting timestamp parameter to ensure fresh data is fetched every time
+        axios.get(`${API_BASE_URL}/user/getAllQuestions?_t=${Date.now()}`, { headers: getAuthHeader() })
             .then((response) => {
                 // Safely extract questions, handling different possible backend responses
                 const questionsArray = response.data.questionsArray || response.data.questions || response.data || []
@@ -44,6 +44,12 @@ const AssignedObject = () => {
             })
             .catch((error) => {
                 console.error("Error fetching assigned subjects:", error)
+                // If token is expired (401) or invalid, clear invalid data and force a fresh login
+                if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+                    localStorage.removeItem('token')
+                    localStorage.removeItem('studentData')
+                    window.location.href = '/studentSignin'
+                }
             })
             .finally(() => {
                 setLoading(false)

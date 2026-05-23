@@ -120,7 +120,7 @@ const ActiveQuizView = () => {
         // 5 minutes warning
         if (timeLeft === 300) {
             Swal.fire({
-                title: '⏰ 5 Minutes Remaining!',
+                title: '5 Minutes Remaining!',
                 text: 'You have 5 minutes left to complete the exam. Please hurry up!',
                 icon: 'warning',
                 iconColor: '#f59e0b',
@@ -290,7 +290,7 @@ const ActiveQuizView = () => {
                     });
                 })
                 .catch((error) => {
-                    console.error("❌ Error saving exam result:");
+                    console.error("Error saving exam result:");
                     console.error("Error message:", error.message);
                     console.error("Error response status:", error.response?.status);
                     console.error("Error response data:", error.response?.data);
@@ -452,7 +452,7 @@ const ActiveQuizView = () => {
                             <line x1="12" y1="8" x2="12" y2="12"></line>
                             <line x1="12" y1="16" x2="12.01" y2="16"></line>
                         </svg>
-                        <strong style={{ color: '#dc2626' }}>⏱️ Time's Up! Your exam has been automatically submitted.</strong>
+                        <strong style={{ color: '#dc2626' }}>Time's Up! Your exam has been automatically submitted.</strong>
                     </div>
                 )}
 
@@ -468,7 +468,7 @@ const ActiveQuizView = () => {
 
                 <button className='container border border-0 bg-light px-3 my-2 text-secondary text-start fw-bold d-block d-lg-none d-md-none'>Review All <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="#6b6868" d="M22 12.999V20a1 1 0 0 1-1 1h-8v-8.001zm-11 0V21H3a1 1 0 0 1-1-1v-7.001zM11 3v7.999H2V4a1 1 0 0 1 1-1zm10 0a1 1 0 0 1 1 1v6.999h-9V3z" /></svg></button>
 
-                <div className='container col-11 col-lg-7 bg-white p-4 rounded-4'>
+                <div className='container col-11 col-lg-7 bg-white p-4 rounded-4 mb-4'>
                     {/* Question */}
                     <h4 className='mb-4'>{currentQuestion?.questionText} </h4>
 
@@ -594,6 +594,59 @@ const ActiveQuizView = () => {
                                 {currentIndex === questions.length - 1 ? "Submit" : "Next"}
                                 <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 16 16"><path fill="#ffffff" fillRule="evenodd" d="M2 8a.75.75 0 0 1 .75-.75h8.69L8.22 4.03a.75.75 0 0 1 1.06-1.06l4.5 4.5a.75.75 0 0 1 0 1.06l-4.5 4.5a.75.75 0 0 1-1.06-1.06l3.22-3.22H2.75A.75.75 0 0 1 2 8" clipRule="evenodd" /></svg>
                             </button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Question Navigator */}
+                <div className='container col-11 col-lg-7 bg-white p-3 rounded-4 mb-3'>
+                    {/* <p className='fw-bold mb-2' style={{ fontSize: "14px", color: "#0f172b" }}>Question Navigator</p> */}
+                    <div className='d-flex flex-wrap gap-2' style={{ maxHeight: "150px", overflowY: "auto", padding: "5px 0" }}>
+                        {questions.map((q, index) => {
+                            const isCurrent = index === currentIndex;
+                            const isAnswered = selectedAnswers[q._id] !== undefined;
+
+                            let bgColor = "#f8f9fa";
+                            let textColor = "#6c757d";
+                            let borderColor = "#dee2e6";
+
+                            if (isAnswered) {
+                                bgColor = "#ab3500";
+                                textColor = "white";
+                                borderColor = "#ab3500";
+                            }
+
+                            return (
+                                <button
+                                    key={q._id || index}
+                                    onClick={() => setCurrentIndex(index)}
+                                    className="btn d-flex align-items-center justify-content-center fw-bold"
+                                    style={{
+                                        width: "35px",
+                                        height: "35px",
+                                        padding: "0",
+                                        backgroundColor: bgColor,
+                                        color: textColor,
+                                        border: `1px solid ${borderColor}`,
+                                        boxShadow: isCurrent ? '0 0 0 2px #0f172b' : 'none',
+                                        borderRadius: "6px",
+                                        transition: "all 0.2s"
+                                    }}
+                                >
+                                    {index + 1}
+                                </button>
+                            )
+                        })}
+                    </div>
+                    <div className='d-flex flex-wrap gap-3 mt-3' style={{ fontSize: "12px", color: "#64748b" }}>
+                        <div className='d-flex align-items-center gap-1'>
+                            <div style={{ width: "12px", height: "12px", backgroundColor: "#ab3500", borderRadius: "3px" }}></div> Answered
+                        </div>
+                        <div className='d-flex align-items-center gap-1'>
+                            <div style={{ width: "12px", height: "12px", backgroundColor: "#f8f9fa", border: "1px solid #dee2e6", borderRadius: "3px" }}></div> Unanswered
+                        </div>
+                        <div className='d-flex align-items-center gap-1'>
+                            <div style={{ width: "12px", height: "12px", backgroundColor: "transparent", border: "1px solid #dee2e6", boxShadow: "0 0 0 2px #0f172b", borderRadius: "3px", margin: "2px" }}></div> Current
                         </div>
                     </div>
                 </div>

@@ -5,6 +5,8 @@ import * as yup from "yup"
 import { showSuccess, showError, showInfo, showConfirm } from '../../utils/toastUtils'
 import API_BASE_URL from '../../utils/api.config'
 import { questionApi } from '../../utils/questionApi'
+import { subjectApi } from '../../utils/subjectApi'
+import Swal from 'sweetalert2'
 
 const QuestionBank = () => {
   const [allQuestions, setAllQuestions] = useState([])
@@ -14,13 +16,13 @@ const QuestionBank = () => {
   const [editingStatus, setEditingStatus] = useState('draft')
   const [subjects, setSubjects] = useState([])
   const [selectedSubject, setSelectedSubject] = useState('')
-  const [isNewSubject, setIsNewSubject] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const formSectionRef = useRef(null)
 
   // Fetch existing subjects and saved questions on component mount
   useEffect(() => {
     fetchAllQuestions()
+    fetchSubjectsList()
   }, [])
 
   // Filter saved questions whenever selectedSubject changes
@@ -34,6 +36,15 @@ const QuestionBank = () => {
       setFilteredSavedQuestions([])
     }
   }, [selectedSubject, allQuestions])
+
+  const fetchSubjectsList = () => {
+    subjectApi.getAllSubjects()
+      .then((response) => {
+        // Populate dropdown strictly with official subjects created by the admin
+        setSubjects(response.subjects || [])
+      })
+      .catch((error) => console.error("Error fetching subjects list:", error))
+  }
 
   const fetchAllQuestions = () => {
     questionApi.getAllQuestions()
@@ -61,23 +72,6 @@ const QuestionBank = () => {
         }))
         
         setAllQuestions(formattedQuestions)
-        
-        // Extract unique subjects
-        const subjectMap = {}
-        questionsArray.forEach(question => {
-          if (!subjectMap[question.subject]) {
-            subjectMap[question.subject] = {
-              name: question.subject,
-              description: question.description,
-              duration: question.duration,
-              marks: question.marks,
-              totalQuestion: question.totalQuestion,
-              score: question.score
-            }
-          }
-        })
-        const uniqueSubjectsArray = Object.values(subjectMap)
-        setSubjects(uniqueSubjectsArray)
       })
       .catch((error) => {
         console.error("Error fetching subjects:", error)
@@ -89,33 +83,15 @@ const QuestionBank = () => {
   const handleSubjectSelect = (subjectName) => {
     setSelectedSubject(subjectName)
     
-    if (subjectName === "new") {
-      setIsNewSubject(true)
-      formik.setValues({
-        subject: "",
-        description: "",
-        marks: '2',
-        duration: "",
-        totalQuestion: "",
-        score: "",
-        questionText: '',
-        optionA: '',
-        optionB: '',
-        optionC: '',
-        optionD: '',
-        correctAnswer: ''
-      })
-      return
-    }
-    
-    setIsNewSubject(false)
     const selectedSubject = subjects.find(s => s.name === subjectName)
+    
     if (selectedSubject) {
       const existingQuestion = allQuestions.find(q => q.subject === subjectName)
       
       formik.setValues({
+        ...formik.values,
         subject: selectedSubject.name,
-        description: selectedSubject.description,
+        description: selectedSubject.description || '',
         marks: String(selectedSubject.marks),
         duration: String(selectedSubject.duration),
         totalQuestion: String(selectedSubject.totalQuestion),
@@ -131,6 +107,14 @@ const QuestionBank = () => {
         optionC: '',
         optionD: '',
         correctAnswer: ''
+      })
+    } else {
+      // Clear specific auto-filled fields if subject is deselected
+      formik.setValues({
+        ...formik.values,
+        subject: '',
+        description: '',
+        duration: ''
       })
     }
   }
@@ -399,28 +383,12 @@ const QuestionBank = () => {
                       {subject.name}
                     </option>
                   ))}
-                  <option value='new'>+ Create New Subject</option>
                 </select>
                 {formik.touched.subject ? <p className='text-danger'>{formik.errors.subject}</p> : ""}
               </label>
 
-              {isNewSubject && (
-                <label className='question-bank__field'>
-                  <span>SUBJECT NAME (NEW)</span>
-                  <input
-                    type='text'
-                    name='subject'
-                    value={formik.values.subject}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    placeholder='Enter new subject name'
-                  />
-                  {formik.touched.subject ? <p className='text-danger'>{formik.errors.subject}</p> : ""}
-                </label>
-              )}
-
               <label className='question-bank__field'>
-                <span>DESCRIPTION {!isNewSubject && formik.values.subject && '(Auto-filled)'}</span>
+                <span>DESCRIPTION</span>
                 <input
                   type='text'
                   name='description'
@@ -428,10 +396,8 @@ const QuestionBank = () => {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   placeholder='Description of the subject'
-                  readOnly={!isNewSubject && !!formik.values.subject}
-                  style={{backgroundColor: !isNewSubject && formik.values.subject ? '#f0f0f0' : '#fff'}}
                 />
-                {formik.touched.subject ? <p className='text-danger'>{formik.errors.description}</p> : ""}
+                {formik.touched.description ? <p className='text-danger'>{formik.errors.description}</p> : ""}
               </label>
 
               <label className='question-bank__field'>
@@ -513,16 +479,14 @@ const QuestionBank = () => {
               </label>
 
               <label className='question-bank__field'>
-                <span>TOTAL QUESTIONS {!isNewSubject && formik.values.subject && '(Auto-filled)'}</span>
+                <span>TOTAL QUESTIONS</span>
                 <input type='number' min='1' name='totalQuestion' placeholder='e.g., 20' value={formik.values.totalQuestion} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                  readOnly={!isNewSubject && !!formik.values.subject}
-                  style={{backgroundColor: !isNewSubject && formik.values.subject ? '#f0f0f0' : '#fff'}}
                 />
                 {formik.touched.totalQuestion ? <p className='text-danger'>{formik.errors.totalQuestion}</p> : ""}
               </label>
 
               <label className='question-bank__field'>
-                <span>TOTAL SCORE {!isNewSubject && formik.values.subject && '(Auto-calculated)'}</span>
+                <span>TOTAL SCORE (Auto-calculated)</span>
                 <input type='number' min='1' name='score' placeholder='e.g., 20' value={formik.values.score}
                   readOnly={true}
                   style={{backgroundColor: '#f0f0f0'}}
@@ -535,7 +499,26 @@ const QuestionBank = () => {
               <button 
                 type='submit' 
                 className='question-bank__button question-bank__button--primary' 
-                disabled={!formik.isValid || isSubmitting}
+                disabled={isSubmitting}
+                onClick={(e) => {
+                  if (subjects.length === 0) {
+                    e.preventDefault();
+                    Swal.fire({
+                      title: 'Subject Required',
+                      text: 'You have to create a subject in the Subjects tab before creating a question.',
+                      icon: 'info',
+                      confirmButtonColor: '#ab3500'
+                    });
+                  } else if (!formik.values.subject) {
+                    e.preventDefault();
+                    Swal.fire({
+                      title: 'Select a Subject',
+                      text: 'Please select a subject from the dropdown to continue.',
+                      icon: 'warning',
+                      confirmButtonColor: '#ab3500'
+                    });
+                  }
+                }}
                 style={{
                   opacity: isSubmitting ? 0.6 : 1,
                   cursor: isSubmitting ? 'not-allowed' : 'pointer',

@@ -78,7 +78,7 @@ const postStudentSignUp = (req, res) => {
                     const token = jsonwebtoken.sign(
                         { id: studentData._id, email: studentData.email, role: userRole }, 
                         process.env.jwtSecretKey, 
-                        { expiresIn: "1h" }
+                        { expiresIn: "24h" }
                     )
                     console.log("Generated token for:", studentData.email)
 
@@ -264,7 +264,7 @@ const postSignin = (req, res) => {
 
             console.log("Login successful for, ", foundStudent.email)
             const userRole = foundStudent.role || "student"
-            const token = jsonwebtoken.sign({id: foundStudent._id, email: foundStudent.email, role: userRole}, process.env.jwtSecretKey, {expiresIn: "1h"})
+            const token = jsonwebtoken.sign({id: foundStudent._id, email: foundStudent.email, role: userRole}, process.env.jwtSecretKey, {expiresIn: "24h"})
 
             // Save the active token to the user document to enforce single-device login
             foundStudent.activeToken = token;

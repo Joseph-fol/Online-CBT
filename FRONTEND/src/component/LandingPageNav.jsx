@@ -46,7 +46,7 @@ const LandingPageNav = () => {
                         <ul className="navbar-nav me-auto gap-3 mb-2 mb-lg-0">
 
                             <li className="nav-item">
-                                <a className="nav-link fw-medium text-black" onClick={()=> navigate("/")}>Home</a>
+                                <a className="nav-link fw-medium text-black" style={{cursor: "pointer"}} onClick={()=> navigate("/")}>Home</a>
                             </li>
                             <li className="nav-item">
                                 <a className="nav-link fw-medium text-black" href="#">About Us</a>
