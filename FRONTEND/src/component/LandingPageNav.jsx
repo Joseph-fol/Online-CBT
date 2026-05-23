@@ -37,26 +37,28 @@ const LandingPageNav = () => {
             >
                 <div className="container-fluid">
                     <a className="navbar-brand fw-bold" onClick={()=> navigate("/")} style={{ cursor: "pointer" }} ><img src={logo} alt="Online CBT Logo" width={30} /> Online CBT</a>
+                    
                     <button className="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="navbar-toggler-icon"></span>
                     </button>
 
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav me-auto gap-3 mb-2 mb-lg-0">
-                            <li className="nav-item">
-                                <a className="nav-link fw-medium text-black" style={{ borderBottom: "2px solid green", paddingBottom: "3px" }} href="#">Platform</a>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link fw-medium text-black" href="#">Security</a>
-                            </li>
 
                             <li className="nav-item">
-                                <a className="nav-link fw-medium text-black" href='#'>Curriculum</a>
+                                <a className="nav-link fw-medium text-black" onClick={()=> navigate("/")}>Home</a>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link fw-medium text-black" href="#">About Us</a>
+                            </li>
+
+                            <li className="nav-item">
+                                <a className="nav-link fw-medium text-black" href='#'>Contact</a>
                             </li>
 
 
                             <li className="nav-item">
-                                <a className="nav-link fw-medium text-black" href='#'>Pricing</a>
+                                <a className="nav-link fw-medium text-black" href='#'>Support</a>
                             </li>
                         </ul>
                         <Link to="/admin/signin">

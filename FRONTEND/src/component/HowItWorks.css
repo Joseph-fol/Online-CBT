@@ -1,6 +1,7 @@
 .how-it-works-wrapper {
     background-color: #f8fafc;
     min-height: 100vh;
+    overflow-x: hidden;
 }
 
 .how-it-works-header {
