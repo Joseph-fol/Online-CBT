@@ -8,6 +8,8 @@ const StudentNavbar = ({ isSidebarOpen, onToggleSidebar }) => {
 
   const handleLogout = () => {
     removeToken()
+    localStorage.removeItem('studentData')
+    localStorage.removeItem('studentResults')
     navigate('/studentSignin')
   }
   return (

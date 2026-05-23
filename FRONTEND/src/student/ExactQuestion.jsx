@@ -5,15 +5,27 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { showError, showConfirm } from '../utils/toastUtils'
 import API_BASE_URL from '../utils/api.config'
+import Swal from 'sweetalert2'
 
 const ExactQuestion = () => {
     const [questionDetail, setQuestionDetail] = useState([])
     const [loading, setLoading] = useState(true)
     const [question, setQuestion] = useState(null)
+    const [hasAttempted, setHasAttempted] = useState(false)
     const navigate = useNavigate()
     const { id } = useParams()
 
     const confirmTest = () => {
+        if (hasAttempted) {
+            Swal.fire({
+                title: 'Exam Already Attempted',
+                text: 'You have already taken this exam and cannot attempt it again.',
+                icon: 'warning',
+                confirmButtonColor: '#ab3500'
+            });
+            return;
+        }
+
         showConfirm("Start Exam?", "Are you sure you want to start this exam? Once started, you cannot change your answers after submission.", "Start", "Cancel")
             .then((result) => {
                 if (result.isConfirmed) {
@@ -29,6 +41,29 @@ const ExactQuestion = () => {
                 setQuestionDetail(response.data)
                 setQuestion(response.data)
                 setLoading(false)
+                
+                // Check if student has already attempted this exam
+                const studentData = localStorage.getItem('studentData')
+                if (studentData) {
+                    Promise.resolve(studentData)
+                        .then(JSON.parse)
+                        .then((parsedData) => {
+                            const email = parsedData.email;
+                            return axios.get(`${API_BASE_URL}/user/exam/student-results?studentEmail=${email}`);
+                        })
+                        .then((res) => {
+                            const pastResults = res.data.results || [];
+                            const attempted = pastResults.some(r => r.subject === response.data.subject);
+                            setHasAttempted(attempted);
+                            setLoading(false);
+                        })
+                        .catch((error) => {
+                            console.error("Eligibility check error:", error);
+                            setLoading(false);
+                        });
+                } else {
+                    setLoading(false)
+                }
             })
 
             .catch((error) => {
@@ -82,7 +117,14 @@ const ExactQuestion = () => {
             </span> </p>
             <hr />
 
-            <button className='btn btn fw-bold' style={{ backgroundColor: "#ab3500", color: "white" }} onClick={confirmTest} >Start Now</button>
+        <button 
+            className='btn btn fw-bold' 
+            style={{ backgroundColor: "#ab3500", color: "white", opacity: loading ? 0.7 : 1 }} 
+            onClick={confirmTest} 
+            disabled={loading}
+        >
+            {loading ? 'Checking Eligibility...' : 'Start Now'}
+        </button>
         </div>
     )
 }

@@ -5,7 +5,6 @@ import * as yup from "yup"
 import { showSuccess, showError, showInfo, showConfirm } from '../../utils/toastUtils'
 import API_BASE_URL from '../../utils/api.config'
 import { questionApi } from '../../utils/questionApi'
-import { subjectApi } from '../../utils/subjectApi'
 
 const QuestionBank = () => {
   const [allQuestions, setAllQuestions] = useState([])
@@ -22,7 +21,6 @@ const QuestionBank = () => {
   // Fetch existing subjects and saved questions on component mount
   useEffect(() => {
     fetchAllQuestions()
-    fetchSubjectsList()
   }, [])
 
   // Filter saved questions whenever selectedSubject changes
@@ -501,19 +499,15 @@ const QuestionBank = () => {
 
             <div className='question-bank__options'>
               <label className='question-bank__field'>
-                <span>MARK (PER QUESTION) {!isNewSubject && formik.values.subject && '(Auto-filled)'}</span>
+                <span>MARK (PER QUESTION)</span>
                 <input type='number' min='1' name='marks' value={formik.values.marks} onChange={formik.handleChange} onBlur={formik.handleBlur}
-                  readOnly={!isNewSubject && !!formik.values.subject}
-                  style={{backgroundColor: !isNewSubject && formik.values.subject ? '#f0f0f0' : '#fff'}}
                 />
                 {formik.touched.marks ? <p className='text-danger'>{formik.errors.marks}</p> : ""}
               </label>
 
               <label className='question-bank__field'>
-                <span>DURATIONS (Minutes) {!isNewSubject && formik.values.subject && '(Auto-filled)'}</span>
+                <span>DURATIONS (Minutes)</span>
                 <input type='number' min='1' name='duration' value={formik.values.duration} placeholder='e.g., 50' onChange={formik.handleChange} onBlur={formik.handleBlur}
-                  readOnly={!isNewSubject && !!formik.values.subject}
-                  style={{backgroundColor: !isNewSubject && formik.values.subject ? '#f0f0f0' : '#fff'}}
                 />
                 {formik.touched.duration ? <p className='text-danger'>{formik.errors.duration}</p> : ""}
               </label>

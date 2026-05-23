@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import axios from 'axios'
 import API_BASE_URL from '../../utils/api.config'
 import { getAuthHeader } from '../../utils/auth'
+import logo from '../../assets/Online-cbt.jpg'
 
 const AdminOverview = () => {
   const [adminName, setAdminName] = useState('Admin')
@@ -79,6 +80,75 @@ const AdminOverview = () => {
     return date.toLocaleDateString()
   }
 
+  const handlePrint = (result) => {
+    const printWindow = window.open('', '_blank')
+    const score = parseFloat(result.score)
+    const statusText = score >= 50 ? 'Pass' : 'Fail'
+    let statusColor = score >= 50 ? '#198754' : '#dc3545'
+
+    const dateTaken = formatDate(result.submittedAt || result.createdAt || result.date)
+    const subject = result.subject || result.subjectName || 'N/A'
+    const studentName = result.studentName || result.studentEmail.split('@')[0]
+    const logoUrl = new URL(logo, window.location.origin).href
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Exam Result - ${studentName} - ${subject}</title>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; max-width: 800px; margin: 0 auto; }
+            .header { text-align: center; border-bottom: 2px solid #ab3500; padding-bottom: 20px; margin-bottom: 30px; }
+            .title { color: #ab3500; margin: 0; font-size: 28px; }
+            .subtitle { margin: 10px 0 0 0; color: #666; font-weight: normal; }
+            .detail-row { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+            .label { font-weight: bold; color: #555; }
+            .value { font-size: 1.1em; }
+            .score-container { text-align: center; margin-top: 40px; padding: 30px; background-color: #f8f9fa; border-radius: 10px; border: 1px solid #e9ecef; }
+            .score-label { font-weight: bold; color: #555; letter-spacing: 2px; }
+            .score { font-size: 4em; font-weight: bold; margin: 10px 0; color: ${statusColor}; }
+            .status { font-size: 1.5em; font-weight: bold; color: ${statusColor}; text-transform: uppercase; }
+            .footer { margin-top: 50px; text-align: center; color: #888; font-size: 0.9em; border-top: 1px solid #eee; padding-top: 20px; }
+            .action-buttons { text-align: right; margin-bottom: 30px; }
+            .btn { padding: 10px 20px; font-weight: 600; cursor: pointer; border-radius: 6px; border: none; font-size: 14px; margin-left: 10px; transition: opacity 0.2s; }
+            .btn:hover { opacity: 0.8; }
+            .btn-print { background-color: #ab3500; color: white; }
+            .btn-close { background-color: #6c757d; color: white; }
+            @media print {
+              body { padding: 0; }
+              .score-container { background-color: #f8f9fa !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              .d-print-none { display: none !important; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="action-buttons d-print-none">
+            <button class="btn btn-close" onclick="window.close()">Close Preview</button>
+            <button class="btn btn-print" onclick="window.print()">Print Result</button>
+          </div>
+          <div class="header">
+            <img src=""title">Online CBT</h1>
+            <h2 class="subtitle">Official Exam Result Statement</h2>
+          </div>
+          <div class="detail-row"><span class="label">Student Name:</span><span class="value">${studentName}</span></div>
+          <div class="detail-row"><span class="label">Email Address:</span><span class="value">${result.studentEmail}</span></div>
+          <div class="detail-row"><span class="label">Date Taken:</span><span class="value">${dateTaken}</span></div>
+          <div class="detail-row"><span class="label">Subject:</span><span class="value">${subject}</span></div>
+          ${result.totalQuestions ? `<div class="detail-row"><span class="label">Total Questions:</span><span class="value">${result.totalQuestions}</span></div>` : ''}
+          ${result.correctAnswers !== undefined ? `<div class="detail-row"><span class="label">Correct Answers:</span><span class="value">${result.correctAnswers}</span></div>` : ''}
+          <div class="score-container">
+            <div class="score-label">FINAL SCORE</div>
+            <div class="score">${result.score}%</div>
+            <div class="status">${statusText}</div>
+          </div>
+          <div class="footer"><p>This is a computer-generated document and does not require a signature.</p><p>Generated on ${new Date().toLocaleString()}</p></div>
+        </body>
+      </html>
+    `)
+    printWindow.document.close()
+    printWindow.focus()
+  }
+
   return (
     <section className='admin-overview'>
       <div className='admin-overview-top-section'>
@@ -127,13 +197,14 @@ const AdminOverview = () => {
                 <th scope="col">SUBJECT</th>
                 <th scope="col">SCORE</th>
                 <th scope="col">TIME SUBMITTED</th>
+                <th scope="col" className="text-center d-print-none">ACTIONS</th>
               </tr>
             </thead>
 
             <tbody>
               {recentActivity.length === 0 ? (
                 <tr>
-                  <td colSpan="4" className="text-center py-3">No recent activity found</td>
+                  <td colSpan="5" className="text-center py-3">No recent activity found</td>
                 </tr>
               ) : (
                 recentActivity.map((activity, index) => (
@@ -144,6 +215,11 @@ const AdminOverview = () => {
                     </td>
                     <td className='fw-medium'>{activity.score}%</td>
                     <td className=''>{formatTimeAgo(activity.submittedAt)}</td>
+                    <td className='text-center d-print-none'>
+                      <button onClick={() => handlePrint(activity)} className='btn btn-sm btn-outline-secondary fw-medium px-2'>
+                        Print
+                      </button>
+                    </td>
                   </tr>
                 ))
               )}
