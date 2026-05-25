@@ -86,7 +86,7 @@ const AdminOverview = () => {
     const statusText = score >= 50 ? 'Pass' : 'Fail'
     let statusColor = score >= 50 ? '#198754' : '#dc3545'
 
-    const dateTaken = formatDate(result.submittedAt || result.createdAt || result.date)
+    const dateTaken = formatTimeAgo(result.submittedAt || result.createdAt || result.date)
     const subject = result.subject || result.subjectName || 'N/A'
     const studentName = result.studentName || result.studentEmail.split('@')[0]
     const logoUrl = new URL(logo, window.location.origin).href
@@ -127,7 +127,8 @@ const AdminOverview = () => {
             <button class="btn btn-print" onclick="window.print()">Print Result</button>
           </div>
           <div class="header">
-            <img src=""title">Online CBT</h1>
+            <img src="${logoUrl}" alt="Logo" style="width: 80px; height: auto; margin-bottom: 15px; border-radius: 8px;" />
+            <h1 class="title">Online CBT</h1>
             <h2 class="subtitle">Official Exam Result Statement</h2>
           </div>
           <div class="detail-row"><span class="label">Student Name:</span><span class="value">${studentName}</span></div>
