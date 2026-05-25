@@ -9,6 +9,8 @@
     color: #d0daf0;
     padding: 1rem 0.85rem;
     z-index: 1100;
+    display: flex;
+    flex-direction: column;
 }
 
 .student-sidebar__brand {

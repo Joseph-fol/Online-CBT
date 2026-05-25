@@ -185,8 +185,17 @@ const LandingPage = () => {
                     </div>
                 </div>
             </section>
-            
-            <LandingPageFooter/>
+
+            <div className="container py-5" data-aos="fade-up">
+                <iframe
+                    src="https://player.mux.com/KLniJTCnN7Na801w166INbOi7dHwba85u3ZI4vK02Nt00o?metadata-video-title=Online+CBT+_+Excel+in+your+academic+career&video-title=Online+CBT+_+Excel+in+your+academic+career"
+                    style={{ width: "100%", border: "none", aspectRatio: "172/91", borderRadius: "16px" }}
+                    allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                    allowFullScreen
+                ></iframe>
+            </div>
+
+            <LandingPageFooter />
         </>
     )
 }

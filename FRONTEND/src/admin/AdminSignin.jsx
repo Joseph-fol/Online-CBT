@@ -176,6 +176,30 @@ const AdminSignin = () => {
                                         <button type="submit" class="btn w-100 py-2 text-black fs-6 fw-bold border border-dark border-1" >CREATE ADMIN ACCOUNT </button>
                                     </Link>
                                 </div>
+
+                                <div>
+                                    <p className='fw-medium lh-0'>Just want to look around? Test the platform instantly without signing up.</p>
+                                    <div className='fw-medium text-left'>Use 
+                                        <p className='d-flex align-items-center gap-2 mb-1'>
+                                            Email: <span className='fw-bold'>admin@demo.com</span>
+                                            <button type="button" className="btn btn-sm btn-light p-1 d-flex align-items-center" onClick={() => {
+                                                navigator.clipboard.writeText('admin@demo.com');
+                                                showSuccess('Email copied!');
+                                            }} title="Copy Email">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 21H8V7h11m0-2H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2m-3-4H4a2 2 0 0 0-2 2v14h2V3h12z"/></svg>
+                                            </button>
+                                        </p>
+                                        <p className='d-flex align-items-center gap-2 mb-1'>
+                                            Password: <span className='fw-bold'>admin1234</span>
+                                            <button type="button" className="btn btn-sm btn-light p-1 d-flex align-items-center" onClick={() => {
+                                                navigator.clipboard.writeText('admin1234');
+                                                showSuccess('Password copied!');
+                                            }} title="Copy Password">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 24 24"><path fill="currentColor" d="M19 21H8V7h11m0-2H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2m-3-4H4a2 2 0 0 0-2 2v14h2V3h12z"/></svg>
+                                            </button>
+                                        </p>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>

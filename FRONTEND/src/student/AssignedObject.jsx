@@ -1,8 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import AssignedObjectCard from './AssignedObjectCard'
-import { useEffect } from 'react'
 import axios from 'axios'
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import API_BASE_URL from '../utils/api.config'
 import { getAuthHeader } from '../utils/auth'
@@ -13,12 +11,29 @@ const AssignedObject = () => {
     const [uniqueSubjects, setUniqueSubjects] = useState([])
 
     useEffect(() => {
-        // Add a cache-busting timestamp parameter to ensure fresh data is fetched every time
-        axios.get(`${API_BASE_URL}/user/getAllQuestions?_t=${Date.now()}`, { headers: getAuthHeader() })
-            .then((response) => {
-                // Safely extract questions, handling different possible backend responses
-                const questionsArray = response.data.questionsArray || response.data.questions || response.data || []
+        // Fetch both questions and active subjects to prevent deleted subjects from appearing
+        Promise.all([
+            axios.get(`${API_BASE_URL}/user/getAllQuestions?_t=${Date.now()}`, { headers: getAuthHeader() }),
+            axios.get(`${API_BASE_URL}/subjects`, { headers: getAuthHeader() }).catch(err => {
+                console.warn("Failed to fetch subjects:", err)
+                return { data: null } // Return null to signal failure
+            })
+        ])
+            .then(([questionsResponse, subjectsResponse]) => {
+                // Safely extract questions
+                const questionsArray = questionsResponse.data.questionsArray || questionsResponse.data.questions || questionsResponse.data || []
                 setQuestions(questionsArray)
+
+                // Safely extract active subjects
+                const activeSubjects = subjectsResponse.data?.subjects
+                const hasSubjectsData = Array.isArray(activeSubjects)
+                
+                const activeSubjectMap = {}
+                if (hasSubjectsData) {
+                    activeSubjects.forEach(s => {
+                        activeSubjectMap[s.name] = s
+                    })
+                }
 
                 if (Array.isArray(questionsArray)) {
                     // Group ONLY published questions by subject (students shouldn't see drafts)
@@ -26,16 +41,21 @@ const AssignedObject = () => {
                     const publishedQuestions = questionsArray.filter(q => q.status === 'published' || !q.status)
 
                     publishedQuestions.forEach(question => {
-                        if (!subjectMap[question.subject]) {
-                            subjectMap[question.subject] = {
-                                subject: question.subject,
-                                description: question.description,
-                                duration: question.duration,
-                                questionCount: 0,
-                                firstQuestionId: question._id || question.id
+                        // If we successfully fetched subjects, ONLY include questions if their subject exists
+                        // If fetching subjects failed, fallback to showing all published questions
+                        if (!hasSubjectsData || activeSubjectMap[question.subject]) {
+                            if (!subjectMap[question.subject]) {
+                                const subjectDetails = hasSubjectsData ? activeSubjectMap[question.subject] : null
+                                subjectMap[question.subject] = {
+                                    subject: question.subject,
+                                    description: subjectDetails?.description || question.description,
+                                    duration: subjectDetails?.duration || question.duration,
+                                    questionCount: 0,
+                                    firstQuestionId: question._id || question.id
+                                }
                             }
+                            subjectMap[question.subject].questionCount += 1
                         }
-                        subjectMap[question.subject].questionCount += 1
                     })
 
                     const uniqueSubjectsArray = Object.values(subjectMap)
