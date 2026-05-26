@@ -30,6 +30,7 @@ const Sidebar = ({ isOpen = false, onNavigate }) => {
           "Content-Type": "application/json",
           "Accept": "application/json"
         },
+
         body: JSON.stringify({
           subject: feedbackTitle,
           email: feedbackEmail,
@@ -45,7 +46,7 @@ const Sidebar = ({ isOpen = false, onNavigate }) => {
         setFeedbackMessage('')
         showSuccess('Thank you for your feedback!')
       } else {
-        throw new Error("Failed to submit to Formspree")
+        throw new Error("Failed to submit to feedback")
       }
     } catch (error) {
       console.error(error)
@@ -70,6 +71,7 @@ const Sidebar = ({ isOpen = false, onNavigate }) => {
             return (
               <NavLink key={item.to} to={item.to} end={item.end} className={({ isActive }) => `admin-sidebar__link ${isActive ? 'is-active' : ''}`
               } onClick={onNavigate} >
+                
                 <Icon className='admin-sidebar__icon' />
                 <span>{item.label}</span>
               </NavLink>

@@ -160,7 +160,6 @@ const LandingPage = () => {
                             </div>
                         </div>
 
-
                         <div className='col-12 col-md-4 h-100' data-aos="slide-up" data-aos-delay="200">
                             <div className='p-4 rounded-4 h-100' style={{ backgroundColor: "#fff7ed" }}>
                                 <div style={{ height: "300px", overflow: "hidden", borderRadius: "16px", marginBottom: "12px" }}>

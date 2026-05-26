@@ -133,13 +133,14 @@ const SigninPage = () => {
                                 </div>
 
                                 <div class="col-12">
-                                    <button type="submit" class="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ background: "#ab3500" }}>{loading ? "Signing in..." : "Signin"}</button>
+                                    <button type="submit" className="btn w-100 py-2 text-white fs-6 fw-bold my-3" disabled={loading} style={{ background: "#ab3500" }}>{loading ? "Signing in..." : "Signin"}</button>
                                 </div>
-                                <span className='text-decoration-none text-center text-black fw-medium d-block'><p>Don't have an account ? </p></span>
+                                <span className='text-decoration-none text-center text-black fw-medium d-block'><p>Don't have student account ? </p></span>
                             </form>
+                            
                             <div class="col-12">
                                 <Link to="/createStudentAccount">
-                                    <button type="submit" class="btn w-100 py-2 text-black fs-6 fw-bold border border-dark border-1" >CREATE ACCOUNT </button>
+                                    <button type="submit" className="btn w-100 py-2 text-black fs-6 fw-bold border border-dark border-1" >CREATE STUDENT ACCOUNT </button>
                                 </Link>
                             </div>
                         </div>

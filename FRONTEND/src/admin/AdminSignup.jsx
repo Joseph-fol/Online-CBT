@@ -32,6 +32,7 @@ const AdminSignup = () => {
                 .then((response) => {
                     console.log("Invitation valid:", response.data)
                 })
+
                 .catch((err) => {
                     console.error("Invalid invitation:", err.response?.data?.message)
                     showErrorModal("Invalid Invitation", "This invitation link is invalid or has expired. Please get a new invitation from an admin.")
@@ -59,53 +60,57 @@ const AdminSignup = () => {
 
             setLoading(true)
             setEmailError("")
+
             axios.post(`${API_BASE_URL}/user/admin/signUp`, {
                 fullName: values.fullName,
                 email: values.email,
                 password: values.password,
                 invitationToken: invitationToken
             })
-            .then((response)=>{
-                setLoading(false)
-                if (response.data.admin) {
-                    localStorage.setItem("adminData", JSON.stringify(response.data.admin))
-                }
-                showSuccess("Admin account created successfully! Redirecting to sign in...")
-                resetForm()
-                setTimeout(() => navigate("/admin/signin"), 2000)
-            })
-            .catch((err) =>{
-                setLoading(false)
-                console.log("Error response:", err.response)
-                console.log("Full error:", err)
-                
-                const errorData = err.response?.data
-                const errorMessage = errorData?.message || err.message || ""
-                const statusCode = err.response?.status
-                
-                // Check for invalid/expired invitation error
-                const isInvalidInvitation = 
-                    statusCode === 403 ||
-                    errorMessage.toLowerCase().includes("invitation")
-                
-                // Check for duplicate email error in various formats
-                const isDuplicateEmail = 
-                    errorMessage.toLowerCase().includes("email") || 
-                    errorMessage.toLowerCase().includes("already exists") ||
-                    errorMessage.toLowerCase().includes("already registered") ||
-                    statusCode === 409 || // Conflict status code
-                    errorData?.error?.toLowerCase().includes("email") ||
-                    (errorData?.errors && errorData.errors.email)
-                
-                if(isInvalidInvitation) {
-                    showError("Invalid or expired invitation. Please get a new invitation link from an admin.")
-                } else if(isDuplicateEmail) {
-                    setEmailError("This email already exists. Please use a different email.")
-                    showError("This email already exists. Please use a different email.")
-                } else {
-                    showError("Signup failed. Please try again.")
-                }
-            })
+
+                .then((response) => {
+                    setLoading(false)
+                    if (response.data.admin) {
+                        localStorage.setItem("adminData", JSON.stringify(response.data.admin))
+                    }
+
+                    showSuccess("Admin account created successfully! Redirecting to sign in...")
+                    resetForm()
+                    setTimeout(() => navigate("/admin/signin"), 2000)
+                })
+
+                .catch((err) => {
+                    setLoading(false)
+                    console.log("Error response:", err.response)
+                    console.log("Full error:", err)
+
+                    const errorData = err.response?.data
+                    const errorMessage = errorData?.message || err.message || ""
+                    const statusCode = err.response?.status
+
+                    // Check for invalid/expired invitation error
+                    const isInvalidInvitation =
+                        statusCode === 403 ||
+                        errorMessage.toLowerCase().includes("invitation")
+
+                    // Check for duplicate email error in various formats
+                    const isDuplicateEmail =
+                        errorMessage.toLowerCase().includes("email") ||
+                        errorMessage.toLowerCase().includes("already exists") ||
+                        errorMessage.toLowerCase().includes("already registered") ||
+                        statusCode === 409 || // Conflict status code
+                        errorData?.error?.toLowerCase().includes("email") ||
+                        (errorData?.errors && errorData.errors.email)
+
+                    if (isInvalidInvitation) {
+                        showError("Invalid or expired invitation. Please get a new invitation link from an admin.")
+                    } else if (isDuplicateEmail) {
+                        setEmailError("This email already exists. Please use a different email.")
+                        showError("This email already exists. Please use a different email.")
+                    } else {
+                        showError("Signup failed. Please try again.")
+                    }
+                })
         },
 
         validationSchema: yup.object({
@@ -139,7 +144,7 @@ const AdminSignup = () => {
                             }}></div>
 
                             <div style={{ position: 'relative', zIndex: 1 }}>
-                                <h4 className='fw-bold mt-4' onClick={()=> navigate("/")} style={{cursor:"pointer"}}> Online CBT</h4>
+                                <h4 className='fw-bold mt-4' onClick={() => navigate("/")} style={{ cursor: "pointer" }}> Online CBT</h4>
                                 <div className='mt-5 pt-5'>
                                     <h1 className='fw-bold' style={{ fontSize: "45px" }}>Orchestrate Academic Excellence.</h1>
                                     <p className='fw-medium fs-6'>Manage dynamic question banks, deploy tamper-proof assessments, and generate real-time performance analytics from your centralized command center.</p>
@@ -151,11 +156,9 @@ const AdminSignup = () => {
                             <form className="row g-3" onSubmit={form.handleSubmit}>
                                 <div className='d-flex justify-content-between'>
                                     <h4 className='fw-bold py-0'>Create Admin Account</h4>
-                                    <Link>
-                                        <button type="button" className='btn' onClick={()=> navigate(-1)}>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="#062164" d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42a.996.996 0 0 0-1.41 0l-6.59 6.59a.996.996 0 0 0 0 1.41l6.59 6.59a.996.996 0 1 0 1.41-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1" /></svg>
-                                        </button>
-                                    </Link>
+                                    <button type="button" className='btn' onClick={() => navigate(-1)}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="#062164" d="M19 11H7.83l4.88-4.88c.39-.39.39-1.03 0-1.42a.996.996 0 0 0-1.41 0l-6.59 6.59a.996.996 0 0 0 0 1.41l6.59 6.59a.996.996 0 1 0 1.41-1.41L7.83 13H19c.55 0 1-.45 1-1s-.45-1-1-1" /></svg>
+                                    </button>
                                 </div>
 
                                 <p className='fw-medium'>Please enter your admin credentials to create your account.</p>
@@ -179,7 +182,9 @@ const AdminSignup = () => {
                                     <div className='input-group border border-0 border-dark bg-white shadow-none rounded-2'>
                                         <input type={show ? "text" : "password"} className="form form-control border-0 text-black rounded-0 py-3 shadow-none" style={{ backgroundColor: "#e1e3e4" }} name='password' value={form.values.password} onChange={form.handleChange} onBlur={form.handleBlur} id="adminPassword" placeholder='Enter your password' />
 
-                                        <div className='border-0 fw-medium px-2 pt-3' style={{ backgroundColor: "#e1e3e4", fontSize: "13px", cursor: "pointer" }} onClick={handleClick}>{show ? "Hide" : "Show"} </div>
+                                        <div className='border-0 fw-medium px-2 pt-3' style={{ backgroundColor: "#e1e3e4", fontSize: "13px", cursor: "pointer" }} onClick={handleClick}>
+                                            {show ? "Hide" : "Show"}
+                                        </div>
                                     </div>
                                     {form.touched.password && form.errors.password ? <p className='text-danger'>{form.errors.password}</p> : ""}
                                 </div>
@@ -188,7 +193,7 @@ const AdminSignup = () => {
                                     <button type="submit" className="btn w-100 py-2 text-white fs-6 fw-bold my-3" style={{ background: "#ab3500" }}>{loading ? "Creating account..." : "Create Admin Account"}</button>
                                 </div>
 
-                                <p className='text-decoration-none text-center text-black fw-medium'>Already have an account?</p>
+                                <p className='text-decoration-none text-center text-black fw-medium'>Already have an admin account?</p>
                             </form>
 
                             <div className="col-12">

@@ -138,7 +138,7 @@ const ActiveQuizView = () => {
         // 1 minute warning
         if (timeLeft === 60) {
             Swal.fire({
-                title: '⏰ 1 Minute Left!',
+                title: '1 Minute Left!',
                 text: 'Only 1 minute remaining! You must submit soon.',
                 icon: 'warning',
                 iconColor: '#ef4444',
@@ -198,7 +198,7 @@ const ActiveQuizView = () => {
 
             // Get student email from stored student data or localStorage
             let studentEmail = '';
-            
+
             // First try to get from studentData (more reliable)
             const studentData = localStorage.getItem('studentData');
             if (studentData) {
@@ -210,7 +210,7 @@ const ActiveQuizView = () => {
                     console.error("Error parsing studentData:", error);
                 }
             }
-            
+
             // Fallback: decode JWT token if studentData not available
             if (!studentEmail) {
                 const jwtToken = localStorage.getItem('token');
@@ -244,16 +244,16 @@ const ActiveQuizView = () => {
             };
 
             console.log("Sending exam result data:", examResultData);
-            console.log("✓ studentEmail:", studentEmail ? "✅ " + studentEmail : "❌ EMPTY");
-            console.log("✓ subject:", subject ? "✅ " + subject : "❌ EMPTY");
-            console.log("✓ totalQuestions:", questions.length ? "✅ " + questions.length : "❌ EMPTY");
-            console.log("✓ correctAnswers:", correct !== undefined ? "✅ " + correct : "❌ EMPTY");
+            console.log("✓ studentEmail:", studentEmail ? "ACTIVE" + studentEmail : "EMPTY");
+            console.log("✓ subject:", subject ? "ACTIVE" + subject : "EMPTY");
+            console.log("✓ totalQuestions:", questions.length ? "ACTIVE" + questions.length : "EMPTY");
+            console.log("✓ correctAnswers:", correct !== undefined ? "ACTIVE" + correct : "EMPTY");
             console.log("Auth headers:", getAuthHeader());
 
             // Save exam result to database
             axios.post(`${API_BASE_URL}/user/exam/save-result`, examResultData, { headers: getAuthHeader() })
                 .then((response) => {
-                    console.log("✅ Exam result saved successfully!");
+                    console.log("Exam result saved successfully!");
                     console.log("Response data:", response.data);
 
                     // Set the exam as submitted and display results
@@ -297,10 +297,10 @@ const ActiveQuizView = () => {
                     console.error("Full error:", error);
 
                     // Get error message from backend
-                    const backendMessage = error.response?.data?.message || 
-                                         error.response?.data?.error ||
-                                         error.message || 
-                                         'Failed to save exam result';
+                    const backendMessage = error.response?.data?.message ||
+                        error.response?.data?.error ||
+                        error.message ||
+                        'Failed to save exam result';
 
                     // Still show results but show a warning about database save
                     Swal.fire({
@@ -424,9 +424,9 @@ const ActiveQuizView = () => {
                     </div>
 
                     <div className='alert alert-danger fw-bold px-4 py-2 fs-sm-5 text-center justify-content-center align-items-center gap-2 ' style={{ backgroundColor: getTimerBgColor(), borderColor: getTimerColor(), borderWidth: '2px', color: getTimerColor() }}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill={getTimerColor()} d="M12 20a8 8 0 0 0 8-8a8 8 0 0 0-8-8a8 8 0 0 0-8 8a8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10a10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67l-.75 1.23L11 13V7z" /></svg> 
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill={getTimerColor()} d="M12 20a8 8 0 0 0 8-8a8 8 0 0 0-8-8a8 8 0 0 0-8 8a8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10a10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67l-.75 1.23L11 13V7z" /></svg>
                         <span>{formatTime(timeLeft)}</span>
-                        {timeLeft && timeLeft <= 300 && <span style={{ marginLeft: '0.5rem', fontSize: '0.9em' }}>⚠️ Hurry!</span>}
+                        {timeLeft && timeLeft <= 300 && <span style={{ marginLeft: '0.5rem', fontSize: '0.9em' }}>Hurry!</span>}
                         {!timerActive && timeLeft === 0 && <span style={{ marginLeft: '0.5rem', fontSize: '0.9em' }}>TIME EXPIRED</span>}
                     </div>
                 </div>
@@ -638,6 +638,7 @@ const ActiveQuizView = () => {
                             )
                         })}
                     </div>
+
                     <div className='d-flex flex-wrap gap-3 mt-3' style={{ fontSize: "12px", color: "#64748b" }}>
                         <div className='d-flex align-items-center gap-1'>
                             <div style={{ width: "12px", height: "12px", backgroundColor: "#ab3500", borderRadius: "3px" }}></div> Answered
