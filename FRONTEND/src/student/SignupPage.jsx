@@ -36,10 +36,10 @@ const SignupPage = () => {
         onSubmit: (values, { resetForm }) => {
             setLoading(true)
             setEmailError("")
+            
             axios.post(`${API_BASE_URL}/user/signUp`, values)
             .then((response)=>{
                 setLoading(false)
-                // Store token if provided
                 if (response.data.token) {
                     setToken(response.data.token)
                 }
@@ -61,7 +61,7 @@ const SignupPage = () => {
                     errorMessage.toLowerCase().includes("email") || 
                     errorMessage.toLowerCase().includes("already exists") ||
                     errorMessage.toLowerCase().includes("already registered") ||
-                    statusCode === 409 || // Conflict status code
+                    statusCode === 409 || 
                     errorData?.error?.toLowerCase().includes("email") ||
                     (errorData?.errors && errorData.errors.email)
                 

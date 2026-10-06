@@ -4,7 +4,7 @@ import AssignedObject from './AssignedObject'
 import { Link } from 'react-router-dom'
 
 const StudentDashboard = () => {
-    const [studentName, setStudentName] = useState('SCHOLAR')
+    const [studentName, setStudentName] = useState('SCHOLAR')    
 
     useEffect(() => {
         const studentData = localStorage.getItem('studentData')

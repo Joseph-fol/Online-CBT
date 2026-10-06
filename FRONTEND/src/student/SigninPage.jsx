@@ -41,7 +41,7 @@ const SigninPage = () => {
                 // Store token in localStorage
                 if (data.token) {
                     setToken(data.token)
-                    console.log("Token stored in localStorage")
+                    // console.log("Token stored in localStorage")
                 }
                 
                 // Store student info if provided

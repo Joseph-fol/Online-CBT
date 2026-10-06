@@ -6,10 +6,7 @@ const { sendWelcomeEmail, sendAdminInvitationEmail } = require("../utils/emailSe
 const {postStudentSignUp, getStudentSignUp, postAdminSignUp, getStudentSignin, getDashboard, postSignin, postAdminSignin, adminSignin, addQuestion, getAllQuestions, getQuestionById, getQuestionBySubject, updateQuestion, deleteQuestion, getDashboardStats, createAdminInvitation, validateInvitation, getPendingInvitations, revokeInvitation, saveExamResult, getStudentExamResults, getAllExamResults} = require("../controllers/user.controller")
 
 // Email Configuration Check Endpoint
-router.get("/test-email-config", (req, res) => {
-    console.log("\n EMAIL CONFIGURATION CHECK");
-    console.log("================================");
-    
+router.get("/test-email-config", (req, res) => {    
     const config = {
         EMAIL_USER: process.env.EMAIL_USER ? "SET" : "NOT SET",
         EMAIL_PASSWORD: process.env.EMAIL_PASSWORD ? "SET" : "NOT SET",

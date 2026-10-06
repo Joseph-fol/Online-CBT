@@ -131,6 +131,7 @@ const ResultAndHistory = () => {
                                             <td className='fw-medium' style={{ color: "#475569" }}>
                                                 {formatDate(result.submittedAt)}
                                             </td>
+                                            
                                             <td>
                                                 <span className='fw-bold' style={{ color: "#0f172a" }}>
                                                     {result.subject.charAt(0).toUpperCase() + result.subject.slice(1)}

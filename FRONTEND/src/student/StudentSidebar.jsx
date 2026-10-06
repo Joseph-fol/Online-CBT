@@ -22,6 +22,7 @@ const StudentSidebar = ({ isOpen = false, onNavigate }) => {
           "Content-Type": "application/json",
           "Accept": "application/json"
         },
+
         body: JSON.stringify({
           subject: feedbackTitle,
           email: feedbackEmail,
@@ -37,7 +38,7 @@ const StudentSidebar = ({ isOpen = false, onNavigate }) => {
         setFeedbackMessage('')
         showSuccess('Thank you for your feedback!')
       } else {
-        throw new Error("Failed to submit to Formspree")
+        throw new Error("Failed to submit form")
       }
     } catch (error) {
       console.error(error)

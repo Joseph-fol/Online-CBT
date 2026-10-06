@@ -24,14 +24,8 @@ const adminSignin = (req, res) => {
 
 const postStudentSignUp = (req, res) => {
     const { fullName, email, password } = req.body
-
-    console.log("\n📝 STUDENT SIGNUP ATTEMPT");
-    console.log("=============================");
-    console.log("Email:", email);
-    console.log("Full Name:", fullName);
     console.log("Resend API Key available:", !!process.env.RESEND_API_KEY);
 
-    // Check if user already exists
     student.findOne({ email: req.body.email })
         .then((userExists) => {
             if (userExists) {
@@ -294,8 +288,6 @@ const postSignin = (req, res) => {
 const postAdminSignin = (req, res) => {
     const { email, password } = req.body
     console.log("Admin signin attempt with email:", email)
-    console.log("Searching for admin with email and role admin...")
-    console.log("Attempting MongoDB query...")
     
     student.findOne({ email: email, role: "admin" })
         .then((foundAdmin) => {
@@ -358,11 +350,6 @@ const postAdminSignin = (req, res) => {
         })
 
         .catch((err) => {
-            console.error("Error during admin signin");
-            console.error("Error type:", err.name);
-            console.error("Error message:", err.message);
-            console.error("Error code:", err.code);
-            console.error("Full error:", err);
             
             // Provide specific error messages
             let errorMessage = "Internal server error";
@@ -397,11 +384,7 @@ const addQuestion = (req, res) => {
             message: "Admin email not found in token. Please sign in again."
         })
     }
-    
-    // If subject is provided as string (name), we need to either:
-    // 1. Store it as is, or
-    // 2. Look it up in Subject collection to get the ID
-    // For now, we'll create the question with the subject name
+
     Question.create({
         subject,  // Store subject name for now
         adminEmail,  // Store the admin's email
@@ -579,12 +562,9 @@ const updateQuestion = (req, res) => {
             }
 
             // Update the question
-            return Question.findByIdAndUpdate(
-                id,
-                updateData,
-                { new: true }
-            )
+            return Question.findByIdAndUpdate(id, updateData, { new: true })
         })
+
         .then((updatedQuestion) => {
             if (!updatedQuestion) {
                 return res.status(404).json({
@@ -631,6 +611,7 @@ const deleteQuestion = (req, res) => {
             // Delete the question
             return Question.findByIdAndDelete(id)
         })
+        
         .then((deletedQuestion) => {
             if (!deletedQuestion) {
                 return res.status(404).json({
